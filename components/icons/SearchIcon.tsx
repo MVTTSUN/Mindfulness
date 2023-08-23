@@ -22,7 +22,7 @@ export function SearchIcon() {
 
 const ViewStyled = styled.View`
   position: absolute;
-  top: 9px;
+  top: 15px;
   left: 15px;
   width: 14px;
   height: 14px;

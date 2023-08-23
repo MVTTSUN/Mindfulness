@@ -13,6 +13,7 @@ const DARK_THEME = {
   },
   borderColor: {
     meditationCard: "#313131",
+    searchOutline: "#000",
   },
 };
 
@@ -31,6 +32,7 @@ const LIGHT_THEME = {
   },
   borderColor: {
     meditationCard: "#e8e7eb",
+    searchOutline: "#f5f4fa",
   },
 };
 
@@ -122,9 +124,9 @@ const MEDITATIONS_DATA = [
     title: "Sleep Token",
     artist: "Mindfulness",
     artwork: require("./assets/images/audio-player-image.png"),
-    url: require("./assets/audios/Sleep_Token_-_The_Offering.mp3"),
+    url: require("./assets/audios/Sleep_Token_-_The_Apparition.mp3"),
     kind: "Стресс",
-    duration: 349,
+    duration: 268,
   },
   {
     id: 6,

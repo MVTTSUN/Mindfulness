@@ -22,7 +22,7 @@ export function LikeIcon({ isActive }: { isActive: boolean }) {
 }
 
 const ViewStyled = styled.View`
-  transform: translateY(-5px);
+  transform: translateY(0);
   width: 24px;
   height: 24px;
 `;

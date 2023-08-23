@@ -1,12 +1,17 @@
 import { StatusBar } from "expo-status-bar";
 import { NavigationContainer } from "@react-navigation/native";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { ThemeProvider, styled } from "styled-components/native";
-import { DARK_THEME, LIGHT_THEME } from "./const";
+import { DARK_THEME, LIGHT_THEME, MEDITATIONS_DATA } from "./const";
 import { useAppSelector } from "./hooks/useAppSelector";
 import { TabNavigator } from "./components/TabNavigator";
+import TrackPlayer, {
+  AppKilledPlaybackBehavior,
+} from "react-native-track-player";
+import { useAppDispatch } from "./hooks/useAppDispatch";
+import { init } from "./store/initializePlayerSlice";
 
 SplashScreen.preventAutoHideAsync();
 

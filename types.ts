@@ -1,4 +1,3 @@
-import { AVPlaybackSource } from "expo-av";
 import store from "./store/store";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
@@ -37,6 +36,11 @@ type MeditationData = {
   duration: number;
 };
 
+type Like = {
+  id: number;
+  isLike: boolean;
+};
+
 export {
   RootState,
   AppDispatch,
@@ -44,4 +48,5 @@ export {
   OptionData,
   MeditationData,
   MainCard,
+  Like,
 };

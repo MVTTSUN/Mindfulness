@@ -5,6 +5,7 @@ const initialState = {
   meditations: MEDITATIONS_DATA,
   meditationsFiltered: MEDITATIONS_DATA,
   meditationsSearched: MEDITATIONS_DATA,
+  meditationsLike: MEDITATIONS_DATA,
 };
 
 export const meditationsSlice = createSlice({
@@ -24,13 +25,24 @@ export const meditationsSlice = createSlice({
         : (state.meditationsSearched = state.meditations.filter((meditation) =>
             meditation.title
               .toLowerCase()
-              .match(RegExp(`^${action.payload.trim()}`, "i"))
+              .split(" ")
+              .some((el) => el.match(RegExp(`^${action.payload.trim()}`, "i")))
+          ));
+    },
+    likeMeditations(state, action) {
+      action.payload === null
+        ? (state.meditationsLike = state.meditations)
+        : (state.meditationsLike = state.meditations.filter((meditation) =>
+            action.payload.some(
+              (like: { id: number; isLike: boolean }) =>
+                like.id === meditation.id
+            )
           ));
     },
   },
 });
 
-export const { filterMeditations, searchMeditations } =
+export const { filterMeditations, searchMeditations, likeMeditations } =
   meditationsSlice.actions;
 
 export default meditationsSlice.reducer;

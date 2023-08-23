@@ -12,16 +12,22 @@ import {
   REGISTER,
 } from "redux-persist";
 import meditationsReducer from "./meditationsSlice";
+import initializePlayerReducer from "./initializePlayerSlice";
+import likesReducer from "./likesSlice";
+import lastMeditationReducer from "./lastMeditationSlice";
 
 const rootReducer = combineReducers({
   theme: themeReducer,
   meditations: meditationsReducer,
+  initializePlayer: initializePlayerReducer,
+  likes: likesReducer,
+  lastMeditation: lastMeditationReducer,
 });
 
 const persistConfig = {
   key: "root",
   storage: AsyncStorage,
-  whitelist: ["theme"],
+  whitelist: ["theme", "initializePlayer", "likes", "lastMeditation"],
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

@@ -9,4 +9,8 @@ module.exports = async function () {
   TrackPlayer.addEventListener(Event.RemotePrevious, () =>
     TrackPlayer.skipToPrevious()
   );
+  TrackPlayer.addEventListener(Event.RemoteLike, () => TrackPlayer.getRate());
+  TrackPlayer.addEventListener(Event.RemoteDislike, () =>
+    TrackPlayer.getRate()
+  );
 };

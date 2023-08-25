@@ -12,14 +12,14 @@ import {
   REGISTER,
 } from "redux-persist";
 import meditationsReducer from "./meditationsSlice";
-import initializePlayerReducer from "./initializePlayerSlice";
+import trackPlayerReducer from "./trackPlayerSlice";
 import likesReducer from "./likesSlice";
 import lastMeditationReducer from "./lastMeditationSlice";
 
 const rootReducer = combineReducers({
   theme: themeReducer,
   meditations: meditationsReducer,
-  initializePlayer: initializePlayerReducer,
+  trackPlayer: trackPlayerReducer,
   likes: likesReducer,
   lastMeditation: lastMeditationReducer,
 });
@@ -27,7 +27,7 @@ const rootReducer = combineReducers({
 const persistConfig = {
   key: "root",
   storage: AsyncStorage,
-  whitelist: ["theme", "initializePlayer", "likes", "lastMeditation"],
+  whitelist: ["theme", "trackPlayer", "likes", "lastMeditation"],
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

@@ -1,5 +1,5 @@
 import { styled } from "styled-components/native";
-import { HomeScreenProp } from "../../types";
+import { MeditationScreenProp } from "../../types";
 import { TouchableCardMeditation } from "./Touchables/TouchableCardMeditation";
 import {
   useFocusEffect,
@@ -32,7 +32,7 @@ export function CardListMeditation({ count }: CardListMeditationProps) {
   const [meditations, setMeditations] = useState(
     meditationFiltered.slice(0, count)
   );
-  const navigation = useNavigation<HomeScreenProp>();
+  const navigation = useNavigation<MeditationScreenProp>();
   const dispatch = useAppDispatch();
 
   const seeAll = () => {

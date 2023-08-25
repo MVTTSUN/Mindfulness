@@ -1,31 +1,32 @@
 import { Pressable } from "react-native";
 import { GlobalScreen } from "../../components/GlobalScreen";
 import { CenterContainer } from "../../components/CenterContainer";
-import { BackIcon } from "../../components/icons/BackIcon";
 import { styled } from "styled-components/native";
 import { TextIcon } from "../../components/icons/TextIcon";
 import { PlayerImages } from "../../components/icons/PlayerImage";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { MeditationData } from "../../types";
+import { MeditationScreenProp, MeditationData } from "../../types";
 import { LikeIcon } from "../../components/icons/LikeIcon";
 import { AudioPlayer } from "../../components/ui/AudioPlayer";
 import { useAppSelector } from "../../hooks/useAppSelector";
 import { useAppDispatch } from "../../hooks/useAppDispatch";
 import TrackPlayer, {
   AppKilledPlaybackBehavior,
+  Capability,
 } from "react-native-track-player";
-import { init } from "../../store/initializePlayerSlice";
+import { init } from "../../store/trackPlayerSlice";
 import { MEDITATIONS_DATA } from "../../const";
 import { useEffect, useState } from "react";
 import { addLike, removeLike } from "../../store/likesSlice";
+import { TopWithBack } from "../../components/ui/TopWithBack";
 
 export function Audio() {
-  const navigation = useNavigation();
+  const navigation = useNavigation<MeditationScreenProp>();
   const route = useRoute();
   const { meditation } = route.params as { meditation: MeditationData };
   const [isActive, setIsActive] = useState(false);
   const isInitialized = useAppSelector(
-    (state) => state.initializePlayer.isInitialized
+    (state) => state.trackPlayer.isInitialized
   );
   const likes = useAppSelector((state) => state.likes.likes);
   const dispatch = useAppDispatch();
@@ -45,8 +46,16 @@ export function Audio() {
         appKilledPlaybackBehavior:
           AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification,
       },
+      capabilities: [
+        Capability.Play,
+        Capability.Pause,
+        Capability.Stop,
+        // Capability.Like,
+        // Capability.Dislike,
+        // Capability.Like,
+      ],
     });
-    await TrackPlayer.add(MEDITATIONS_DATA);
+    // await TrackPlayer.add(MEDITATIONS_DATA);
     dispatch(init(true));
   };
 
@@ -63,12 +72,13 @@ export function Audio() {
   return (
     <GlobalScreen>
       <CenterContainer>
-        <TopView>
-          <Pressable onPress={() => navigation.goBack()}>
-            <BackIcon />
+        <TopWithBack>
+          <Pressable
+            onPress={() => navigation.navigate("Text", { meditation })}
+          >
+            <TextIcon />
           </Pressable>
-          <TextIcon />
-        </TopView>
+        </TopWithBack>
         <PlayerImages />
         <TitleAndLikeView>
           <TextAudio>{meditation.title}</TextAudio>
@@ -81,13 +91,6 @@ export function Audio() {
     </GlobalScreen>
   );
 }
-
-const TopView = styled.View`
-  margin-bottom: 40px;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-`;
 
 const TextAudio = styled.Text`
   font-family: "Poppins-Medium";

@@ -1,56 +1,83 @@
 import { styled } from "styled-components/native";
 import { PlayIcon } from "../icons/PlayIcon";
 import TrackPlayer, {
+  Event,
   State,
   usePlaybackState,
-  useProgress,
+  useTrackPlayerEvents,
 } from "react-native-track-player";
 import { Slider } from "@miblanchard/react-native-slider";
 import { useAppSelector } from "../../hooks/useAppSelector";
 import { memo, useEffect, useState } from "react";
 import { PauseIcon } from "../icons/PauseIcon";
 import { useAppDispatch } from "../../hooks/useAppDispatch";
-import { init } from "../../store/initializePlayerSlice";
+import { init, setLastMeditationId } from "../../store/trackPlayerSlice";
+import { Animated, Easing } from "react-native";
+import { LoaderIcon } from "../icons/LoaderIcon";
+import { MEDITATIONS_DATA } from "../../const";
 
 export const AudioPlayer = memo(
   ({ id, duration }: { id: number; duration: number }) => {
     const [isCurrentAudio, setIsCurrentAudio] = useState(false);
     const playbackState = usePlaybackState();
-    const progress = useProgress();
     const theme = useAppSelector((state) => state.theme.value);
     const dispatch = useAppDispatch();
+    const spinValue = new Animated.Value(0);
+    const [position, setPosition] = useState(0);
+    let positionInterval: NodeJS.Timer;
+    const rotate = spinValue.interpolate({
+      inputRange: [0, 1],
+      outputRange: ["0deg", "360deg"],
+    });
+
+    const spin = () => {
+      spinValue.setValue(0);
+      Animated.timing(spinValue, {
+        toValue: 1,
+        duration: 1200,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      }).start(() => spin());
+    };
 
     const togglePlayAudio = async () => {
-      const currentAudio = await TrackPlayer.getCurrentTrack();
+      const currentAudio = await TrackPlayer.getTrack(0);
 
-      if (currentAudio !== id - 1) {
-        await TrackPlayer.skip(id - 1);
+      if (currentAudio?.id !== id) {
+        await TrackPlayer.reset();
+        await TrackPlayer.add([MEDITATIONS_DATA[id - 1]]);
         await TrackPlayer.play();
         setIsCurrentAudio(true);
+        dispatch(setLastMeditationId(id));
       }
 
-      if (currentAudio === id - 1 && currentAudio !== null) {
+      if (currentAudio?.id === id && currentAudio?.id !== null) {
         if (playbackState === State.Paused || playbackState === State.Ready) {
           await TrackPlayer.play();
           setIsCurrentAudio(true);
+          dispatch(setLastMeditationId(id));
         } else if (playbackState === State.Playing) {
           await TrackPlayer.pause();
         }
       }
     };
 
-    const changeValue = (e: number[]) => {
-      setTimeout(() => {
-        TrackPlayer.seekTo(e[0]);
-      }, 400);
+    const startInterval = () => {
+      positionInterval = setInterval(async () => {
+        const asyncPosition = await TrackPlayer.getPosition();
+        setPosition(asyncPosition);
+      }, 500);
+    };
+
+    const changeValue = async (e: number[]) => {
+      setPosition(e[0]);
+      await TrackPlayer.seekTo(e[0]);
     };
 
     const currentAudio = async () => {
       try {
-        const currentAudio = await TrackPlayer.getCurrentTrack();
-        console.log(currentAudio);
-        console.log(playbackState);
-        if (currentAudio === id - 1) {
+        const currentAudio = await TrackPlayer.getTrack(0);
+        if (currentAudio?.id === id) {
           setIsCurrentAudio(true);
         } else {
           setIsCurrentAudio(false);
@@ -60,18 +87,28 @@ export const AudioPlayer = memo(
       }
     };
 
+    useTrackPlayerEvents([Event.PlaybackQueueEnded], async () => {
+      await TrackPlayer.reset();
+      await TrackPlayer.add([MEDITATIONS_DATA[id - 1]]);
+    });
+
     useEffect(() => {
       currentAudio();
+      startInterval();
+
+      return () => {
+        clearInterval(positionInterval);
+      };
     }, []);
+
+    spin();
 
     return (
       <ViewContainer>
         <Slider
-          animationType="timing"
-          animateTransitions
           disabled={!isCurrentAudio}
-          value={isCurrentAudio ? progress.position : 0}
-          onValueChange={(e) => changeValue(e)}
+          value={isCurrentAudio ? position : 0}
+          onSlidingComplete={changeValue}
           maximumValue={duration}
           thumbStyle={{
             width: 13,
@@ -94,26 +131,40 @@ export const AudioPlayer = memo(
         <ContainerTime>
           <InfoTime>
             {isCurrentAudio
-              ? Math.floor(progress.position / 60) +
-                ":" +
-                (progress.position % 60 < 9
-                  ? "0" + Math.ceil(progress.position % 60)
-                  : Math.ceil(progress.position % 60))
-              : "0:00"}
+              ? new Date(position * 1000).toISOString().slice(14, 19)
+              : "00:00"}
           </InfoTime>
           <InfoTime>
-            {Math.floor(duration / 60)}:
-            {duration % 60 < 9 ? "0" + (duration % 60) : duration % 60}
+            {new Date(duration * 1000).toISOString().slice(14, 19)}
           </InfoTime>
         </ContainerTime>
         <Controls>
-          <PlayButton onPress={togglePlayAudio} underlayColor={"#b5f2ea"}>
-            {isCurrentAudio && playbackState === State.Playing ? (
+          {isCurrentAudio && playbackState === State.Playing && (
+            <PlayButton onPress={togglePlayAudio} underlayColor={"#b5f2ea"}>
               <PauseIcon />
-            ) : (
+            </PlayButton>
+          )}
+          {(playbackState === State.Paused ||
+            playbackState === State.Ready ||
+            playbackState === State.Stopped ||
+            !isCurrentAudio) && (
+            <PlayButton onPress={togglePlayAudio} underlayColor={"#b5f2ea"}>
               <PlayIcon size="32px" />
+            </PlayButton>
+          )}
+          {isCurrentAudio &&
+            (playbackState === State.Buffering ||
+              playbackState === State.Connecting) && (
+              <PlayButton>
+                <Animated.View
+                  style={{
+                    transform: [{ rotate }],
+                  }}
+                >
+                  <LoaderIcon />
+                </Animated.View>
+              </PlayButton>
             )}
-          </PlayButton>
         </Controls>
       </ViewContainer>
     );

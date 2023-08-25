@@ -5,7 +5,9 @@ type RootState = ReturnType<typeof store.getState>;
 
 type AppDispatch = typeof store.dispatch;
 
-type HomeScreenProp = NativeStackNavigationProp<{
+type MeditationScreenProp = NativeStackNavigationProp<{
+  Tips: undefined;
+  Text: undefined | { meditation: MeditationData };
   Audio: undefined | { meditation: MeditationData };
   Meditation: undefined;
   MeditationStack:
@@ -14,6 +16,11 @@ type HomeScreenProp = NativeStackNavigationProp<{
         screen: string;
         params: { screen: string; meditation: MeditationData };
       };
+}>;
+
+type InfoAndSettingsScreenProp = NativeStackNavigationProp<{
+  InfoAndSettings: undefined;
+  InfoAndSettingsStack: undefined;
 }>;
 
 type MainCard = {
@@ -28,12 +35,19 @@ type OptionData = {
   isActive: boolean;
 };
 
+type Text = {
+  timeAt: number;
+  timeTo: number;
+  text: string;
+};
+
 type MeditationData = {
   id: number;
   title: string;
   url: string;
   kind: string;
   duration: number;
+  textLines: Text[];
 };
 
 type Like = {
@@ -44,9 +58,10 @@ type Like = {
 export {
   RootState,
   AppDispatch,
-  HomeScreenProp,
+  MeditationScreenProp,
   OptionData,
   MeditationData,
   MainCard,
   Like,
+  InfoAndSettingsScreenProp,
 };

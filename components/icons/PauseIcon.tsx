@@ -1,9 +1,13 @@
 import { Path, Svg } from "react-native-svg";
 import styled from "styled-components/native";
 
-export function PauseIcon() {
+type PlayIconProps = {
+  size?: string;
+};
+
+export function PauseIcon({ size }: PlayIconProps) {
   return (
-    <ViewStyled>
+    <ViewStyled $size={size}>
       <Svg viewBox="0 0 24 24" fill="none">
         <Path
           fill-rule="evenodd"
@@ -22,7 +26,7 @@ export function PauseIcon() {
   );
 }
 
-const ViewStyled = styled.View`
-  width: 32px;
-  height: 32px;
+const ViewStyled = styled.View<{ $size?: string }>`
+  width: ${({ $size }) => ($size ? $size : "32px")};
+  height: ${({ $size }) => ($size ? $size : "32px")};
 `;

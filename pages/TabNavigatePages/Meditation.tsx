@@ -4,12 +4,12 @@ import {
   useNavigation,
   useRoute,
 } from "@react-navigation/native";
-import { HomeScreenProp, MeditationData } from "../../types";
+import { MeditationScreenProp, MeditationData } from "../../types";
 import { CenterContainer } from "../../components/CenterContainer";
 import { Title } from "../../components/ui/Titles/Title";
 import { Input } from "../../components/ui/Input";
 import { Select } from "../../components/ui/Select";
-import { OPTIONS_DATA } from "../../const";
+import { MEDITATIONS_DATA, OPTIONS_DATA } from "../../const";
 import { Subtitle } from "../../components/ui/Titles/Subtitle";
 import { CardListMeditation } from "../../components/ui/CardListMeditation";
 import { useAppDispatch } from "../../hooks/useAppDispatch";
@@ -22,17 +22,24 @@ import { styled } from "styled-components/native";
 import { LikeIcon } from "../../components/icons/LikeIcon";
 import { useAppSelector } from "../../hooks/useAppSelector";
 import { PlayIcon } from "../../components/icons/PlayIcon";
+import { Pressable } from "react-native";
+import TrackPlayer, {
+  State,
+  usePlaybackState,
+} from "react-native-track-player";
+import { PauseIcon } from "../../components/icons/PauseIcon";
 
 export function Meditation() {
-  const navigation = useNavigation<HomeScreenProp>();
+  const navigation = useNavigation<MeditationScreenProp>();
   const dispatch = useAppDispatch();
   const route = useRoute();
   const theme = useAppSelector((state) => state.theme.value);
   const likes = useAppSelector((state) => state.likes.likes);
   const [isActive, setIsActive] = useState(false);
-  const [lastMeditation, setLastMeditation] = useState<null | MeditationData>(
-    null
+  const lastMeditationId = useAppSelector(
+    (state) => state.trackPlayer.lastMeditationId
   );
+  const playbackState = usePlaybackState();
 
   useEffect(() => {
     if (route.params) {
@@ -48,6 +55,14 @@ export function Meditation() {
       dispatch(likeMeditations(likes));
     }
     setIsActive(!isActive);
+  };
+
+  const toggleAudio = async () => {
+    if (playbackState === State.Paused || playbackState === State.Ready) {
+      await TrackPlayer.play();
+    } else if (playbackState === State.Playing) {
+      await TrackPlayer.pause();
+    }
   };
 
   useFocusEffect(
@@ -80,20 +95,38 @@ export function Meditation() {
       <CenterContainer>
         <CardListMeditation count={9} />
         <Subtitle>Последняя медитация</Subtitle>
-        <LastMeditation>
-          <TextStyled>
-            {lastMeditation === null
-              ? "Вы еще не слушали медитации"
-              : lastMeditation.title}
-          </TextStyled>
-          <Play>
-            <PlayIcon size="16px" />
-          </Play>
-        </LastMeditation>
+        <Pressable
+          onPress={() => {
+            if (lastMeditationId !== null) {
+              navigation.navigate("Audio", {
+                meditation: MEDITATIONS_DATA[lastMeditationId - 1],
+              });
+            }
+          }}
+        >
+          <LastMeditation>
+            <TextStyled>
+              {lastMeditationId === null
+                ? "Вы еще не слушали медитации"
+                : MEDITATIONS_DATA[lastMeditationId - 1].title}
+            </TextStyled>
+            <Pressable onPress={toggleAudio}>
+              <Play>
+                {playbackState === State.Playing ? (
+                  <PauseIcon size="16px" />
+                ) : (
+                  <PlayIcon size="16px" />
+                )}
+              </Play>
+            </Pressable>
+          </LastMeditation>
+        </Pressable>
         <Subtitle>Как медитировать правильно?</Subtitle>
-        <RuleMeditation>
-          <TextStyled>Есть несколько советов для этого</TextStyled>
-        </RuleMeditation>
+        <Pressable onPress={() => navigation.navigate("Tips")}>
+          <RuleMeditation>
+            <TextStyled>Есть несколько советов для этого</TextStyled>
+          </RuleMeditation>
+        </Pressable>
       </CenterContainer>
     </GlobalScreen>
   );

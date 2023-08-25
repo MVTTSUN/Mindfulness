@@ -2,14 +2,29 @@ import { styled } from "styled-components/native";
 import { PropsWithChildren } from "react";
 import { ScrollView } from "react-native";
 
-export function GlobalScreen({ children }: PropsWithChildren) {
+type GlobalScreenProps = PropsWithChildren<{
+  withoutScrollView?: boolean;
+}>;
+
+export function GlobalScreen({
+  children,
+  withoutScrollView,
+}: GlobalScreenProps) {
   return (
     <ViewStyled>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <TopAndBottomSpace />
-        {children}
-        <TopAndBottomSpace />
-      </ScrollView>
+      {withoutScrollView ? (
+        <>
+          <TopAndBottomSpace />
+          {children}
+          <TopAndBottomSpace />
+        </>
+      ) : (
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <TopAndBottomSpace />
+          {children}
+          <TopAndBottomSpace />
+        </ScrollView>
+      )}
     </ViewStyled>
   );
 }

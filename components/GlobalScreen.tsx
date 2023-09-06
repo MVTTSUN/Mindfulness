@@ -14,15 +14,17 @@ export function GlobalScreen({
     <ViewStyled>
       {withoutScrollView ? (
         <>
-          <TopAndBottomSpace />
+          <TopSpace />
           {children}
           <TopAndBottomSpace />
         </>
       ) : (
         <ScrollView showsVerticalScrollIndicator={false}>
-          <TopAndBottomSpace />
-          {children}
-          <TopAndBottomSpace />
+          <>
+            <TopSpace />
+            {children}
+            <TopAndBottomSpace />
+          </>
         </ScrollView>
       )}
     </ViewStyled>
@@ -32,6 +34,10 @@ export function GlobalScreen({
 const ViewStyled = styled.View`
   flex: 1;
   background-color: ${({ theme }) => theme.backgroundColor.main};
+`;
+
+const TopSpace = styled.View`
+  height: 40px;
 `;
 
 const TopAndBottomSpace = styled.View`

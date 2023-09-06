@@ -9,10 +9,10 @@ export const trackPlayerSlice = createSlice({
   name: "trackPlayer",
   initialState,
   reducers: {
-    init: (state, action) => {
+    init(state, action) {
       state.isInitialized = action.payload;
     },
-    setLastMeditationId: (state, action) => {
+    setLastMeditationId(state, action) {
       state.lastMeditationId = action.payload;
     },
   },

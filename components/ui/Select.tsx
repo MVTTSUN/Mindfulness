@@ -6,7 +6,6 @@ import { ScrollView } from "react-native";
 import { useAppDispatch } from "../../hooks/useAppDispatch";
 import {
   filterMeditations,
-  searchMeditations,
 } from "../../store/meditationsSlice";
 import { useFocusEffect } from "@react-navigation/native";
 
@@ -81,5 +80,5 @@ const ViewStyledContainer = styled.View<{ $length: number }>`
 `;
 
 const ViewPadding = styled.View`
-  width: 30px;
+  width: 10px;
 `;

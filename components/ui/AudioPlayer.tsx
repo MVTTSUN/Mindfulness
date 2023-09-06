@@ -8,168 +8,220 @@ import TrackPlayer, {
 } from "react-native-track-player";
 import { Slider } from "@miblanchard/react-native-slider";
 import { useAppSelector } from "../../hooks/useAppSelector";
-import { memo, useEffect, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import { PauseIcon } from "../icons/PauseIcon";
 import { useAppDispatch } from "../../hooks/useAppDispatch";
 import { init, setLastMeditationId } from "../../store/trackPlayerSlice";
-import { Animated, Easing } from "react-native";
+import { Pressable } from "react-native";
 import { LoaderIcon } from "../icons/LoaderIcon";
 import { MEDITATIONS_DATA } from "../../const";
+import { PreviousIcon } from "../icons/PreviousIcon";
+import Animated, {
+  useSharedValue,
+  withRepeat,
+  withTiming,
+  Easing,
+  useAnimatedStyle,
+} from "react-native-reanimated";
 
-export const AudioPlayer = memo(
-  ({ id, duration }: { id: number; duration: number }) => {
-    const [isCurrentAudio, setIsCurrentAudio] = useState(false);
-    const playbackState = usePlaybackState();
-    const theme = useAppSelector((state) => state.theme.value);
-    const dispatch = useAppDispatch();
-    const spinValue = new Animated.Value(0);
-    const [position, setPosition] = useState(0);
-    let positionInterval: NodeJS.Timer;
-    const rotate = spinValue.interpolate({
-      inputRange: [0, 1],
-      outputRange: ["0deg", "360deg"],
-    });
+type AudioPlayerProps = {
+  id: number;
+  duration: number;
+};
 
-    const spin = () => {
-      spinValue.setValue(0);
-      Animated.timing(spinValue, {
-        toValue: 1,
-        duration: 1200,
-        easing: Easing.linear,
-        useNativeDriver: true,
-      }).start(() => spin());
-    };
+export const AudioPlayer = memo(({ id, duration }: AudioPlayerProps) => {
+  const [isCurrentAudio, setIsCurrentAudio] = useState(false);
+  const playbackState = usePlaybackState();
+  const theme = useAppSelector((state) => state.theme.value);
+  const dispatch = useAppDispatch();
+  const rotate = useSharedValue(0);
+  const rotatePlayButton = useSharedValue(0);
+  const borderRadius = useSharedValue(35);
+  const [position, setPosition] = useState(0);
+  let positionInterval: NodeJS.Timer;
+  const rotateStyle = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${rotate.value * 360}deg` }],
+  }));
+  const buttonPlayStyle = useAnimatedStyle(() => ({
+    borderRadius: withTiming(borderRadius.value, {
+      duration: 500,
+      easing: Easing.bezier(0.25, -0.5, 0.25, 1),
+    }),
+    transform: [{ rotate: `${rotatePlayButton.value * 360}deg` }],
+  }));
 
-    const togglePlayAudio = async () => {
-      const currentAudio = await TrackPlayer.getTrack(0);
+  const togglePlayAudio = async () => {
+    const currentAudio = await TrackPlayer.getTrack(0);
 
-      if (currentAudio?.id !== id) {
-        await TrackPlayer.reset();
-        await TrackPlayer.add([MEDITATIONS_DATA[id - 1]]);
+    if (currentAudio?.id !== id) {
+      borderRadius.value = 25;
+      rotatePlayButton.value = withTiming(1, {
+        duration: 500,
+        easing: Easing.bezier(0.25, -0.5, 0.25, 1),
+      });
+      await TrackPlayer.reset();
+      await TrackPlayer.add([MEDITATIONS_DATA[id - 1]]);
+      await TrackPlayer.play();
+      setIsCurrentAudio(true);
+      dispatch(setLastMeditationId(id));
+    }
+
+    if (currentAudio?.id === id && currentAudio?.id !== null) {
+      if (playbackState === State.Paused || playbackState === State.Ready) {
+        borderRadius.value = 25;
+        rotatePlayButton.value = withTiming(1, {
+          duration: 500,
+          easing: Easing.bezier(0.25, -0.5, 0.25, 1),
+        });
         await TrackPlayer.play();
         setIsCurrentAudio(true);
         dispatch(setLastMeditationId(id));
+      } else if (playbackState === State.Playing) {
+        borderRadius.value = 35;
+        rotatePlayButton.value = withTiming(0, {
+          duration: 500,
+          easing: Easing.bezier(0.25, -0.5, 0.25, 1),
+        });
+        await TrackPlayer.pause();
       }
+    }
+  };
 
-      if (currentAudio?.id === id && currentAudio?.id !== null) {
-        if (playbackState === State.Paused || playbackState === State.Ready) {
-          await TrackPlayer.play();
-          setIsCurrentAudio(true);
-          dispatch(setLastMeditationId(id));
-        } else if (playbackState === State.Playing) {
-          await TrackPlayer.pause();
-        }
+  const backToStart = async () => {
+    await TrackPlayer.skipToPrevious();
+  };
+
+  const startInterval = () => {
+    positionInterval = setInterval(async () => {
+      const asyncPosition = await TrackPlayer.getPosition();
+      setPosition(asyncPosition);
+    }, 500);
+  };
+
+  const changeValue = async (e: number[]) => {
+    setPosition(e[0]);
+    await TrackPlayer.seekTo(e[0]);
+  };
+
+  const currentAudio = async () => {
+    try {
+      const currentAudio = await TrackPlayer.getTrack(0);
+      if (currentAudio?.id === id) {
+        setIsCurrentAudio(true);
+      } else {
+        setIsCurrentAudio(false);
       }
+    } catch {
+      dispatch(init(false));
+    }
+  };
+
+  useTrackPlayerEvents([Event.PlaybackQueueEnded], async () => {
+    await TrackPlayer.reset();
+    await TrackPlayer.add([MEDITATIONS_DATA[id - 1]]);
+  });
+
+  useEffect(() => {
+    rotate.value = withRepeat(
+      withTiming(1, { duration: 800, easing: Easing.linear }),
+      -1
+    );
+    currentAudio();
+    startInterval();
+
+    return () => {
+      clearInterval(positionInterval);
     };
+  }, []);
 
-    const startInterval = () => {
-      positionInterval = setInterval(async () => {
-        const asyncPosition = await TrackPlayer.getPosition();
-        setPosition(asyncPosition);
-      }, 500);
-    };
+  useEffect(() => {
+    if (playbackState === State.Playing && isCurrentAudio) {
+      rotatePlayButton.value = withTiming(1, {
+        duration: 500,
+        easing: Easing.bezier(0.25, -0.5, 0.25, 1),
+      });
+      borderRadius.value = 25;
+    }
+  }, [playbackState, isCurrentAudio]);
 
-    const changeValue = async (e: number[]) => {
-      setPosition(e[0]);
-      await TrackPlayer.seekTo(e[0]);
-    };
-
-    const currentAudio = async () => {
-      try {
-        const currentAudio = await TrackPlayer.getTrack(0);
-        if (currentAudio?.id === id) {
-          setIsCurrentAudio(true);
-        } else {
-          setIsCurrentAudio(false);
-        }
-      } catch {
-        dispatch(init(false));
-      }
-    };
-
-    useTrackPlayerEvents([Event.PlaybackQueueEnded], async () => {
-      await TrackPlayer.reset();
-      await TrackPlayer.add([MEDITATIONS_DATA[id - 1]]);
-    });
-
-    useEffect(() => {
-      currentAudio();
-      startInterval();
-
-      return () => {
-        clearInterval(positionInterval);
-      };
-    }, []);
-
-    spin();
-
-    return (
-      <ViewContainer>
-        <Slider
-          disabled={!isCurrentAudio}
-          value={isCurrentAudio ? position : 0}
-          onSlidingComplete={changeValue}
-          maximumValue={duration}
-          thumbStyle={{
-            width: 13,
-            height: 13,
-            borderRadius: 10,
-            backgroundColor: theme === "light" ? "#313131" : "#edecf5",
-          }}
-          trackStyle={{
-            borderRadius: 2,
-            height: 3,
-          }}
-          minimumTrackStyle={{
-            backgroundColor: theme === "light" ? "#313131" : "#edecf5",
-          }}
-          maximumTrackStyle={{
-            backgroundColor: theme === "light" ? "#313131" : "#edecf5",
-            opacity: 0.3,
-          }}
-        />
-        <ContainerTime>
-          <InfoTime>
-            {isCurrentAudio
-              ? new Date(position * 1000).toISOString().slice(14, 19)
-              : "00:00"}
-          </InfoTime>
-          <InfoTime>
-            {new Date(duration * 1000).toISOString().slice(14, 19)}
-          </InfoTime>
-        </ContainerTime>
-        <Controls>
-          {isCurrentAudio && playbackState === State.Playing && (
-            <PlayButton onPress={togglePlayAudio} underlayColor={"#b5f2ea"}>
-              <PauseIcon />
-            </PlayButton>
-          )}
-          {(playbackState === State.Paused ||
-            playbackState === State.Ready ||
-            playbackState === State.Stopped ||
-            !isCurrentAudio) && (
-            <PlayButton onPress={togglePlayAudio} underlayColor={"#b5f2ea"}>
-              <PlayIcon size="32px" />
-            </PlayButton>
-          )}
-          {isCurrentAudio &&
-            (playbackState === State.Buffering ||
-              playbackState === State.Connecting) && (
-              <PlayButton>
-                <Animated.View
-                  style={{
-                    transform: [{ rotate }],
-                  }}
-                >
+  return (
+    <ViewContainer>
+      <Slider
+        disabled={!isCurrentAudio}
+        value={isCurrentAudio ? position : 0}
+        onSlidingComplete={changeValue}
+        maximumValue={duration}
+        thumbStyle={{
+          width: 13,
+          height: 13,
+          borderRadius: 10,
+          backgroundColor: theme === "light" ? "#313131" : "#edecf5",
+        }}
+        trackStyle={{
+          borderRadius: 2,
+          height: 3,
+        }}
+        minimumTrackStyle={{
+          backgroundColor: theme === "light" ? "#313131" : "#edecf5",
+        }}
+        maximumTrackStyle={{
+          backgroundColor: theme === "light" ? "#313131" : "#edecf5",
+          opacity: 0.3,
+        }}
+      />
+      <ContainerTime>
+        <InfoTime>
+          {isCurrentAudio
+            ? new Date(position * 1000).toISOString().slice(14, 19)
+            : "00:00"}
+        </InfoTime>
+        <InfoTime>
+          {new Date(duration * 1000).toISOString().slice(14, 19)}
+        </InfoTime>
+      </ContainerTime>
+      <Controls>
+        <Pressable onPress={isCurrentAudio ? backToStart : () => {}}>
+          <PreviousIcon />
+        </Pressable>
+        <PlayButton style={buttonPlayStyle}>
+          <PressableStyled
+            onPress={
+              isCurrentAudio &&
+              (playbackState === State.Buffering ||
+                playbackState === State.Connecting)
+                ? () => {}
+                : togglePlayAudio
+            }
+            style={({ pressed }) => [
+              {
+                backgroundColor: pressed
+                  ? isCurrentAudio &&
+                    (playbackState === State.Buffering ||
+                      playbackState === State.Connecting)
+                    ? ""
+                    : "#9dd8d0"
+                  : "#b5f2ea",
+              },
+            ]}
+          >
+            {isCurrentAudio && playbackState === State.Playing && <PauseIcon />}
+            {(playbackState === State.Paused ||
+              playbackState === State.Ready ||
+              playbackState === State.Stopped ||
+              !isCurrentAudio) && <PlayIcon size="32px" />}
+            {isCurrentAudio &&
+              (playbackState === State.Buffering ||
+                playbackState === State.Connecting) && (
+                <Animated.View style={rotateStyle}>
                   <LoaderIcon />
                 </Animated.View>
-              </PlayButton>
-            )}
-        </Controls>
-      </ViewContainer>
-    );
-  }
-);
+              )}
+          </PressableStyled>
+        </PlayButton>
+      </Controls>
+    </ViewContainer>
+  );
+});
 
 const ViewContainer = styled.View``;
 
@@ -187,14 +239,22 @@ const InfoTime = styled.Text`
 `;
 
 const Controls = styled.View`
+  gap: 26px;
+  transform: translateX(-23px);
+  align-self: center;
+  flex-direction: row;
   align-items: center;
 `;
 
-const PlayButton = styled.TouchableHighlight`
-  align-items: center;
-  justify-content: center;
+const PlayButton = styled(Animated.View)`
+  overflow: hidden;
   width: 70px;
   height: 70px;
-  border-radius: 35px;
-  background-color: #b5f2ea;
+`;
+
+const PressableStyled = styled.Pressable`
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
 `;

@@ -18,7 +18,7 @@ export function TopWithBack({ children }: PropsWithChildren) {
 }
 
 const TopView = styled.View`
-  margin-bottom: 40px;
+  margin-bottom: 15px;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;

@@ -18,24 +18,26 @@ export function TouchableHighlightCard({
       onPress={onPress}
       underlayColor="#aedcd6"
     >
-      <TextWhite>{children}</TextWhite>
+      <TextStyled>{children}</TextStyled>
     </TouchableHighlightStyled>
   );
 }
 
 const TouchableHighlightStyled = styled.TouchableHighlight`
+  height: 100px;
   flex: 1;
   flex-basis: 48%;
   justify-content: center;
   align-items: center;
-  padding: 40px 10px 35px;
+  padding: 10px;
   background-color: #d4f4ef;
   border-radius: 25px;
 `;
 
-const TextWhite = styled.Text`
+const TextStyled = styled.Text`
+  text-align: center;
   font-family: "Poppins-Medium";
   font-size: 14px;
-  line-height: 16px;
+  line-height: 20px;
   color: #313131;
 `;

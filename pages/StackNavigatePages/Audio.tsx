@@ -5,33 +5,45 @@ import { styled } from "styled-components/native";
 import { TextIcon } from "../../components/icons/TextIcon";
 import { PlayerImages } from "../../components/icons/PlayerImage";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { MeditationScreenProp, MeditationData } from "../../types";
+import {
+  MeditationScreenProp,
+  MeditationData,
+  NotesScreenProp,
+} from "../../types";
 import { LikeIcon } from "../../components/icons/LikeIcon";
 import { AudioPlayer } from "../../components/ui/AudioPlayer";
 import { useAppSelector } from "../../hooks/useAppSelector";
 import { useAppDispatch } from "../../hooks/useAppDispatch";
-import TrackPlayer, {
-  AppKilledPlaybackBehavior,
-  Capability,
-} from "react-native-track-player";
-import { init } from "../../store/trackPlayerSlice";
-import { MEDITATIONS_DATA } from "../../const";
 import { useEffect, useState } from "react";
 import { addLike, removeLike } from "../../store/likesSlice";
 import { TopWithBack } from "../../components/ui/TopWithBack";
+import { AddIcon } from "../../components/icons/AddIcon";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withSequence,
+  withSpring,
+} from "react-native-reanimated";
 
 export function Audio() {
-  const navigation = useNavigation<MeditationScreenProp>();
+  const navigation = useNavigation<MeditationScreenProp & NotesScreenProp>();
   const route = useRoute();
   const { meditation } = route.params as { meditation: MeditationData };
   const [isActive, setIsActive] = useState(false);
-  const isInitialized = useAppSelector(
-    (state) => state.trackPlayer.isInitialized
-  );
   const likes = useAppSelector((state) => state.likes.likes);
   const dispatch = useAppDispatch();
+  const scaleLike = useSharedValue(1);
+  const likeStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scaleLike.value }],
+  }));
 
   const toggleLike = () => {
+    scaleLike.value = withSequence(
+      withSpring(1),
+      withSpring(1.2),
+      withSpring(1)
+    );
     if (isActive) {
       dispatch(removeLike(meditation.id));
     } else {
@@ -39,58 +51,65 @@ export function Audio() {
     }
   };
 
-  const setup = async () => {
-    await TrackPlayer.setupPlayer();
-    await TrackPlayer.updateOptions({
-      android: {
-        appKilledPlaybackBehavior:
-          AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification,
-      },
-      capabilities: [
-        Capability.Play,
-        Capability.Pause,
-        Capability.Stop,
-        // Capability.Like,
-        // Capability.Dislike,
-        // Capability.Like,
-      ],
-    });
-    // await TrackPlayer.add(MEDITATIONS_DATA);
-    dispatch(init(true));
-  };
-
-  useEffect(() => {
-    if (!isInitialized) {
-      setup();
-    }
-  }, [isInitialized]);
-
   useEffect(() => {
     setIsActive(likes.some((like) => like.id === meditation.id));
   }, [likes]);
 
   return (
-    <GlobalScreen>
-      <CenterContainer>
-        <TopWithBack>
-          <Pressable
-            onPress={() => navigation.navigate("Text", { meditation })}
-          >
-            <TextIcon />
-          </Pressable>
-        </TopWithBack>
-        <PlayerImages />
-        <TitleAndLikeView>
-          <TextAudio>{meditation.title}</TextAudio>
-          <Pressable onPress={toggleLike}>
-            <LikeIcon isActive={isActive} />
-          </Pressable>
-        </TitleAndLikeView>
-        <AudioPlayer id={meditation.id} duration={meditation.duration} />
-      </CenterContainer>
-    </GlobalScreen>
+    <>
+      <GlobalScreen>
+        <CenterContainer>
+          <TopWithBack>
+            <Pressable
+              onPress={() => navigation.navigate("Text", { meditation })}
+            >
+              <TextIcon />
+            </Pressable>
+          </TopWithBack>
+          <PlayerImages />
+          <TitleAndLikeView>
+            <TextAudio>{meditation.title}</TextAudio>
+            <Pressable onPress={toggleLike}>
+              <Animated.View
+                style={[{ backgroundColor: "transparent" }, likeStyle]}
+              >
+                <LikeIcon isActive={isActive} />
+              </Animated.View>
+            </Pressable>
+          </TitleAndLikeView>
+          <AudioPlayer id={meditation.id} duration={meditation.duration} />
+        </CenterContainer>
+      </GlobalScreen>
+      <PressableStyled
+        onPress={() =>
+          navigation.navigate("NotesStack", {
+            screen: "Notes",
+            params: { screen: "Note", meditation },
+          })
+        }
+      >
+        <ViewPlus>
+          <AddIcon />
+        </ViewPlus>
+      </PressableStyled>
+    </>
   );
 }
+
+const PressableStyled = styled.Pressable`
+  position: absolute;
+  right: 40px;
+  bottom: 100px;
+`;
+
+const ViewPlus = styled.View`
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  border-radius: 25px;
+  background-color: #313131;
+`;
 
 const TextAudio = styled.Text`
   font-family: "Poppins-Medium";

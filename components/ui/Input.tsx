@@ -66,7 +66,6 @@ const TextInputStyled = styled.TextInput<{
 const FocusOutline = styled.View<{ $isFocus: boolean }>`
   align-self: flex-start;
   width: 100%;
-  transform: translateX(-8px);
   padding: 3px;
   border: ${({ $isFocus, theme }) =>
     $isFocus

@@ -9,10 +9,10 @@ export const themeSlice = createSlice({
   name: "theme",
   initialState,
   reducers: {
-    changeTheme: (state, action) => {
+    changeTheme(state, action) {
       state.value = action.payload;
     },
-    setIdRadioButton: (state, action) => {
+    setIdRadioButton(state, action) {
       state.idRadioButton = action.payload;
     },
   },

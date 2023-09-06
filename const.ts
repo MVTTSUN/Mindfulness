@@ -41,23 +41,23 @@ const LIGHT_THEME = {
 const MAIN_CARDS = [
   {
     id: 1,
-    title: "Исцеление разума",
-    screen: "Mind Healing",
+    title: "Медитации",
+    screen: "MeditationStack",
   },
   {
     id: 2,
-    title: "Подсказки",
-    screen: "Tips",
+    title: "Осознанность как часть жизни",
+    screen: "MeditationStack",
   },
   {
     id: 3,
-    title: "Медитации",
-    screen: "Meditations",
+    title: "Ежедневник",
+    screen: "Notes",
   },
   {
     id: 4,
-    title: "Советы на день",
-    screen: "Advice of the day",
+    title: "Информация",
+    screen: "InfoAndSettingsStack",
   },
 ];
 

@@ -12,6 +12,9 @@ import { Notes } from "../pages/TabNavigatePages/Notes";
 import { InfoAndSettings } from "../pages/TabNavigatePages/InfoAndSettings";
 import { InfoAndSettingsIcon } from "./icons/NavigateIcons/InfoAndSettingsIcon";
 import { InfoAndSettingsStackScreen } from "../stackScreens/InfoAndSettingsStackScreen";
+import { NotesStackScreen } from "../stackScreens/NotesStackScreen";
+import { Tasks } from "../pages/TabNavigatePages/Tasks";
+import { TasksIcon } from "./icons/NavigateIcons/TasksIcon";
 
 const Tab = createBottomTabNavigator();
 
@@ -56,8 +59,15 @@ export function TabNavigator() {
         }}
       />
       <Tab.Screen
-        name="Notes"
-        component={Notes}
+        name="Tasks"
+        component={Tasks}
+        options={{
+          tabBarIcon: ({ color }) => <TasksIcon color={color} />,
+        }}
+      />
+      <Tab.Screen
+        name="NotesStack"
+        component={NotesStackScreen}
         options={{
           tabBarIcon: ({ color }) => <NotesIcon color={color} />,
         }}

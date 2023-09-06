@@ -1,10 +1,7 @@
 import Svg, { Path, G, Ellipse } from "react-native-svg";
-import { useAppSelector } from "../../hooks/useAppSelector";
 import { styled } from "styled-components/native";
 
 export function PlayerImages() {
-  const theme = useAppSelector((state) => state.theme.value);
-
   return (
     <ViewStyled>
       <Svg viewBox="0 0 500 500">
@@ -213,5 +210,5 @@ const ViewStyled = styled.View`
   aspect-ratio: 1 / 1;
   overflow: hidden;
   border-radius: 20px;
-  margin-bottom: 30px;
+  margin: 25px 0 30px;
 `;

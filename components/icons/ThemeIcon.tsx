@@ -1,4 +1,4 @@
-import Svg, { G, Path } from "react-native-svg";
+import Svg, { Path } from "react-native-svg";
 import { useAppSelector } from "../../hooks/useAppSelector";
 import { styled } from "styled-components/native";
 

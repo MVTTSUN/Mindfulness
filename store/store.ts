@@ -15,6 +15,8 @@ import meditationsReducer from "./meditationsSlice";
 import trackPlayerReducer from "./trackPlayerSlice";
 import likesReducer from "./likesSlice";
 import lastMeditationReducer from "./lastMeditationSlice";
+import notesReducer from "./notesSlice";
+import notificationsReducer from "./notificationsSlice";
 
 const rootReducer = combineReducers({
   theme: themeReducer,
@@ -22,12 +24,21 @@ const rootReducer = combineReducers({
   trackPlayer: trackPlayerReducer,
   likes: likesReducer,
   lastMeditation: lastMeditationReducer,
+  notes: notesReducer,
+  notifications: notificationsReducer,
 });
 
 const persistConfig = {
   key: "root",
   storage: AsyncStorage,
-  whitelist: ["theme", "trackPlayer", "likes", "lastMeditation"],
+  whitelist: [
+    "theme",
+    "trackPlayer",
+    "likes",
+    "lastMeditation",
+    "notes",
+    "notifications",
+  ],
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

@@ -6,5 +6,5 @@ export function CenterContainer({ children }: PropsWithChildren) {
 }
 
 const ViewStyled = styled.View`
-  padding: 0 40px;
+  padding: 0 20px;
 `;

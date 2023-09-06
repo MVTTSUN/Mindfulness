@@ -19,8 +19,23 @@ type MeditationScreenProp = NativeStackNavigationProp<{
 }>;
 
 type InfoAndSettingsScreenProp = NativeStackNavigationProp<{
+  ImportAndExport: undefined;
+  Notification: undefined;
+  Service: undefined;
+  Contacts: undefined;
   InfoAndSettings: undefined;
   InfoAndSettingsStack: undefined;
+}>;
+
+type NotesScreenProp = NativeStackNavigationProp<{
+  Note: undefined | { meditation: MeditationData };
+  Notes: undefined;
+  NotesStack:
+    | undefined
+    | {
+        screen: string;
+        params: { screen: string; meditation: MeditationData };
+      };
 }>;
 
 type MainCard = {
@@ -55,6 +70,28 @@ type Like = {
   isLike: boolean;
 };
 
+type Note = {
+  id: string;
+  color: string;
+  title: string;
+  text: string;
+  icon: NodeRequire;
+  createdAt: string;
+};
+
+type DataTime = {
+  id: string;
+  value: number;
+};
+
+type Notification = {
+  id: number;
+  hours: number;
+  minutes: number;
+  enable: boolean;
+  isOpen: boolean;
+};
+
 export {
   RootState,
   AppDispatch,
@@ -63,5 +100,9 @@ export {
   MeditationData,
   MainCard,
   Like,
+  Note,
   InfoAndSettingsScreenProp,
+  NotesScreenProp,
+  DataTime,
+  Notification,
 };

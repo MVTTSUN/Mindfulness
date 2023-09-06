@@ -24,10 +24,22 @@ import { useAppSelector } from "../../hooks/useAppSelector";
 import { PlayIcon } from "../../components/icons/PlayIcon";
 import { Pressable } from "react-native";
 import TrackPlayer, {
+  AppKilledPlaybackBehavior,
+  Capability,
+  Event,
+  RatingType,
   State,
   usePlaybackState,
+  useTrackPlayerEvents,
 } from "react-native-track-player";
 import { PauseIcon } from "../../components/icons/PauseIcon";
+import { init } from "../../store/trackPlayerSlice";
+import Animated, {
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
 
 export function Meditation() {
   const navigation = useNavigation<MeditationScreenProp>();
@@ -40,13 +52,18 @@ export function Meditation() {
     (state) => state.trackPlayer.lastMeditationId
   );
   const playbackState = usePlaybackState();
-
-  useEffect(() => {
-    if (route.params) {
-      const { meditation } = route.params as { meditation: MeditationData };
-      navigation.navigate("Audio", { meditation });
-    }
-  }, [route.params]);
+  const borderRadius = useSharedValue(20);
+  const rotate = useSharedValue(0);
+  const isInitialized = useAppSelector(
+    (state) => state.trackPlayer.isInitialized
+  );
+  const playButtonStyle = useAnimatedStyle(() => ({
+    borderRadius: withTiming(borderRadius.value, {
+      duration: 500,
+      easing: Easing.bezier(0.25, -0.5, 0.25, 1),
+    }),
+    transform: [{ rotate: `${rotate.value * 360}deg` }],
+  }));
 
   const findFavorites = () => {
     if (isActive) {
@@ -58,12 +75,54 @@ export function Meditation() {
   };
 
   const toggleAudio = async () => {
+    if (playbackState === State.None && lastMeditationId !== null) {
+      borderRadius.value = 13;
+      rotate.value = withTiming(1, {
+        duration: 500,
+        easing: Easing.bezier(0.25, -0.5, 0.25, 1),
+      });
+      await TrackPlayer.add([MEDITATIONS_DATA[lastMeditationId - 1]]);
+      await TrackPlayer.play();
+    }
+
     if (playbackState === State.Paused || playbackState === State.Ready) {
+      borderRadius.value = 13;
+      rotate.value = withTiming(1, {
+        duration: 500,
+        easing: Easing.bezier(0.25, -0.5, 0.25, 1),
+      });
       await TrackPlayer.play();
     } else if (playbackState === State.Playing) {
+      borderRadius.value = 20;
+      rotate.value = withTiming(0, {
+        duration: 500,
+        easing: Easing.bezier(0.25, -0.5, 0.25, 1),
+      });
       await TrackPlayer.pause();
     }
   };
+
+  const setup = async () => {
+    await TrackPlayer.setupPlayer();
+    await TrackPlayer.updateOptions({
+      android: {
+        appKilledPlaybackBehavior:
+          AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification,
+      },
+      capabilities: [
+        Capability.Play,
+        Capability.Pause,
+        Capability.SkipToPrevious,
+      ],
+    });
+    dispatch(init(true));
+  };
+
+  // useEffect(() => {
+  //   if (!isInitialized) {
+  //     setup();
+  //   }
+  // }, [isInitialized]);
 
   useFocusEffect(
     useCallback(() => {
@@ -72,6 +131,17 @@ export function Meditation() {
       };
     }, [])
   );
+
+  useEffect(() => {
+    setup();
+  }, []);
+
+  useEffect(() => {
+    if (route.params) {
+      const { meditation } = route.params as { meditation: MeditationData };
+      navigation.navigate("Audio", { meditation });
+    }
+  }, [route.params]);
 
   return (
     <GlobalScreen>
@@ -105,26 +175,33 @@ export function Meditation() {
           }}
         >
           <LastMeditation>
-            <TextStyled>
+            <TextLasMeditation>
               {lastMeditationId === null
                 ? "Вы еще не слушали медитации"
                 : MEDITATIONS_DATA[lastMeditationId - 1].title}
-            </TextStyled>
-            <Pressable onPress={toggleAudio}>
-              <Play>
+            </TextLasMeditation>
+            <Play style={playButtonStyle}>
+              <PressableStyled
+                onPress={toggleAudio}
+                style={({ pressed }) => [
+                  { backgroundColor: pressed ? "#9dd8d0" : "#b5f2ea" },
+                ]}
+              >
                 {playbackState === State.Playing ? (
                   <PauseIcon size="16px" />
                 ) : (
                   <PlayIcon size="16px" />
                 )}
-              </Play>
-            </Pressable>
+              </PressableStyled>
+            </Play>
           </LastMeditation>
         </Pressable>
         <Subtitle>Как медитировать правильно?</Subtitle>
         <Pressable onPress={() => navigation.navigate("Tips")}>
           <RuleMeditation>
-            <TextStyled>Есть несколько советов для этого</TextStyled>
+            <TextRightMeditation>
+              Есть несколько советов для этого
+            </TextRightMeditation>
           </RuleMeditation>
         </Pressable>
       </CenterContainer>
@@ -154,19 +231,29 @@ const LastMeditation = styled.View`
   align-items: center;
 `;
 
-const TextStyled = styled.Text`
+const TextLasMeditation = styled.Text`
   font-family: "Poppins-Medium";
   font-size: 14px;
   color: #313131;
 `;
 
-const Play = styled.View`
-  align-items: center;
-  justify-content: center;
+const TextRightMeditation = styled.Text`
+  font-family: "Poppins-Medium";
+  font-size: 14px;
+  color: ${({ theme }) => theme.color.standard};
+`;
+
+const Play = styled(Animated.View)`
+  overflow: hidden;
   height: 40px;
   width: 40px;
-  border-radius: 20px;
-  background-color: #b5f2ea;
+`;
+
+const PressableStyled = styled.Pressable`
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
 `;
 
 const RuleMeditation = styled.View`

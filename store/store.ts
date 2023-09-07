@@ -17,6 +17,7 @@ import likesReducer from "./likesSlice";
 import lastMeditationReducer from "./lastMeditationSlice";
 import notesReducer from "./notesSlice";
 import notificationsReducer from "./notificationsSlice";
+import tasksReducer from "./tasksSlice";
 
 const rootReducer = combineReducers({
   theme: themeReducer,
@@ -26,6 +27,7 @@ const rootReducer = combineReducers({
   lastMeditation: lastMeditationReducer,
   notes: notesReducer,
   notifications: notificationsReducer,
+  tasks: tasksReducer,
 });
 
 const persistConfig = {
@@ -35,9 +37,11 @@ const persistConfig = {
     "theme",
     "trackPlayer",
     "likes",
+    // "meditations",
     "lastMeditation",
     "notes",
     "notifications",
+    "tasks",
   ],
 };
 

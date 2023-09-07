@@ -14,7 +14,7 @@ import { useAppDispatch } from "../../hooks/useAppDispatch";
 import { init, setLastMeditationId } from "../../store/trackPlayerSlice";
 import { Pressable } from "react-native";
 import { LoaderIcon } from "../icons/LoaderIcon";
-import { MEDITATIONS_DATA } from "../../const";
+import { MAIN_COLOR, MEDITATIONS_DATA } from "../../const";
 import { PreviousIcon } from "../icons/PreviousIcon";
 import Animated, {
   useSharedValue,
@@ -22,6 +22,8 @@ import Animated, {
   withTiming,
   Easing,
   useAnimatedStyle,
+  withSequence,
+  withSpring,
 } from "react-native-reanimated";
 
 type AudioPlayerProps = {
@@ -48,6 +50,10 @@ export const AudioPlayer = memo(({ id, duration }: AudioPlayerProps) => {
       easing: Easing.bezier(0.25, -0.5, 0.25, 1),
     }),
     transform: [{ rotate: `${rotatePlayButton.value * 360}deg` }],
+  }));
+  const scaleBackPlay = useSharedValue(1);
+  const backPlayStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scaleBackPlay.value }],
   }));
 
   const togglePlayAudio = async () => {
@@ -88,6 +94,11 @@ export const AudioPlayer = memo(({ id, duration }: AudioPlayerProps) => {
   };
 
   const backToStart = async () => {
+    scaleBackPlay.value = withSequence(
+      withSpring(1),
+      withSpring(1.3),
+      withSpring(1)
+    );
     await TrackPlayer.skipToPrevious();
   };
 
@@ -181,7 +192,9 @@ export const AudioPlayer = memo(({ id, duration }: AudioPlayerProps) => {
       </ContainerTime>
       <Controls>
         <Pressable onPress={isCurrentAudio ? backToStart : () => {}}>
-          <PreviousIcon />
+          <Animated.View style={backPlayStyle}>
+            <PreviousIcon />
+          </Animated.View>
         </Pressable>
         <PlayButton style={buttonPlayStyle}>
           <PressableStyled
@@ -199,8 +212,8 @@ export const AudioPlayer = memo(({ id, duration }: AudioPlayerProps) => {
                     (playbackState === State.Buffering ||
                       playbackState === State.Connecting)
                     ? ""
-                    : "#9dd8d0"
-                  : "#b5f2ea",
+                    : MAIN_COLOR.normalPressed
+                  : MAIN_COLOR.normal,
               },
             ]}
           >

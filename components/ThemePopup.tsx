@@ -1,16 +1,9 @@
-import {
-  Dimensions,
-  Pressable,
-  ScrollView,
-  useColorScheme,
-} from "react-native";
-import { CenterContainer } from "./CenterContainer";
-import { GlobalScreen } from "./GlobalScreen";
-import { TopWithBack } from "./ui/TopWithBack";
+import { Pressable, useColorScheme } from "react-native";
 import styled from "styled-components/native";
 import { useAppDispatch } from "../hooks/useAppDispatch";
 import { useAppSelector } from "../hooks/useAppSelector";
 import { changeTheme, setIdRadioButton } from "../store/themeSlice";
+import { MAIN_COLOR } from "../const";
 
 export function ThemePopup() {
   const variants = ["Как на устройстве", "Темная тема", "Светлая тема"];
@@ -45,8 +38,10 @@ export function ThemePopup() {
             }
           >
             <ViewVariant>
-              <RadioButton>
-                {idRadioButton === index && <RadioButtonFill />}
+              <RadioButton $mainColor={MAIN_COLOR.normal}>
+                {idRadioButton === index && (
+                  <RadioButtonFill $mainColor={MAIN_COLOR.normal} />
+                )}
               </RadioButton>
               <TextStyled>{variant}</TextStyled>
             </ViewVariant>
@@ -87,19 +82,19 @@ const TextStyled = styled.Text`
   color: ${({ theme }) => theme.color.standard};
 `;
 
-const RadioButton = styled.View`
+const RadioButton = styled.View<{ $mainColor: string }>`
   transform: translateY(-1px);
   align-items: center;
   justify-content: center;
   height: 25px;
   width: 25px;
-  border: 3px solid #b5f2ea;
+  border: 3px solid ${({ $mainColor }) => $mainColor};
   border-radius: 40px;
 `;
 
-const RadioButtonFill = styled.View`
+const RadioButtonFill = styled.View<{ $mainColor: string }>`
   height: 13px;
   width: 13px;
-  background-color: #b5f2ea;
+  background-color: ${({ $mainColor }) => $mainColor};
   border-radius: 40px;
 `;

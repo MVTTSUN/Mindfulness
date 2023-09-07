@@ -3,6 +3,7 @@ import { Animated, Easing, Pressable } from "react-native";
 import { styled } from "styled-components/native";
 import { useAppDispatch } from "../../hooks/useAppDispatch";
 import { toggleNotification } from "../../store/notificationsSlice";
+import { MAIN_COLOR } from "../../const";
 
 type TumblerProps = {
   id: number;
@@ -18,7 +19,7 @@ export function Tumbler({ id, enable }: TumblerProps) {
   });
   const tumblerChangeColor = tumblerValue.interpolate({
     inputRange: [0, 1],
-    outputRange: ["#d1d1d1", "#b5f2ea"],
+    outputRange: ["#d1d1d1", MAIN_COLOR.normal],
   });
   const tumblerSizeRadio = tumblerValue.interpolate({
     inputRange: [0, 0.5, 1],

@@ -1,9 +1,3 @@
-import notifee, {
-  AndroidColor,
-  RepeatFrequency,
-  TimestampTrigger,
-  TriggerType,
-} from "@notifee/react-native";
 import { styled } from "styled-components/native";
 import { Tumbler } from "./Tumbler";
 import { TimePicker } from "./TimePicker";
@@ -22,7 +16,7 @@ import {
   setTime,
 } from "../../store/notificationsSlice";
 import { TouchableHighlight } from "./Touchables/TouchableHighlight";
-import { LogBox } from "react-native";
+import { useNotifee } from "../../hooks/useNotifee";
 
 type TimeNotificationProps = {
   notification: Notification;
@@ -38,59 +32,11 @@ export const TimeNotification = memo(
     const styleSelectTimeContainer = useAnimatedStyle(() => ({
       height: height.value,
     }));
-
-    const onCreateTriggerNotification = async (
-      id: number,
-      hours: number,
-      minutes: number
-    ) => {
-      await notifee.requestPermission();
-
-      const channelId = await notifee.createChannel({
-        id: String(id),
-        name: "Медитация",
-        vibration: true,
-        vibrationPattern: [300, 500],
-        lights: true,
-        lightColor: AndroidColor.AQUA,
-      });
-
-      const date = new Date(Date.now());
-      date.setHours(hours);
-      date.setMinutes(minutes);
-      date.setSeconds(0);
-
-      console.log(date, hours, minutes);
-
-      const trigger: TimestampTrigger = {
-        type: TriggerType.TIMESTAMP,
-        timestamp: date.getTime(),
-        repeatFrequency: RepeatFrequency.DAILY,
-      };
-
-      await notifee.createTriggerNotification(
-        {
-          id: String(id),
-          title: `Сегодня в ${date.getHours()}:${
-            date.getMinutes() < 10 ? `0${date.getMinutes()}` : date.getMinutes()
-          } у вас медитация`,
-          android: {
-            channelId,
-            pressAction: {
-              id: String(id),
-            },
-          },
-          ios: {
-            sound: "default",
-          },
-        },
-        trigger
-      );
-    };
-
-    const cancelNotification = async (id: number) => {
-      await notifee.cancelNotification(String(id));
-    };
+    const {
+      onCreateTriggerNotification,
+      cancelNotification,
+      getTriggerNotificationIds,
+    } = useNotifee();
 
     const togglePicker = () => {
       if (isOpen) {
@@ -102,9 +48,18 @@ export const TimeNotification = memo(
       }
     };
 
-    useEffect(() => {
-      // LogBox.ignoreLogs(["VirtualizedLists should never be nested"]);
+    const createTriggerNotificationAsync = async () => {
+      const ids = await getTriggerNotificationIds();
+      !ids.includes(String(id)) &&
+        onCreateTriggerNotification(id, hoursHandle, minutesHandle);
+    };
 
+    const cancelNotificationAsync = async () => {
+      const ids = await getTriggerNotificationIds();
+      ids.includes(String(id)) && cancelNotification(id);
+    };
+
+    useEffect(() => {
       return () => {
         dispatch(closeNotification(id));
       };
@@ -118,11 +73,9 @@ export const TimeNotification = memo(
 
     useEffect(() => {
       if (enable) {
-        // console.log(id);
-        onCreateTriggerNotification(id, hoursHandle, minutesHandle);
+        createTriggerNotificationAsync();
       } else {
-        // console.log(1);
-        cancelNotification(id);
+        cancelNotificationAsync();
       }
     }, [enable]);
 

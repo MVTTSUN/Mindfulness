@@ -9,7 +9,7 @@ import { CenterContainer } from "../../components/CenterContainer";
 import { Title } from "../../components/ui/Titles/Title";
 import { Input } from "../../components/ui/Input";
 import { Select } from "../../components/ui/Select";
-import { MEDITATIONS_DATA, OPTIONS_DATA } from "../../const";
+import { MAIN_COLOR, MEDITATIONS_DATA, OPTIONS_DATA } from "../../const";
 import { Subtitle } from "../../components/ui/Titles/Subtitle";
 import { CardListMeditation } from "../../components/ui/CardListMeditation";
 import { useAppDispatch } from "../../hooks/useAppDispatch";
@@ -26,11 +26,8 @@ import { Pressable } from "react-native";
 import TrackPlayer, {
   AppKilledPlaybackBehavior,
   Capability,
-  Event,
-  RatingType,
   State,
   usePlaybackState,
-  useTrackPlayerEvents,
 } from "react-native-track-player";
 import { PauseIcon } from "../../components/icons/PauseIcon";
 import { init } from "../../store/trackPlayerSlice";
@@ -46,7 +43,7 @@ export function Meditation() {
   const dispatch = useAppDispatch();
   const route = useRoute();
   const theme = useAppSelector((state) => state.theme.value);
-  const likes = useAppSelector((state) => state.likes.likes);
+  const likes = useAppSelector((state) => state.likes.likesMeditation);
   const [isActive, setIsActive] = useState(false);
   const lastMeditationId = useAppSelector(
     (state) => state.trackPlayer.lastMeditationId
@@ -174,7 +171,7 @@ export function Meditation() {
             }
           }}
         >
-          <LastMeditation>
+          <LastMeditation $mainColor={MAIN_COLOR.pastel}>
             <TextLasMeditation>
               {lastMeditationId === null
                 ? "Вы еще не слушали медитации"
@@ -184,7 +181,11 @@ export function Meditation() {
               <PressableStyled
                 onPress={toggleAudio}
                 style={({ pressed }) => [
-                  { backgroundColor: pressed ? "#9dd8d0" : "#b5f2ea" },
+                  {
+                    backgroundColor: pressed
+                      ? MAIN_COLOR.normalPressed
+                      : MAIN_COLOR.normal,
+                  },
                 ]}
               >
                 {playbackState === State.Playing ? (
@@ -221,11 +222,11 @@ const FavoritesButton = styled.TouchableHighlight`
   transform: translateY(7px);
 `;
 
-const LastMeditation = styled.View`
+const LastMeditation = styled.View<{ $mainColor: string }>`
   margin-bottom: 20px;
   padding: 20px 18px 20px 30px;
   border-radius: 30px;
-  background-color: #d4f4ef;
+  background-color: ${({ $mainColor }) => $mainColor};
   flex-direction: row;
   justify-content: space-between;
   align-items: center;

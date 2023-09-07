@@ -6,8 +6,32 @@ import { CenterContainer } from "../../components/CenterContainer";
 import { Subtitle } from "../../components/ui/Titles/Subtitle";
 import { CardListMeditation } from "../../components/ui/CardListMeditation";
 import { CardListMain } from "../../components/ui/CardListMain";
+import { useNotifee } from "../../hooks/useNotifee";
+import { useAppSelector } from "../../hooks/useAppSelector";
+import { useEffect } from "react";
 
 export function Home() {
+  const { onCreateTriggerNotification, getTriggerNotificationIds } =
+    useNotifee();
+  const notification = useAppSelector(
+    (state) => state.notifications.notifications[0]
+  );
+
+  const setNotificationFirstLaunchApp = async () => {
+    const ids = await getTriggerNotificationIds();
+    notification.enable &&
+      !ids.includes(String(notification.id)) &&
+      onCreateTriggerNotification(
+        notification.id,
+        notification.hours,
+        notification.minutes
+      );
+  };
+
+  useEffect(() => {
+    setNotificationFirstLaunchApp();
+  }, []);
+
   return (
     <GlobalScreen>
       <CenterContainer>

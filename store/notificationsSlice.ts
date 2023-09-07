@@ -4,9 +4,9 @@ const initialState = {
   notifications: [
     {
       id: 1,
-      hours: 0,
+      hours: 19,
       minutes: 0,
-      enable: false,
+      enable: true,
       isOpen: false,
     },
     {

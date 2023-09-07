@@ -15,7 +15,10 @@ import { AudioPlayer } from "../../components/ui/AudioPlayer";
 import { useAppSelector } from "../../hooks/useAppSelector";
 import { useAppDispatch } from "../../hooks/useAppDispatch";
 import { useEffect, useState } from "react";
-import { addLike, removeLike } from "../../store/likesSlice";
+import {
+  addMeditationLike,
+  removeMeditationLike,
+} from "../../store/likesSlice";
 import { TopWithBack } from "../../components/ui/TopWithBack";
 import { AddIcon } from "../../components/icons/AddIcon";
 import Animated, {
@@ -31,7 +34,7 @@ export function Audio() {
   const route = useRoute();
   const { meditation } = route.params as { meditation: MeditationData };
   const [isActive, setIsActive] = useState(false);
-  const likes = useAppSelector((state) => state.likes.likes);
+  const likes = useAppSelector((state) => state.likes.likesMeditation);
   const dispatch = useAppDispatch();
   const scaleLike = useSharedValue(1);
   const likeStyle = useAnimatedStyle(() => ({
@@ -45,9 +48,9 @@ export function Audio() {
       withSpring(1)
     );
     if (isActive) {
-      dispatch(removeLike(meditation.id));
+      dispatch(removeMeditationLike(meditation.id));
     } else {
-      dispatch(addLike(meditation.id));
+      dispatch(addMeditationLike(meditation.id));
     }
   };
 

@@ -1,16 +1,17 @@
 import { StatusBar } from "expo-status-bar";
 import { NavigationContainer } from "@react-navigation/native";
-import { useCallback } from "react";
+import { memo, useCallback, useEffect } from "react";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { ThemeProvider, styled } from "styled-components/native";
 import { DARK_THEME, LIGHT_THEME } from "./const";
 import { useAppSelector } from "./hooks/useAppSelector";
 import { TabNavigator } from "./components/TabNavigator";
+import { useNotifee } from "./hooks/useNotifee";
 
 SplashScreen.preventAutoHideAsync();
 
-export default function App() {
+export const App = memo(() => {
   const [fontsLoaded] = useFonts({
     "Poppins-Regular": require("./assets/fonts/Poppins-Regular.ttf"),
     "Poppins-Medium": require("./assets/fonts/Poppins-Medium.ttf"),
@@ -38,7 +39,7 @@ export default function App() {
       </ThemeProvider>
     </ViewStyled>
   );
-}
+});
 
 const ViewStyled = styled.View`
   flex: 1;

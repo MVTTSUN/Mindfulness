@@ -3,12 +3,32 @@ import { Note } from "../types";
 
 const initialState = {
   notes: [] as Note[],
+  notesFiltered: [] as Note[],
+  notesSearched: [] as Note[],
+  notesLike: [] as Note[],
 };
 
 export const notesSlice = createSlice({
   name: "notes",
   initialState,
   reducers: {
+    filterNotes(state, action) {
+      action.payload === "Всё"
+        ? (state.notesFiltered = state.notes)
+        : (state.notesFiltered = state.notes.filter(
+            (note) => note.kind === action.payload
+          ));
+    },
+    searchNotes(state, action) {
+      action.payload.trim() === ""
+        ? (state.notesSearched = state.notes)
+        : (state.notesSearched = state.notes.filter((note) =>
+            note.title
+              .toLowerCase()
+              .split(" ")
+              .some((el) => el.match(RegExp(`^${action.payload.trim()}`, "i")))
+          ));
+    },
     addNote(state, action) {
       state.notes.unshift({
         id: nanoid(),
@@ -17,6 +37,7 @@ export const notesSlice = createSlice({
         text: action.payload.text || "",
         icon: action.payload.icon || null,
         createdAt: new Date().toISOString(),
+        kind: action.payload.kind || "",
       });
     },
     removeNotes(state, action) {
@@ -35,7 +56,13 @@ export const notesSlice = createSlice({
   },
 });
 
-export const { addNote, removeNotes, updateNote, setNotes } =
-  notesSlice.actions;
+export const {
+  filterNotes,
+  searchNotes,
+  addNote,
+  removeNotes,
+  updateNote,
+  setNotes,
+} = notesSlice.actions;
 
 export default notesSlice.reducer;

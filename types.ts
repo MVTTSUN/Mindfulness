@@ -77,6 +77,19 @@ type Note = {
   text: string;
   icon: NodeRequire;
   createdAt: string;
+  kind: string;
+};
+
+type TaskContent = {
+  type: string;
+  text: string;
+};
+
+type Task = {
+  id: number;
+  title: string;
+  content: TaskContent[];
+  kind: string;
 };
 
 type DataTime = {
@@ -105,4 +118,5 @@ export {
   NotesScreenProp,
   DataTime,
   Notification,
+  Task,
 };

@@ -38,6 +38,13 @@ const LIGHT_THEME = {
   },
 };
 
+const MAIN_COLOR = {
+  normal: "#b5f2ea",
+  normalPressed: "#9dd8d0",
+  pastel: "#d4f4ef",
+  pastelPressed: "#aedcd6",
+};
+
 const MAIN_CARDS = [
   {
     id: 1,
@@ -47,12 +54,12 @@ const MAIN_CARDS = [
   {
     id: 2,
     title: "Осознанность как часть жизни",
-    screen: "MeditationStack",
+    screen: "TasksStack",
   },
   {
     id: 3,
     title: "Ежедневник",
-    screen: "Notes",
+    screen: "NotesStack",
   },
   {
     id: 4,
@@ -316,4 +323,11 @@ const MEDITATIONS_DATA = [
   },
 ];
 
-export { DARK_THEME, LIGHT_THEME, MAIN_CARDS, OPTIONS_DATA, MEDITATIONS_DATA };
+export {
+  DARK_THEME,
+  LIGHT_THEME,
+  MAIN_CARDS,
+  OPTIONS_DATA,
+  MEDITATIONS_DATA,
+  MAIN_COLOR,
+};

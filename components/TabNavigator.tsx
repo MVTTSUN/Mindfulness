@@ -15,6 +15,7 @@ import { InfoAndSettingsStackScreen } from "../stackScreens/InfoAndSettingsStack
 import { NotesStackScreen } from "../stackScreens/NotesStackScreen";
 import { Tasks } from "../pages/TabNavigatePages/Tasks";
 import { TasksIcon } from "./icons/NavigateIcons/TasksIcon";
+import { TasksStackScreen } from "../stackScreens/TasksStackScreen";
 
 const Tab = createBottomTabNavigator();
 
@@ -59,8 +60,8 @@ export function TabNavigator() {
         }}
       />
       <Tab.Screen
-        name="Tasks"
-        component={Tasks}
+        name="TasksStack"
+        component={TasksStackScreen}
         options={{
           tabBarIcon: ({ color }) => <TasksIcon color={color} />,
         }}

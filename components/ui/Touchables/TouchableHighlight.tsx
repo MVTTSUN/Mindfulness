@@ -1,5 +1,6 @@
 import { styled } from "styled-components/native";
 import { PropsWithChildren } from "react";
+import { MAIN_COLOR } from "../../../const";
 
 type TouchableHighlightProps = PropsWithChildren<{
   onPress: () => void;
@@ -17,10 +18,11 @@ export function TouchableHighlight({
 }: TouchableHighlightProps) {
   return (
     <TouchableHighlightStyled
+      $mainColor={MAIN_COLOR.normal}
       $backgroundColor={backgroundColor}
       onPress={onPress}
       $isRound={isRound}
-      underlayColor={underlayColor ? underlayColor : "#aedcd6"}
+      underlayColor={underlayColor ? underlayColor : MAIN_COLOR.normalPressed}
     >
       {isRound ? children : <TextWhite>{children}</TextWhite>}
     </TouchableHighlightStyled>
@@ -30,12 +32,13 @@ export function TouchableHighlight({
 const TouchableHighlightStyled = styled.TouchableHighlight<{
   $isRound?: boolean;
   $backgroundColor?: string;
+  $mainColor: string;
 }>`
   align-self: center;
   align-items: center;
   padding: ${({ $isRound }) => ($isRound ? "5px" : "20px 40px 15px")};
-  background-color: ${({ $backgroundColor }) =>
-    $backgroundColor ? $backgroundColor : "#b5f2ea"};
+  background-color: ${({ $backgroundColor, $mainColor }) =>
+    $backgroundColor ? $backgroundColor : $mainColor};
   border-radius: 42px;
 `;
 

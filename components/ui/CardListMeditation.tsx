@@ -39,7 +39,7 @@ export function CardListMeditation({ count }: CardListMeditationProps) {
     setMeditations(meditationFiltered);
   };
 
-  const navigateMeditation = () => navigation.navigate("MeditationStack");
+  const navigateMeditation = () => navigation.navigate("Meditation");
 
   useFocusEffect(
     useCallback(() => {

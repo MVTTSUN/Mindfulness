@@ -105,6 +105,11 @@ type Notification = {
   isOpen: boolean;
 };
 
+type DataInput = {
+  id: number;
+  title: string;
+};
+
 export {
   RootState,
   AppDispatch,
@@ -119,4 +124,5 @@ export {
   DataTime,
   Notification,
   Task,
+  DataInput,
 };

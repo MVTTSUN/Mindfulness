@@ -9,7 +9,13 @@ import { CenterContainer } from "../../components/CenterContainer";
 import { Title } from "../../components/ui/Titles/Title";
 import { Input } from "../../components/ui/Input";
 import { Select } from "../../components/ui/Select";
-import { MAIN_COLOR, MEDITATIONS_DATA, OPTIONS_DATA } from "../../const";
+import {
+  COLORS,
+  LIGHT_THEME,
+  MAIN_COLOR,
+  MEDITATIONS_DATA,
+  OPTIONS_DATA,
+} from "../../const";
 import { Subtitle } from "../../components/ui/Titles/Subtitle";
 import { CardListMeditation } from "../../components/ui/CardListMeditation";
 import { useAppDispatch } from "../../hooks/useAppDispatch";
@@ -152,9 +158,12 @@ export function Meditation() {
           />
           <FavoritesButton
             onPress={findFavorites}
-            underlayColor={theme === "light" ? "#d3d3db" : "#1f1f1f"}
+            underlayColor={LIGHT_THEME.backgroundColor.meditationCardPressed}
           >
-            <LikeIcon isActive={isActive} />
+            <LikeIcon
+              color={COLORS.textColors.meditationCard}
+              isActive={isActive}
+            />
           </FavoritesButton>
         </SearchView>
       </CenterContainer>
@@ -212,6 +221,7 @@ export function Meditation() {
 
 const SearchView = styled.View`
   flex-direction: row;
+  gap: 5px;
 `;
 
 const FavoritesButton = styled.TouchableHighlight`
@@ -235,13 +245,15 @@ const LastMeditation = styled.View<{ $mainColor: string }>`
 const TextLasMeditation = styled.Text`
   font-family: "Poppins-Medium";
   font-size: 14px;
+  line-height: 18px;
   color: #313131;
 `;
 
 const TextRightMeditation = styled.Text`
   font-family: "Poppins-Medium";
   font-size: 14px;
-  color: ${({ theme }) => theme.color.standard};
+  line-height: 18px;
+  color: ${COLORS.textColors.meditationCard};
 `;
 
 const Play = styled(Animated.View)`

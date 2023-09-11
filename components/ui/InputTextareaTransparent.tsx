@@ -1,21 +1,28 @@
 import { styled } from "styled-components/native";
 import { useAppSelector } from "../../hooks/useAppSelector";
 import { useEffect, useState } from "react";
+import {
+  GestureResponderEvent,
+  LayoutChangeEvent,
+  NativeSyntheticEvent,
+  NativeTouchEvent,
+  TextInputFocusEventData,
+} from "react-native";
 
 type InputProps = {
   onChangeText: (text: string) => void;
   placeholder: string;
-  autoFocus?: boolean;
   height: number;
   borderColor: string;
+  onTouchEnd: (event: GestureResponderEvent) => void;
 };
 
 export function InputTextareaTransparent({
-  autoFocus,
   placeholder,
   onChangeText,
   height,
   borderColor,
+  onTouchEnd,
 }: InputProps) {
   const theme = useAppSelector((state) => state.theme.value);
   const [value, setValue] = useState("");
@@ -23,10 +30,10 @@ export function InputTextareaTransparent({
   return (
     <>
       <TextInputStyled
+        onTouchEnd={onTouchEnd}
         $borderColor={borderColor}
         $height={height}
         value={value}
-        autoFocus={autoFocus}
         onChangeText={(text: string) => setValue(text)}
         multiline
         textAlignVertical="top"
@@ -50,7 +57,7 @@ const TextInputStyled = styled.TextInput<{
   color: ${({ theme }) => theme.color.standard};
   padding: 15px;
   font-family: "Poppins-Regular";
-  font-size: 18px;
+  font-size: 16px;
   border-radius: 15px;
   border: 7px dotted ${({ $borderColor }) => $borderColor};
 `;

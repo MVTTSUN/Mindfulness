@@ -2,6 +2,7 @@ import { PropsWithChildren } from "react";
 import { styled } from "styled-components/native";
 import { MoreIcons } from "../../icons/MoreIcons";
 import { useAppSelector } from "../../../hooks/useAppSelector";
+import { LIGHT_THEME } from "../../../const";
 
 type TouchableCardMeditationProps = PropsWithChildren<{
   onPress: () => void;
@@ -19,10 +20,16 @@ export function TouchableCardMeditation({
     <TouchableHighlightStyled
       $isAll={isAll}
       onPress={onPress}
-      underlayColor={theme === "light" ? "#d3d3db" : "#1f1f1f"}
+      underlayColor={
+        isAll
+          ? theme === "light"
+            ? "#d3d3db"
+            : "#1f1f1f"
+          : LIGHT_THEME.backgroundColor.meditationCardPressed
+      }
     >
       <TextContainer>
-        <TextWhite>{children}</TextWhite>
+        <TextStyled $isAll={isAll}>{children}</TextStyled>
         {isAll && <MoreIcons />}
       </TextContainer>
     </TouchableHighlightStyled>
@@ -51,10 +58,11 @@ const TextContainer = styled.View`
   justify-content: space-between;
 `;
 
-const TextWhite = styled.Text`
+const TextStyled = styled.Text<{ $isAll?: boolean }>`
   text-align: center;
   font-family: "Poppins-Regular";
   font-size: 12px;
   line-height: 16px;
-  color: ${({ theme }) => theme.color.standard};
+  color: ${({ $isAll, theme }) =>
+    $isAll ? theme.color.standard : theme.color.meditation};
 `;

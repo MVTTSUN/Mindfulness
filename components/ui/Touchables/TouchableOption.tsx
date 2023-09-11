@@ -28,18 +28,19 @@ const ViewStyled = styled.View<{
   width: 10%;
   height: 31px;
   flex: auto;
-  padding: 9px 3px 6px;
+  justify-content: center;
   background-color: ${({ $isActive, theme }) =>
     $isActive ? theme.backgroundColor.selectActive : "transparent"};
   border-radius: 42px;
-  border: 1px solid ${({ theme }) => theme.color.standard};
+  border: 1px solid
+    ${({ $isActive, theme }) =>
+      $isActive ? theme.backgroundColor.selectActive : theme.color.standard};
 `;
 
 const TextStyled = styled.Text<{ $isActive: boolean }>`
   font-family: "Poppins-Regular";
   font-size: 12px;
-  line-height: 14px;
-  color: ${({ theme }) => theme.color.standard};
+  line-height: 18px;
   color: ${({ $isActive, theme }) =>
     $isActive ? theme.color.selectActive : theme.color.standard};
 `;

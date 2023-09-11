@@ -3,13 +3,17 @@ const DARK_THEME = {
     standard: "#edecf5",
     selected: "#000",
     selectActive: "#313131",
+    meditation: "#edecf5",
+    task: "#313131",
   },
   backgroundColor: {
     main: "#000",
     primary: "#b5f2ea",
     tabNavigator: "#1f1f1f",
-    selectActive: "#edecf5",
-    meditationCard: "#313131",
+    selectActive: "#adc0e0",
+    taskCard: "#e6f4e5",
+    meditationCard: "#469ab2",
+    meditationCardPressed: "#377a8c",
     blur: "rgba(49, 49, 49, 0.5)",
   },
   borderColor: {
@@ -21,6 +25,8 @@ const DARK_THEME = {
 const LIGHT_THEME = {
   color: {
     standard: "#313131",
+    meditation: "#edecf5",
+    task: "#313131",
     selected: "#edecf5",
     selectActive: "#edecf5",
   },
@@ -28,8 +34,10 @@ const LIGHT_THEME = {
     main: "#f5f4fa",
     primary: "#b5f2ea",
     tabNavigator: "#313131",
-    selectActive: "#313131",
-    meditationCard: "#e8e7eb",
+    selectActive: "#283957",
+    taskCard: "#d2f2d0",
+    meditationCard: "#469ab2",
+    meditationCardPressed: "#377a8c",
     blur: "rgba(0, 0, 0, 0.3)",
   },
   borderColor: {
@@ -39,10 +47,31 @@ const LIGHT_THEME = {
 };
 
 const MAIN_COLOR = {
-  normal: "#b5f2ea",
-  normalPressed: "#9dd8d0",
-  pastel: "#d4f4ef",
-  pastelPressed: "#aedcd6",
+  normal: "#aef0f6",
+  normalPressed: "#98d3d8",
+  pastel: "#d1f9fe",
+  pastelPressed: "#badbdf",
+};
+
+const COLORS = {
+  mainColors: {
+    normal: "#aef0f6",
+    normalPressed: "#98d3d8",
+    pastel: "#d1f9fe",
+    pastelPressed: "#badbdf",
+  },
+  textColors: {
+    normal: "#313131",
+    meditationCard: "#edecf5",
+    taskCard: "#313131",
+  },
+  backgroundColors: {
+    meditationCard: "#469ab2",
+    meditationCardPressed: "#377a8c",
+    taskCard: "#d2f2d0",
+    taskCardPressed: "#b9d5b7",
+  },
+  borderColors: {},
 };
 
 const MAIN_CARDS = [
@@ -323,6 +352,168 @@ const MEDITATIONS_DATA = [
   },
 ];
 
+const DATA_INPUTS_NOTE = [
+  {
+    id: 1,
+    title: "Какие ощущения удалось уловить?",
+  },
+  {
+    id: 2,
+    title: "Какие возникли сложности?",
+  },
+  {
+    id: 3,
+    title: "Что вас удивило?",
+  },
+  {
+    id: 4,
+    title: "Вы можете записать любые размышления",
+  },
+];
+
+const EMOTIONS = [
+  {
+    id: 1,
+    text: "Неловкость",
+  },
+  {
+    id: 2,
+    text: "Смущение",
+  },
+  {
+    id: 3,
+    text: "Стыд",
+  },
+  {
+    id: 4,
+    text: "Вина",
+  },
+  {
+    id: 5,
+    text: "Удовлетворение",
+  },
+  {
+    id: 6,
+    text: "Удовольствие",
+  },
+  {
+    id: 7,
+    text: "Радость",
+  },
+  {
+    id: 8,
+    text: "Восторг",
+  },
+  {
+    id: 9,
+    text: "Досада",
+  },
+  {
+    id: 10,
+    text: "Обида",
+  },
+  {
+    id: 11,
+    text: "Зависть",
+  },
+  {
+    id: 12,
+    text: "Безразличие",
+  },
+  {
+    id: 13,
+    text: "Спокойствие",
+  },
+  {
+    id: 14,
+    text: "Умиротворение",
+  },
+  {
+    id: 15,
+    text: "Разочарование",
+  },
+  {
+    id: 16,
+    text: "Печаль",
+  },
+  {
+    id: 17,
+    text: "Грусть",
+  },
+  {
+    id: 18,
+    text: "Тоска",
+  },
+  {
+    id: 19,
+    text: "Отчаяние",
+  },
+  {
+    id: 20,
+    text: "Горе",
+  },
+  {
+    id: 21,
+    text: "Недовольство",
+  },
+  {
+    id: 22,
+    text: "Неприязнь",
+  },
+  {
+    id: 23,
+    text: "Отвращение",
+  },
+  {
+    id: 24,
+    text: "Беспокойство",
+  },
+  {
+    id: 25,
+    text: "Тревога",
+  },
+  {
+    id: 26,
+    text: "Страх",
+  },
+  {
+    id: 27,
+    text: "Ужас",
+  },
+  {
+    id: 28,
+    text: "Удивление",
+  },
+  {
+    id: 29,
+    text: "Интерес",
+  },
+  {
+    id: 30,
+    text: "Предвкушение",
+  },
+  {
+    id: 31,
+    text: "Воодушевление",
+  },
+  {
+    id: 32,
+    text: "Раздражение",
+  },
+  {
+    id: 33,
+    text: "Злость",
+  },
+  {
+    id: 34,
+    text: "Гнев",
+  },
+  {
+    id: 35,
+    text: "Ярость",
+  },
+];
+
 export {
   DARK_THEME,
   LIGHT_THEME,
@@ -330,4 +521,7 @@ export {
   OPTIONS_DATA,
   MEDITATIONS_DATA,
   MAIN_COLOR,
+  COLORS,
+  DATA_INPUTS_NOTE,
+  EMOTIONS,
 };

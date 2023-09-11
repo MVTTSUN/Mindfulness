@@ -42,6 +42,6 @@ const TextStyled = styled.Text`
   text-align: center;
   font-family: "Poppins-Medium";
   font-size: 14px;
-  line-height: 20px;
+  line-height: 18px;
   color: #313131;
 `;

@@ -79,7 +79,8 @@ export function InfoAndSettings() {
         </CenterContainer>
       </GlobalScreen>
       <ViewMade>
-        <TextMade>© {new Date().getFullYear()} Made by MVTTSUN</TextMade>
+        <TextMade>v 1.0.0</TextMade>
+        <TextMade>© {new Date().getFullYear()} Made by MVTT</TextMade>
       </ViewMade>
       {isOpenThemePopup && (
         <PressableBlur onPress={() => setIsOpenThemePopup(false)}>
@@ -122,8 +123,8 @@ const TextLine = styled.Text`
 `;
 
 const ViewMade = styled.View`
-  padding-top: 7px;
-  height: 100px;
+  padding-top: 10px;
+  height: 122px;
   align-items: center;
   background-color: ${({ theme }) => theme.backgroundColor.main};
 `;
@@ -131,4 +132,6 @@ const ViewMade = styled.View`
 const TextMade = styled.Text`
   font-family: "Poppins-Regular";
   font-size: 14px;
+  line-height: 18px;
+  color: ${({ theme }) => theme.color.standard};
 `;

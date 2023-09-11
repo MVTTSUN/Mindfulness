@@ -21,7 +21,8 @@
         "UIBackgroundModes": [
           "audio"
         ]
-      }
+      },
+      "bundleIdentifier": "com.anonymous.Mindfulness"
     },
     "android": {
       "userInterfaceStyle": "automatic",

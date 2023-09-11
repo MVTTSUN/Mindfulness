@@ -30,12 +30,20 @@ export function Notes() {
             placeholder="Поиск заметок"
           />
           <NotesContainer>
-            <TouchableHighlightNote $backgroundColor="#ff6868">
+            <TouchableHighlightNote $backgroundColor="#469ab2">
               <>
-                <NoteTitle numberOfLines={2} ellipsizeMode="tail">
+                <NoteTitle
+                  $color="#f5f4fa"
+                  numberOfLines={2}
+                  ellipsizeMode="tail"
+                >
                   rhthhthrthrthrthrthrthrththrthr
                 </NoteTitle>
-                <NoteText numberOfLines={4} ellipsizeMode="tail">
+                <NoteText
+                  $color="#f5f4fa"
+                  numberOfLines={4}
+                  ellipsizeMode="tail"
+                >
                   gerger rhthhthrthrthrthrthrthrththrthr
                   vrhthhthrthrthrthrthrthrththrthr
                   rhthhthrthrthrthrthrthrththrthr
@@ -47,28 +55,28 @@ export function Notes() {
                 </DateText>
               </>
             </TouchableHighlightNote>
-            <TouchableHighlightNote $backgroundColor="#feed30">
+            <TouchableHighlightNote $backgroundColor="#d2f2d0">
               <>
-                <NoteTitle>rhth</NoteTitle>
-                <NoteText>gerger</NoteText>
+                <NoteTitle $color="#313131">rhth</NoteTitle>
+                <NoteText $color="#313131">gerger</NoteText>
                 <DateText numberOfLines={1} ellipsizeMode="tail">
                   19 Августа
                 </DateText>
               </>
             </TouchableHighlightNote>
-            <TouchableHighlightNote $backgroundColor="#12fa73">
+            <TouchableHighlightNote $backgroundColor="#d2f2d0">
               <>
-                <NoteTitle>rhth</NoteTitle>
-                <NoteText>gerger</NoteText>
+                <NoteTitle $color="#313131">rhth</NoteTitle>
+                <NoteText $color="#313131">gerger</NoteText>
                 <DateText numberOfLines={1} ellipsizeMode="tail">
                   19 Августа
                 </DateText>
               </>
             </TouchableHighlightNote>
-            <TouchableHighlightNote $backgroundColor="#54f7f2">
+            <TouchableHighlightNote $backgroundColor="#469ab2">
               <>
-                <NoteTitle>rhth</NoteTitle>
-                <NoteText>gerger</NoteText>
+                <NoteTitle $color="#f5f4fa">rhth</NoteTitle>
+                <NoteText $color="#f5f4fa">gerger</NoteText>
                 <DateText numberOfLines={1} ellipsizeMode="tail">
                   19 Августа
                 </DateText>
@@ -118,16 +126,18 @@ const TouchableHighlightNote = styled.TouchableHighlight<{
   border-radius: 25px;
 `;
 
-const NoteTitle = styled.Text`
+const NoteTitle = styled.Text<{ $color: string }>`
   font-family: "Poppins-Medium";
   font-size: 14px;
+  color: ${({ $color }) => $color};
 `;
 
-const NoteText = styled.Text`
+const NoteText = styled.Text<{ $color: string }>`
   flex: 1;
   opacity: 0.6;
   font-family: "Poppins-Medium";
   font-size: 12px;
+  color: ${({ $color }) => $color};
 `;
 
 const DateText = styled.Text`

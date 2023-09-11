@@ -117,6 +117,7 @@ const ViewPlus = styled.View`
 const TextAudio = styled.Text`
   font-family: "Poppins-Medium";
   font-size: 18px;
+  line-height: 30px;
   color: ${({ theme }) => theme.color.standard};
 `;
 

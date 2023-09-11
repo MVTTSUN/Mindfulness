@@ -14,7 +14,7 @@ import { setLikes } from "../../store/likesSlice";
 import { setNotes } from "../../store/notesSlice";
 
 export function ImportAndExport() {
-  const likes = useAppSelector((state) => state.likes.likes);
+  const likes = useAppSelector((state) => state.likes);
   const notes = useAppSelector((state) => state.notes.notes);
   const dispatch = useAppDispatch();
 

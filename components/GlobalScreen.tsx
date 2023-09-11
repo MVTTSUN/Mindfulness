@@ -32,6 +32,7 @@ export function GlobalScreen({
 }
 
 const ViewStyled = styled.View`
+  padding-top: 10px;
   flex: 1;
   background-color: ${({ theme }) => theme.backgroundColor.main};
 `;

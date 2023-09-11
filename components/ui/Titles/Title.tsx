@@ -6,7 +6,8 @@ export function Title({ children }: PropsWithChildren) {
 }
 
 const TextStyled = styled.Text`
-  margin-bottom: 15px;
+  line-height: 30px;
+  margin: 15px 0;
   font-family: "Poppins-SemiBold";
   font-size: 28px;
   color: ${({ theme }) => theme.color.standard};

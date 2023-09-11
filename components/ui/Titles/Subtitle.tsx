@@ -6,8 +6,9 @@ export function Subtitle({ children }: PropsWithChildren) {
 }
 
 const TextStyled = styled.Text`
-  margin-bottom: 15px;
+  margin: 5px 0 15px;
   font-family: "Poppins-Medium";
   font-size: 18px;
+  line-height: 22px;
   color: ${({ theme }) => theme.color.standard};
 `;

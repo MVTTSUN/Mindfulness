@@ -16,7 +16,6 @@ export function Input({
   width,
   withoutIcon,
   placeholder,
-  isTextarea,
   onChangeText,
 }: InputProps) {
   const theme = useAppSelector((state) => state.theme.value);
@@ -30,14 +29,10 @@ export function Input({
           onFocus={() => setIsFocus(true)}
           onBlur={() => setIsFocus(false)}
           onChangeText={onChangeText}
-          multiline={isTextarea}
-          numberOfLines={isTextarea ? 30 : 1}
-          textAlignVertical={isTextarea ? "top" : "center"}
           placeholder={placeholder}
           selectionColor={theme === "light" ? "#313131" : "#edecf5"}
           placeholderTextColor={theme === "light" ? "#929292" : "#656566"}
           $withoutIcon={withoutIcon}
-          $isTextarea={isTextarea}
         />
       </FocusOutline>
     </ViewStyled>
@@ -52,13 +47,13 @@ const ViewStyled = styled.View<{ $width: string }>`
 
 const TextInputStyled = styled.TextInput<{
   $withoutIcon?: boolean;
-  $isTextarea?: boolean;
 }>`
+  height: 32px;
   color: ${({ theme }) => theme.color.standard};
-  padding: ${({ $isTextarea }) => ($isTextarea ? "8px" : "3px")} 10px 0
-    ${({ $withoutIcon }) => ($withoutIcon ? "10px" : "40px")};
+  padding: 2px 10px 0 ${({ $withoutIcon }) => ($withoutIcon ? "10px" : "40px")};
   font-family: "Poppins-Regular";
   font-size: 12px;
+  line-height: 16px;
   border: 1px solid ${({ theme }) => theme.color.standard};
   border-radius: 20px;
 `;

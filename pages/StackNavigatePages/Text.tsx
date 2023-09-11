@@ -81,5 +81,6 @@ const TextLine = styled.Text<{ $isOpacity: boolean }>`
   opacity: ${({ $isOpacity }) => ($isOpacity ? 1 : 0.4)};
   font-family: "Poppins-Medium";
   font-size: 24px;
+  line-height: 38px;
   color: ${({ theme }) => theme.color.standard};
 `;

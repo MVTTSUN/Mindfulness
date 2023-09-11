@@ -7,6 +7,7 @@ type TouchableHighlightProps = PropsWithChildren<{
   isRound?: boolean;
   backgroundColor?: string;
   underlayColor?: string;
+  color?: string;
 }>;
 
 export function TouchableHighlight({
@@ -15,6 +16,7 @@ export function TouchableHighlight({
   isRound,
   backgroundColor,
   underlayColor,
+  color,
 }: TouchableHighlightProps) {
   return (
     <TouchableHighlightStyled
@@ -24,7 +26,7 @@ export function TouchableHighlight({
       $isRound={isRound}
       underlayColor={underlayColor ? underlayColor : MAIN_COLOR.normalPressed}
     >
-      {isRound ? children : <TextWhite>{children}</TextWhite>}
+      {isRound ? children : <TextStyle $color={color}>{children}</TextStyle>}
     </TouchableHighlightStyled>
   );
 }
@@ -42,9 +44,9 @@ const TouchableHighlightStyled = styled.TouchableHighlight<{
   border-radius: 42px;
 `;
 
-const TextWhite = styled.Text`
+const TextStyle = styled.Text<{ $color?: string }>`
   font-family: "Poppins-Medium";
   font-size: 14px;
   line-height: 16px;
-  color: #313131;
+  color: ${({ $color }) => ($color ? $color : "#313131")};
 `;

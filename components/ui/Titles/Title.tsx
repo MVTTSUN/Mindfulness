@@ -6,7 +6,7 @@ export function Title({ children }: PropsWithChildren) {
 }
 
 const TextStyled = styled.Text`
-  line-height: 30px;
+  line-height: 40px;
   margin: 15px 0;
   font-family: "Poppins-SemiBold";
   font-size: 28px;

@@ -1,5 +1,5 @@
 import { styled } from "styled-components/native";
-import { TouchableHighlightCard } from "../../components/ui/Touchables/TouchableHighlightCard";
+import { TouchableHighlightCardMain } from "./Touchables/TouchableHighlightCardMain";
 import {
   InfoAndSettingsScreenProp,
   MainCard,
@@ -19,7 +19,7 @@ export function CardListMain({ mainCards }: CardListMainProps) {
   return (
     <ViewStyled>
       {mainCards.map((card) => (
-        <TouchableHighlightCard
+        <TouchableHighlightCardMain
           key={card.id}
           onPress={() =>
             navigation.navigate(
@@ -32,7 +32,7 @@ export function CardListMain({ mainCards }: CardListMainProps) {
           }
         >
           {card.title}
-        </TouchableHighlightCard>
+        </TouchableHighlightCardMain>
       ))}
     </ViewStyled>
   );

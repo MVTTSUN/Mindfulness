@@ -2,12 +2,11 @@ import { styled } from "styled-components/native";
 import { CenterContainer } from "../../components/CenterContainer";
 import { GlobalScreen } from "../../components/GlobalScreen";
 import { TopWithBack } from "../../components/ui/TopWithBack";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Platform, Pressable } from "react-native";
+import { Platform } from "react-native";
 import * as FileSystem from "expo-file-system";
 import { useAppSelector } from "../../hooks/useAppSelector";
 import { TouchableHighlight } from "../../components/ui/Touchables/TouchableHighlight";
-// import { shareAsync } from "expo-sharing";
+import { shareAsync } from "expo-sharing";
 import { useAppDispatch } from "../../hooks/useAppDispatch";
 import * as DocumentPicker from "expo-document-picker";
 import { setLikes } from "../../store/likesSlice";
@@ -46,18 +45,18 @@ export function ImportAndExport() {
       }
     }
 
-    // if (Platform.OS === "ios") {
-    //   const fileUri = FileSystem.documentDirectory + "Mindfulness.json";
-    //   FileSystem.writeAsStringAsync(fileUri, JSON.stringify(data), {
-    //     encoding: FileSystem.EncodingType.UTF8,
-    //   });
-    //   const UTI = "Mindfulness.json";
-    //   await shareAsync(fileUri, { UTI });
-    // }
+    if (Platform.OS === "ios") {
+      const fileUri = FileSystem.documentDirectory + "Mindfulness.json";
+      FileSystem.writeAsStringAsync(fileUri, JSON.stringify(data), {
+        encoding: FileSystem.EncodingType.UTF8,
+      });
+      const UTI = "Mindfulness.json";
+      await shareAsync(fileUri, { UTI });
+    }
   };
 
   const importFile = async () => {
-    let parsedData = { likes: null, notes: null };
+    let parsedData = { likes: [], notes: [] };
     const fileInfo = await DocumentPicker.getDocumentAsync({
       type: "application/json",
     });
@@ -67,7 +66,7 @@ export function ImportAndExport() {
       parsedData = JSON.parse(data);
     }
 
-    if (parsedData.likes !== null && parsedData.notes !== null) {
+    if (parsedData.likes.length !== 0 && parsedData.notes.length !== 0) {
       dispatch(setLikes(parsedData.likes));
       dispatch(setNotes(parsedData.notes));
     }

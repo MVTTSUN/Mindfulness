@@ -1,24 +1,17 @@
 import { createSlice, nanoid } from "@reduxjs/toolkit";
-import { Note } from "../types";
+import { NoteType } from "../types";
 
 const initialState = {
-  notes: [] as Note[],
-  notesFiltered: [] as Note[],
-  notesSearched: [] as Note[],
-  notesLike: [] as Note[],
+  notes: [] as NoteType[],
+  notesFiltered: [] as NoteType[],
+  notesSearched: [] as NoteType[],
+  notesLike: [] as NoteType[],
 };
 
 export const notesSlice = createSlice({
   name: "notes",
   initialState,
   reducers: {
-    filterNotes(state, action) {
-      action.payload === "Всё"
-        ? (state.notesFiltered = state.notes)
-        : (state.notesFiltered = state.notes.filter(
-            (note) => note.kind === action.payload
-          ));
-    },
     searchNotes(state, action) {
       action.payload.trim() === ""
         ? (state.notesSearched = state.notes)
@@ -32,12 +25,14 @@ export const notesSlice = createSlice({
     addNote(state, action) {
       state.notes.unshift({
         id: nanoid(),
-        color: action.payload.color || "",
-        title: action.payload.title || "",
-        text: action.payload.text || "",
-        icon: action.payload.icon || null,
-        createdAt: new Date().toISOString(),
-        kind: action.payload.kind || "",
+        emotionsBefore: action.payload.emotionsBefore,
+        emotionsAfter: action.payload.emotionsAfter,
+        title: action.payload.title || "...",
+        texts: action.payload.texts,
+        createdAt: String(new Date()),
+        color: action.payload.color,
+        backgroundColor: action.payload.backgroundColor,
+        underlayColor: action.payload.underlayColor,
       });
     },
     removeNotes(state, action) {
@@ -56,13 +51,7 @@ export const notesSlice = createSlice({
   },
 });
 
-export const {
-  filterNotes,
-  searchNotes,
-  addNote,
-  removeNotes,
-  updateNote,
-  setNotes,
-} = notesSlice.actions;
+export const { searchNotes, addNote, removeNotes, updateNote, setNotes } =
+  notesSlice.actions;
 
 export default notesSlice.reducer;

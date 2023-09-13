@@ -3,6 +3,7 @@ import { useAppSelector } from "../hooks/useAppSelector";
 import { Pressable, ScrollView } from "react-native";
 import { COLORS } from "../const";
 import { RadioButton } from "./ui/RadioButton";
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
 type MeditationsAndTasksPopupProps = {
   nameNote: string;
@@ -19,53 +20,80 @@ export function MeditationsAndTasksPopup({
   setNameNote,
 }: MeditationsAndTasksPopupProps) {
   const meditations = useAppSelector((state) => state.meditations.meditations);
+  const tasks = useAppSelector((state) => state.tasks.tasks);
 
   return (
-    <Container>
-      <FilterContainer>
-        <FilterTouchableHighlight
-          onPress={() => {}}
-          underlayColor={COLORS.backgroundColors.meditationCardPressed}
-          $backgroundColor={COLORS.backgroundColors.meditationCard}
-        >
-          <TextFilter $color={COLORS.textColors.meditationCard}>
-            Медитации
-          </TextFilter>
-        </FilterTouchableHighlight>
-        <FilterTouchableHighlight
-          onPress={() => {}}
-          underlayColor={COLORS.backgroundColors.taskCardPressed}
-          $backgroundColor={COLORS.backgroundColors.taskCard}
-        >
-          <TextFilter $color={COLORS.textColors.taskCard}>Задания</TextFilter>
-        </FilterTouchableHighlight>
-      </FilterContainer>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <MeditationsContainer>
-          {meditations.map((meditation) => (
-            <Pressable
-              key={`meditation-${meditation.id}`}
-              onPress={() =>
-                nameNote.split(": ")[1] === meditation.title
-                  ? () => {}
-                  : setNameNote(
-                      `Медитация: ${meditation.title}`,
-                      COLORS.backgroundColors.meditationCard,
-                      COLORS.backgroundColors.meditationCardPressed,
-                      COLORS.textColors.meditationCard
-                    )
-              }
-            >
-              <RadioButton
-                color={COLORS.backgroundColors.meditationCard}
-                text={meditation.title}
-                isActive={nameNote.split(": ")[1] === meditation.title}
-              />
-            </Pressable>
-          ))}
-        </MeditationsContainer>
-      </ScrollView>
-    </Container>
+    <Animated.View
+      entering={FadeIn.duration(200)}
+      exiting={FadeOut.duration(200)}
+    >
+      <Container>
+        <FilterContainer>
+          <FilterTouchableHighlight
+            onPress={() => {}}
+            underlayColor={COLORS.backgroundColors.meditationCardPressed}
+            $backgroundColor={COLORS.backgroundColors.meditationCard}
+          >
+            <TextFilter $color={COLORS.textColors.meditationCard}>
+              Медитации
+            </TextFilter>
+          </FilterTouchableHighlight>
+          <FilterTouchableHighlight
+            onPress={() => {}}
+            underlayColor={COLORS.backgroundColors.taskCardPressed}
+            $backgroundColor={COLORS.backgroundColors.taskCard}
+          >
+            <TextFilter $color={COLORS.textColors.taskCard}>Задания</TextFilter>
+          </FilterTouchableHighlight>
+        </FilterContainer>
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <MeditationsContainer>
+            {meditations.map((meditation) => (
+              <Pressable
+                key={`meditation-${meditation.id}`}
+                onPress={() =>
+                  nameNote.split(": ")[1] === meditation.title
+                    ? () => {}
+                    : setNameNote(
+                        `Медитация: ${meditation.title}`,
+                        COLORS.backgroundColors.meditationCard,
+                        COLORS.backgroundColors.meditationCardPressed,
+                        COLORS.textColors.meditationCard
+                      )
+                }
+              >
+                <RadioButton
+                  color={COLORS.backgroundColors.meditationCard}
+                  text={meditation.title}
+                  isActive={nameNote.split(": ")[1] === meditation.title}
+                />
+              </Pressable>
+            ))}
+            {tasks.map((task) => (
+              <Pressable
+                key={`task-${task.id}`}
+                onPress={() =>
+                  nameNote.split(": ")[1] === task.title
+                    ? () => {}
+                    : setNameNote(
+                        `Задание: ${task.title}`,
+                        COLORS.backgroundColors.taskCard,
+                        COLORS.backgroundColors.taskCardPressed,
+                        COLORS.textColors.taskCard
+                      )
+                }
+              >
+                <RadioButton
+                  color={COLORS.backgroundColors.taskCard}
+                  text={task.title}
+                  isActive={nameNote.split(": ")[1] === task.title}
+                />
+              </Pressable>
+            ))}
+          </MeditationsContainer>
+        </ScrollView>
+      </Container>
+    </Animated.View>
   );
 }
 

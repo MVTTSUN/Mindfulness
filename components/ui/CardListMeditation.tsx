@@ -1,6 +1,6 @@
 import { styled } from "styled-components/native";
 import { MeditationScreenProp } from "../../types";
-import { TouchableCardMeditation } from "./Touchables/TouchableCardMeditation";
+import { TouchableHighlightCard } from "./Touchables/TouchableHighlightCard";
 import {
   useFocusEffect,
   useNavigation,
@@ -13,16 +13,18 @@ import {
   filterMeditations,
   likeMeditations,
 } from "../../store/meditationsSlice";
+import { COLORS } from "../../const";
+import deepEqual from "deep-equal";
 
 type CardListMeditationProps = {
   count: number;
 };
 
 export function CardListMeditation({ count }: CardListMeditationProps) {
-  const meditationFiltered = useAppSelector(
+  const meditationsFiltered = useAppSelector(
     (state) => state.meditations.meditationsFiltered
   );
-  const meditationSearched = useAppSelector(
+  const meditationsSearched = useAppSelector(
     (state) => state.meditations.meditationsSearched
   );
   const meditationsLike = useAppSelector(
@@ -30,35 +32,43 @@ export function CardListMeditation({ count }: CardListMeditationProps) {
   );
   const route = useRoute();
   const [meditations, setMeditations] = useState(
-    meditationFiltered.slice(0, count)
+    meditationsFiltered.slice(0, count)
   );
   const navigation = useNavigation<MeditationScreenProp>();
   const dispatch = useAppDispatch();
 
   const seeAll = () => {
-    setMeditations(meditationFiltered);
+    setMeditations(meditationsFiltered);
   };
 
-  const navigateMeditation = () => navigation.navigate("Meditation");
+  const navigateMeditation = () => navigation.navigate("MeditationStack");
 
   useFocusEffect(
     useCallback(() => {
       return () => {
         dispatch(filterMeditations("Всё"));
         dispatch(likeMeditations(null));
-        setMeditations(meditationFiltered.slice(0, count));
+        setMeditations(meditationsFiltered.slice(0, count));
       };
     }, [])
   );
 
   useEffect(() => {
     setMeditations(
-      meditationFiltered
-        .filter((meditation) => meditationSearched.includes(meditation))
-        .filter((meditation) => meditationsLike.includes(meditation))
+      meditationsFiltered
+        .filter((meditation) =>
+          meditationsSearched.some((meditationSearched) =>
+            deepEqual(meditation, meditationSearched)
+          )
+        )
+        .filter((meditation) =>
+          meditationsLike.some((meditationLike) =>
+            deepEqual(meditation, meditationLike)
+          )
+        )
         .slice(0, count)
     );
-  }, [meditationFiltered, meditationSearched, meditationsLike]);
+  }, [meditationsFiltered, meditationsSearched, meditationsLike]);
 
   return (
     <ViewContainer>
@@ -66,20 +76,23 @@ export function CardListMeditation({ count }: CardListMeditationProps) {
         if (
           index + 1 === count &&
           count % 3 === 0 &&
-          meditations !== meditationFiltered
+          meditations !== meditationsFiltered
         ) {
           return (
-            <TouchableCardMeditation
+            <TouchableHighlightCard
               isAll
               key={meditation.id}
               onPress={route.name === "Home" ? navigateMeditation : seeAll}
             >
               Смотреть все
-            </TouchableCardMeditation>
+            </TouchableHighlightCard>
           );
         }
         return (
-          <TouchableCardMeditation
+          <TouchableHighlightCard
+            color={COLORS.textColors.meditationCard}
+            backgroundColor={COLORS.backgroundColors.meditationCard}
+            underlayColor={COLORS.backgroundColors.meditationCardPressed}
             key={meditation.id}
             onPress={() => {
               if (route.name === "Home") {
@@ -93,7 +106,7 @@ export function CardListMeditation({ count }: CardListMeditationProps) {
             }}
           >
             {meditation.title}
-          </TouchableCardMeditation>
+          </TouchableHighlightCard>
         );
       })}
     </ViewContainer>

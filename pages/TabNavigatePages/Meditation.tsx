@@ -41,6 +41,8 @@ import Animated, {
   Easing,
   useAnimatedStyle,
   useSharedValue,
+  withSequence,
+  withSpring,
   withTiming,
 } from "react-native-reanimated";
 
@@ -67,8 +69,17 @@ export function Meditation() {
     }),
     transform: [{ rotate: `${rotate.value * 360}deg` }],
   }));
+  const scaleLike = useSharedValue(1);
+  const likeStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scaleLike.value }],
+  }));
 
   const findFavorites = () => {
+    scaleLike.value = withSequence(
+      withSpring(1),
+      withSpring(1.2),
+      withSpring(1)
+    );
     if (isActive) {
       dispatch(likeMeditations(null));
     } else {
@@ -160,10 +171,12 @@ export function Meditation() {
             onPress={findFavorites}
             underlayColor={LIGHT_THEME.backgroundColor.meditationCardPressed}
           >
-            <LikeIcon
-              color={COLORS.textColors.meditationCard}
-              isActive={isActive}
-            />
+            <Animated.View style={likeStyle}>
+              <LikeIcon
+                color={COLORS.textColors.meditationCard}
+                isActive={isActive}
+              />
+            </Animated.View>
           </FavoritesButton>
         </SearchView>
       </CenterContainer>

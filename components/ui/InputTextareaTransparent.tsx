@@ -8,6 +8,13 @@ import {
   NativeTouchEvent,
   TextInputFocusEventData,
 } from "react-native";
+import { COLORS, DARK_THEME, LIGHT_THEME } from "../../const";
+import Animated, {
+  interpolateColor,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
 
 type InputProps = {
   onChangeText: (text: string) => void;
@@ -15,39 +22,74 @@ type InputProps = {
   height: number;
   borderColor: string;
   onTouchEnd: (event: GestureResponderEvent) => void;
+  value: string;
 };
 
 export function InputTextareaTransparent({
   placeholder,
   onChangeText,
+  value,
   height,
   borderColor,
   onTouchEnd,
 }: InputProps) {
+  const [isActive, setIsActive] = useState(false);
   const theme = useAppSelector((state) => state.theme.value);
-  const [value, setValue] = useState("");
+  const opacity = useSharedValue(0);
+  const borderColorStyle = useAnimatedStyle(() => ({
+    borderWidth: 3,
+    borderStyle: "dashed",
+    borderColor: interpolateColor(
+      opacity.value,
+      [0, 1],
+      [
+        "transparent",
+        theme === "light"
+          ? LIGHT_THEME.backgroundColor.selectActive
+          : DARK_THEME.backgroundColor.selectActive,
+      ]
+    ),
+  }));
+
+  useEffect(() => {
+    if (isActive) {
+      opacity.value = withTiming(1, { duration: 200 });
+    } else {
+      opacity.value = withTiming(0, { duration: 200 });
+    }
+  }, [isActive]);
 
   return (
     <>
-      <TextInputStyled
-        onTouchEnd={onTouchEnd}
-        $borderColor={borderColor}
-        $height={height}
-        value={value}
-        onChangeText={(text: string) => setValue(text)}
-        multiline
-        textAlignVertical="top"
-        placeholder={placeholder}
-        selectionColor={theme === "light" ? "#313131" : "#edecf5"}
-        placeholderTextColor={
-          theme === "light"
-            ? "rgba(49, 49, 49, 0.3)"
-            : "rgba(237, 236, 245, 0.3)"
-        }
-      />
+      <Outline style={borderColorStyle}>
+        <TextInputStyled
+          onFocus={() => setIsActive(true)}
+          onBlur={() => setIsActive(false)}
+          onTouchEnd={onTouchEnd}
+          $borderColor={borderColor}
+          $height={height}
+          value={value}
+          onChangeText={onChangeText}
+          multiline
+          textAlignVertical="top"
+          placeholder={placeholder}
+          cursorColor={theme === "light" ? "#313131" : "#edecf5"}
+          selectionColor={COLORS.mainColors.pastel}
+          placeholderTextColor={
+            theme === "light"
+              ? "rgba(49, 49, 49, 0.3)"
+              : "rgba(237, 236, 245, 0.3)"
+          }
+        />
+      </Outline>
     </>
   );
 }
+
+const Outline = styled(Animated.View)`
+  padding: 5px;
+  border-radius: 15px;
+`;
 
 const TextInputStyled = styled.TextInput<{
   $height: number;

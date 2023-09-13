@@ -1,7 +1,14 @@
 import { styled } from "styled-components/native";
 import { SearchIcon } from "../icons/SearchIcon";
 import { useAppSelector } from "../../hooks/useAppSelector";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { COLORS } from "../../const";
+import Animated, {
+  interpolateColor,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
 
 type InputProps = {
   onChangeText: (text: string) => void;
@@ -10,6 +17,7 @@ type InputProps = {
   placeholder: string;
   height?: string;
   isTextarea?: boolean;
+  editable?: boolean;
 };
 
 export function Input({
@@ -17,20 +25,41 @@ export function Input({
   withoutIcon,
   placeholder,
   onChangeText,
+  editable,
 }: InputProps) {
   const theme = useAppSelector((state) => state.theme.value);
   const [isFocus, setIsFocus] = useState(false);
+  const opacity = useSharedValue(0);
+  const borderColorAnimated = useAnimatedStyle(() => ({
+    borderWidth: 3,
+    borderStyle: "solid",
+    borderColor: interpolateColor(
+      opacity.value,
+      [0, 1],
+      ["transparent", COLORS.mainColors.normal]
+    ),
+  }));
+
+  useEffect(() => {
+    if (isFocus) {
+      opacity.value = withTiming(1, { duration: 200 });
+    } else {
+      opacity.value = withTiming(0, { duration: 200 });
+    }
+  }, [isFocus]);
 
   return (
     <ViewStyled $width={width}>
       {!withoutIcon && <SearchIcon />}
-      <FocusOutline $isFocus={isFocus}>
+      <FocusOutline style={borderColorAnimated}>
         <TextInputStyled
+          editable={editable}
           onFocus={() => setIsFocus(true)}
           onBlur={() => setIsFocus(false)}
           onChangeText={onChangeText}
           placeholder={placeholder}
-          selectionColor={theme === "light" ? "#313131" : "#edecf5"}
+          cursorColor={theme === "light" ? "#313131" : "#edecf5"}
+          selectionColor={COLORS.mainColors.pastel}
           placeholderTextColor={theme === "light" ? "#929292" : "#656566"}
           $withoutIcon={withoutIcon}
         />
@@ -58,13 +87,9 @@ const TextInputStyled = styled.TextInput<{
   border-radius: 20px;
 `;
 
-const FocusOutline = styled.View<{ $isFocus: boolean }>`
+const FocusOutline = styled(Animated.View)`
   align-self: flex-start;
   width: 100%;
   padding: 3px;
-  border: ${({ $isFocus, theme }) =>
-    $isFocus
-      ? "3px solid #b5f2ea"
-      : `3px solid ${theme.borderColor.searchOutline}`};
   border-radius: 40px;
 `;

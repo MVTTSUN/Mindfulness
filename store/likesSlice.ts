@@ -27,7 +27,8 @@ export const likesSlice = createSlice({
       );
     },
     setLikes(state, action) {
-      state.likesMeditation = action.payload;
+      state.likesTask = action.payload.likesTask;
+      state.likesMeditation = action.payload.likesMeditation;
     },
   },
 });

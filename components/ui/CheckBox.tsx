@@ -1,12 +1,23 @@
 import styled from "styled-components/native";
 import { CheckIcon } from "../icons/CheckIcon";
 import { COLORS } from "../../const";
+import Animated, {
+  FadeIn,
+  FadeOut,
+  interpolateColor,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
+import { useEffect } from "react";
 
 type CheckBoxProps = {
-  color: string;
+  color?: string;
   backgroundColor: string;
-  text: string;
+  text?: string;
   isActive: boolean;
+  isRound?: boolean;
+  isStroke?: boolean;
 };
 
 export function CheckBox({
@@ -14,43 +25,59 @@ export function CheckBox({
   backgroundColor,
   text,
   isActive,
+  isRound,
+  isStroke,
 }: CheckBoxProps) {
+  const opacity = useSharedValue(0);
+  const backgroundColorAnimation = useAnimatedStyle(() => ({
+    backgroundColor: interpolateColor(
+      opacity.value,
+      [0, 1],
+      ["transparent", backgroundColor]
+    ),
+  }));
+
+  useEffect(() => {
+    if (isActive) {
+      opacity.value = withTiming(1, { duration: 200 });
+    } else {
+      opacity.value = withTiming(0, { duration: 200 });
+    }
+  }, [isActive]);
+
   return (
     <Container>
       <CheckBoxStyled
-        $backgroundColor={
-          backgroundColor === ""
-            ? COLORS.backgroundColors.meditationCard
-            : backgroundColor
-        }
+        style={backgroundColorAnimation}
+        $borderColor={backgroundColor}
         $isActive={isActive}
+        $isRound={isRound}
       >
         {isActive && (
-          <CheckIcon
-            color={color === "" ? COLORS.textColors.meditationCard : color}
-            size={20}
-            isStroke
-          />
+          <Animated.View
+            entering={FadeIn.duration(200)}
+            exiting={FadeOut.duration(200)}
+          >
+            <CheckIcon color={color} size={20} isStroke={isStroke} />
+          </Animated.View>
         )}
       </CheckBoxStyled>
-      <TextStyled>{text}</TextStyled>
+      {text && <TextStyled>{text}</TextStyled>}
     </Container>
   );
 }
 
-const CheckBoxStyled = styled.View<{
-  $backgroundColor: string;
+const CheckBoxStyled = styled(Animated.View)<{
+  $borderColor: string;
   $isActive: boolean;
+  $isRound?: boolean;
 }>`
   align-items: center;
   justify-content: center;
-  transform: translateY(-2px);
   height: 25px;
   width: 25px;
-  border: 3px solid ${({ $backgroundColor }) => $backgroundColor};
-  background-color: ${({ $isActive, $backgroundColor }) =>
-    $isActive ? $backgroundColor : "transparent"};
-  border-radius: 5px;
+  border: 3px solid ${({ $borderColor }) => $borderColor};
+  border-radius: ${({ $isRound }) => ($isRound ? "20px" : "5px")};
 `;
 
 const Container = styled.View`

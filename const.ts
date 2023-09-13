@@ -66,6 +66,7 @@ const COLORS = {
     taskCard: "#313131",
   },
   backgroundColors: {
+    dark: "#283957",
     meditationCard: "#469ab2",
     meditationCardPressed: "#377a8c",
     taskCard: "#d2f2d0",
@@ -514,6 +515,343 @@ const EMOTIONS = [
   },
 ];
 
+const TASKS = [
+  {
+    id: 1,
+    title: "Задача 1",
+    kind: "Тревога",
+    content: [
+      {
+        type: "text",
+        payload:
+          "Медитация — практика, которая полезна практически всем. Она помогает снижать уровень стресса, справляться с агрессией, тренировать внимание, успокаиваться и прислушиваться к себе. Хотя кажется, что для нее нужны особые условия и инструктор, на самом деле это не так — есть простые техники, которые можно выполнять дома, например дыхательная медитация. Рассказываем, какие это техники и как с ними работать.",
+      },
+      {
+        type: "lottie",
+        payload: require("./assets/lottie/broko.lottie"),
+      },
+      {
+        type: "text",
+        payload:
+          "Медитация — практика, которая полезна практически всем. Она помогает снижать уровень стресса, справляться с агрессией, тренировать внимание, успокаиваться и прислушиваться к себе. Хотя кажется, что для нее нужны особые условия и инструктор, на самом деле это не так — есть простые техники, которые можно выполнять дома, например дыхательная медитация. Рассказываем, какие это техники и как с ними работать.",
+      },
+      {
+        type: "image",
+        payload: require("./assets/images/audio-player-image.png"),
+      },
+      {
+        type: "text",
+        payload:
+          "Медитация — практика, которая полезна практически всем. Она помогает снижать уровень стресса, справляться с агрессией, тренировать внимание, успокаиваться и прислушиваться к себе. Хотя кажется, что для нее нужны особые условия и инструктор, на самом деле это не так — есть простые техники, которые можно выполнять дома, например дыхательная медитация. Рассказываем, какие это техники и как с ними работать.",
+      },
+    ],
+  },
+  {
+    id: 2,
+    title: "Задача 2",
+    kind: "Тревога",
+    content: [
+      {
+        type: "lottie",
+        payload: require("./assets/lottie/dotlottie.lottie"),
+      },
+      {
+        type: "text",
+        payload: "You need a new clean slate without the dents",
+      },
+      {
+        type: "image",
+        payload: require("./assets/images/audio-player-image.png"),
+      },
+    ],
+  },
+  {
+    id: 3,
+    title: "Задача 3",
+    kind: "Тревога",
+    content: [
+      {
+        type: "lottie",
+        payload: require("./assets/lottie/dotlottie.lottie"),
+      },
+      {
+        type: "text",
+        payload: "You need a new clean slate without the dents",
+      },
+      {
+        type: "image",
+        payload: require("./assets/images/audio-player-image.png"),
+      },
+    ],
+  },
+  {
+    id: 4,
+    title: "Задача 4",
+    kind: "Тревога",
+    content: [
+      {
+        type: "lottie",
+        payload: require("./assets/lottie/dotlottie.lottie"),
+      },
+      {
+        type: "text",
+        payload: "You need a new clean slate without the dents",
+      },
+      {
+        type: "image",
+        payload: require("./assets/images/audio-player-image.png"),
+      },
+    ],
+  },
+  {
+    id: 5,
+    title: "Задача 5",
+    kind: "Тревога",
+    content: [
+      {
+        type: "lottie",
+        payload: require("./assets/lottie/dotlottie.lottie"),
+      },
+      {
+        type: "text",
+        payload: "You need a new clean slate without the dents",
+      },
+      {
+        type: "image",
+        payload: require("./assets/images/audio-player-image.png"),
+      },
+    ],
+  },
+  {
+    id: 6,
+    title: "Задача 6",
+    kind: "Тревога",
+    content: [
+      {
+        type: "lottie",
+        payload: require("./assets/lottie/dotlottie.lottie"),
+      },
+      {
+        type: "text",
+        payload: "You need a new clean slate without the dents",
+      },
+      {
+        type: "image",
+        payload: require("./assets/images/audio-player-image.png"),
+      },
+    ],
+  },
+  {
+    id: 7,
+    title: "Задача 7",
+    kind: "Тревога",
+    content: [
+      {
+        type: "lottie",
+        payload: require("./assets/lottie/dotlottie.lottie"),
+      },
+      {
+        type: "text",
+        payload: "You need a new clean slate without the dents",
+      },
+      {
+        type: "image",
+        payload: require("./assets/images/audio-player-image.png"),
+      },
+    ],
+  },
+  {
+    id: 8,
+    title: "Задача 8",
+    kind: "Тревога",
+    content: [
+      {
+        type: "lottie",
+        payload: require("./assets/lottie/dotlottie.lottie"),
+      },
+      {
+        type: "text",
+        payload: "You need a new clean slate without the dents",
+      },
+      {
+        type: "image",
+        payload: require("./assets/images/audio-player-image.png"),
+      },
+    ],
+  },
+  {
+    id: 9,
+    title: "Задача 9",
+    kind: "Тревога",
+    content: [
+      {
+        type: "lottie",
+        payload: require("./assets/lottie/dotlottie.lottie"),
+      },
+      {
+        type: "text",
+        payload: "You need a new clean slate without the dents",
+      },
+      {
+        type: "image",
+        payload: require("./assets/images/audio-player-image.png"),
+      },
+    ],
+  },
+  {
+    id: 10,
+    title: "Задача 10",
+    kind: "Тревога",
+    content: [
+      {
+        type: "lottie",
+        payload: require("./assets/lottie/dotlottie.lottie"),
+      },
+      {
+        type: "text",
+        payload: "You need a new clean slate without the dents",
+      },
+      {
+        type: "image",
+        payload: require("./assets/images/audio-player-image.png"),
+      },
+    ],
+  },
+  {
+    id: 11,
+    title: "Задача 11",
+    kind: "Тревога",
+    content: [
+      {
+        type: "lottie",
+        payload: require("./assets/lottie/dotlottie.lottie"),
+      },
+      {
+        type: "text",
+        payload: "You need a new clean slate without the dents",
+      },
+      {
+        type: "image",
+        payload: require("./assets/images/audio-player-image.png"),
+      },
+    ],
+  },
+  {
+    id: 12,
+    title: "Задача 12",
+    kind: "Тревога",
+    content: [
+      {
+        type: "lottie",
+        payload: require("./assets/lottie/dotlottie.lottie"),
+      },
+      {
+        type: "text",
+        payload: "You need a new clean slate without the dents",
+      },
+      {
+        type: "image",
+        payload: require("./assets/images/audio-player-image.png"),
+      },
+    ],
+  },
+  {
+    id: 13,
+    title: "Задача 13",
+    kind: "Тревога",
+    content: [
+      {
+        type: "lottie",
+        payload: require("./assets/lottie/dotlottie.lottie"),
+      },
+      {
+        type: "text",
+        payload: "You need a new clean slate without the dents",
+      },
+      {
+        type: "image",
+        payload: require("./assets/images/audio-player-image.png"),
+      },
+    ],
+  },
+  {
+    id: 14,
+    title: "Задача 14",
+    kind: "Тревога",
+    content: [
+      {
+        type: "lottie",
+        payload: require("./assets/lottie/dotlottie.lottie"),
+      },
+      {
+        type: "text",
+        payload: "You need a new clean slate without the dents",
+      },
+      {
+        type: "image",
+        payload: require("./assets/images/audio-player-image.png"),
+      },
+    ],
+  },
+  {
+    id: 15,
+    title: "Задача 15",
+    kind: "Тревога",
+    content: [
+      {
+        type: "lottie",
+        payload: require("./assets/lottie/dotlottie.lottie"),
+      },
+      {
+        type: "text",
+        payload: "You need a new clean slate without the dents",
+      },
+      {
+        type: "image",
+        payload: require("./assets/images/audio-player-image.png"),
+      },
+    ],
+  },
+  {
+    id: 16,
+    title: "Задача 16",
+    kind: "Тревога",
+    content: [
+      {
+        type: "lottie",
+        payload: require("./assets/lottie/dotlottie.lottie"),
+      },
+      {
+        type: "text",
+        payload: "You need a new clean slate without the dents",
+      },
+      {
+        type: "image",
+        payload: require("./assets/images/audio-player-image.png"),
+      },
+    ],
+  },
+  {
+    id: 17,
+    title: "Задача 17",
+    kind: "Тревога",
+    content: [
+      {
+        type: "lottie",
+        payload: require("./assets/lottie/dotlottie.lottie"),
+      },
+      {
+        type: "text",
+        payload: "You need a new clean slate without the dents",
+      },
+      {
+        type: "image",
+        payload: require("./assets/images/audio-player-image.png"),
+      },
+    ],
+  },
+];
+
 export {
   DARK_THEME,
   LIGHT_THEME,
@@ -524,4 +862,5 @@ export {
   COLORS,
   DATA_INPUTS_NOTE,
   EMOTIONS,
+  TASKS,
 };

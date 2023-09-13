@@ -3,6 +3,7 @@ import { CheckBox } from "./ui/CheckBox";
 import { Pressable, ScrollView } from "react-native";
 import { COLORS, EMOTIONS } from "../const";
 import { useState } from "react";
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
 type EmotionsPopupProps = {
   backgroundColor: string;
@@ -40,29 +41,34 @@ export function EmotionsPopup({
   };
 
   return (
-    <Container>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <EmotionsContainer>
-          {EMOTIONS.map((emotion) => (
-            <Pressable
-              key={emotion.id}
-              onPress={() => toggleActiveEmotion(emotion.text)}
-            >
-              <CheckBox
-                color={color}
-                backgroundColor={backgroundColor}
-                text={emotion.text}
-                isActive={
-                  typeEmotions === "before"
-                    ? emotionsBefore.includes(emotion.text)
-                    : emotionsAfter.includes(emotion.text)
-                }
-              />
-            </Pressable>
-          ))}
-        </EmotionsContainer>
-      </ScrollView>
-    </Container>
+    <Animated.View
+      entering={FadeIn.duration(200)}
+      exiting={FadeOut.duration(200)}
+    >
+      <Container>
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <EmotionsContainer>
+            {EMOTIONS.map((emotion) => (
+              <Pressable
+                key={emotion.id}
+                onPress={() => toggleActiveEmotion(emotion.text)}
+              >
+                <CheckBox
+                  color={color}
+                  backgroundColor={backgroundColor}
+                  text={emotion.text}
+                  isActive={
+                    typeEmotions === "before"
+                      ? emotionsBefore.includes(emotion.text)
+                      : emotionsAfter.includes(emotion.text)
+                  }
+                />
+              </Pressable>
+            ))}
+          </EmotionsContainer>
+        </ScrollView>
+      </Container>
+    </Animated.View>
   );
 }
 

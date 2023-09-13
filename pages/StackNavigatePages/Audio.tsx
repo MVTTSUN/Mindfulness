@@ -40,6 +40,7 @@ export function Audio() {
   const likeStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scaleLike.value }],
   }));
+  const theme = useAppSelector((state) => state.theme.value);
 
   const toggleLike = () => {
     scaleLike.value = withSequence(
@@ -76,7 +77,10 @@ export function Audio() {
               <Animated.View
                 style={[{ backgroundColor: "transparent" }, likeStyle]}
               >
-                <LikeIcon isActive={isActive} />
+                <LikeIcon
+                  isActive={isActive}
+                  color={theme === "light" ? "#313131" : "#edecf5"}
+                />
               </Animated.View>
             </Pressable>
           </TitleAndLikeView>

@@ -29,7 +29,11 @@ export function useNotifee() {
     });
 
     let date = new Date();
-    if (date.getHours() > hours) {
+    if (
+      date.getHours() >= hours &&
+      date.getMinutes() >= minutes &&
+      date.getSeconds() >= 0
+    ) {
       date = new Date(date.getTime() + 24 * 60 * 60 * 1000);
     }
     date.setHours(hours);

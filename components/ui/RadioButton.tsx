@@ -1,3 +1,4 @@
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import styled from "styled-components/native";
 
 type RadioButtonProps = {
@@ -10,7 +11,14 @@ export function RadioButton({ color, text, isActive }: RadioButtonProps) {
   return (
     <Container>
       <RadioButtonStyled $color={color}>
-        {isActive && <RadioButtonFill $color={color} />}
+        {isActive && (
+          <Animated.View
+            entering={FadeIn.duration(200)}
+            exiting={FadeOut.duration(200)}
+          >
+            <RadioButtonFill $color={color} />
+          </Animated.View>
+        )}
       </RadioButtonStyled>
       <TextStyled>{text}</TextStyled>
     </Container>

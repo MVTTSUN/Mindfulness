@@ -1,11 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { Task } from "../types";
+import { TaskType } from "../types";
+import { TASKS } from "../const";
 
 const initialState = {
-  tasks: [] as Task[],
-  tasksFiltered: [] as Task[],
-  tasksSearched: [] as Task[],
-  tasksLike: [] as Task[],
+  tasks: TASKS as TaskType[],
+  tasksFiltered: TASKS as TaskType[],
+  tasksSearched: TASKS as TaskType[],
+  tasksLike: TASKS as TaskType[],
 };
 
 export const tasksSlice = createSlice({

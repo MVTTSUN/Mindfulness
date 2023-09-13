@@ -4,12 +4,21 @@ import { BackIcon } from "../icons/BackIcon";
 import { PropsWithChildren } from "react";
 import { useNavigation } from "@react-navigation/native";
 
-export function TopWithBack({ children }: PropsWithChildren) {
+type TopWithBackProps = PropsWithChildren<{
+  onPress?: () => void;
+  isCustomPress?: boolean;
+}>;
+
+export function TopWithBack({
+  children,
+  onPress,
+  isCustomPress,
+}: TopWithBackProps) {
   const navigation = useNavigation();
 
   return (
     <TopView>
-      <Pressable onPress={() => navigation.goBack()}>
+      <Pressable onPress={isCustomPress ? onPress : () => navigation.goBack()}>
         <BackIcon />
       </Pressable>
       {children}

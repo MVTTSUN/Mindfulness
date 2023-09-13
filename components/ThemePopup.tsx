@@ -5,6 +5,7 @@ import { useAppSelector } from "../hooks/useAppSelector";
 import { changeTheme, setIdRadioButton } from "../store/themeSlice";
 import { MAIN_COLOR } from "../const";
 import { RadioButton } from "./ui/RadioButton";
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
 export function ThemePopup() {
   const variants = ["Как на устройстве", "Темная тема", "Светлая тема"];
@@ -28,25 +29,30 @@ export function ThemePopup() {
   };
 
   return (
-    <ViewPopup>
-      <TextTheme>Тема</TextTheme>
-      <ViewVariants>
-        {variants.map((variant, index) => (
-          <Pressable
-            key={index}
-            onPress={() =>
-              idRadioButton === index ? () => {} : changeThemeHandle(index)
-            }
-          >
-            <RadioButton
-              color={MAIN_COLOR.normal}
-              text={variant}
-              isActive={idRadioButton === index}
-            />
-          </Pressable>
-        ))}
-      </ViewVariants>
-    </ViewPopup>
+    <Animated.View
+      entering={FadeIn.duration(200)}
+      exiting={FadeOut.duration(200)}
+    >
+      <ViewPopup>
+        <TextTheme>Тема</TextTheme>
+        <ViewVariants>
+          {variants.map((variant, index) => (
+            <Pressable
+              key={index}
+              onPress={() =>
+                idRadioButton === index ? () => {} : changeThemeHandle(index)
+              }
+            >
+              <RadioButton
+                color={MAIN_COLOR.normal}
+                text={variant}
+                isActive={idRadioButton === index}
+              />
+            </Pressable>
+          ))}
+        </ViewVariants>
+      </ViewPopup>
+    </Animated.View>
   );
 }
 

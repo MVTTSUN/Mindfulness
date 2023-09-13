@@ -1,47 +1,73 @@
 import { PropsWithChildren } from "react";
-import { StyleProp, ViewStyle } from "react-native";
 import { styled } from "styled-components/native";
-import { MAIN_COLOR } from "../../../const";
+import { MoreIcons } from "../../icons/MoreIcons";
+import { useAppSelector } from "../../../hooks/useAppSelector";
 
 type TouchableHighlightCardProps = PropsWithChildren<{
   onPress: () => void;
-  style?: StyleProp<ViewStyle>;
+  isAll?: boolean;
+  backgroundColor?: string;
+  color?: string;
+  underlayColor?: string;
 }>;
 
 export function TouchableHighlightCard({
-  style,
   children,
   onPress,
+  isAll,
+  backgroundColor,
+  color,
+  underlayColor,
 }: TouchableHighlightCardProps) {
+  const theme = useAppSelector((state) => state.theme.value);
+
   return (
     <TouchableHighlightStyled
-      $mainColor={MAIN_COLOR.pastel}
-      style={style}
+      $backgroundColor={backgroundColor}
+      $isAll={isAll}
       onPress={onPress}
-      underlayColor={MAIN_COLOR.pastelPressed}
+      underlayColor={
+        isAll ? (theme === "light" ? "#d3d3db" : "#1f1f1f") : underlayColor
+      }
     >
-      <TextStyled>{children}</TextStyled>
+      <TextContainer>
+        <TextStyled $color={color} $isAll={isAll}>
+          {children}
+        </TextStyled>
+        {isAll && <MoreIcons />}
+      </TextContainer>
     </TouchableHighlightStyled>
   );
 }
 
 const TouchableHighlightStyled = styled.TouchableHighlight<{
-  $mainColor: string;
+  $isAll?: boolean;
+  $backgroundColor?: string;
 }>`
-  height: 100px;
-  flex: 1;
-  flex-basis: 48%;
+  width: 31%;
+  height: 31%;
+  aspect-ratio: 1 / 1;
   justify-content: center;
   align-items: center;
-  padding: 10px;
-  background-color: ${({ $mainColor }) => $mainColor};
+  padding: 20px 10px 15px;
+  background-color: ${({ $isAll, $backgroundColor }) =>
+    $isAll ? "transparent" : $backgroundColor};
   border-radius: 25px;
+  border: ${({ $isAll, theme }) =>
+    $isAll ? `1px solid ${theme.color.standard}` : "none"};
 `;
 
-const TextStyled = styled.Text`
+const TextContainer = styled.View`
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+`;
+
+const TextStyled = styled.Text<{ $isAll?: boolean; $color?: string }>`
   text-align: center;
-  font-family: "Poppins-Medium";
-  font-size: 14px;
-  line-height: 18px;
-  color: #313131;
+  font-family: "Poppins-Regular";
+  font-size: 12px;
+  line-height: 16px;
+  color: ${({ $isAll, theme, $color }) =>
+    $isAll ? theme.color.standard : $color};
 `;

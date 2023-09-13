@@ -2,27 +2,35 @@ import { styled } from "styled-components/native";
 import { CenterContainer } from "../../components/CenterContainer";
 import { GlobalScreen } from "../../components/GlobalScreen";
 import { TopWithBack } from "../../components/ui/TopWithBack";
-import { UndoIcon } from "../../components/icons/UndoIcon";
-import { RedoIcon } from "../../components/icons/RedoIcon";
 import { CheckIcon } from "../../components/icons/CheckIcon";
 import { InputTextareaTransparent } from "../../components/ui/InputTextareaTransparent";
-import { InputTransparent } from "../../components/ui/InputTransparent";
-import { useEffect, useRef, useState } from "react";
-import { Subtitle } from "../../components/ui/Titles/Subtitle";
-import { Title } from "../../components/ui/Titles/Title";
-import { Dimensions, FlatList, Keyboard, ScrollView, Text } from "react-native";
-import { useRoute } from "@react-navigation/native";
-import { DataInput, MeditationData } from "../../types";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
+import { AppState, Dimensions, FlatList, Pressable } from "react-native";
+import {
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+} from "@react-navigation/native";
+import {
+  DataInput,
+  MeditationData,
+  NoteType,
+  NotesScreenProp,
+  TaskType,
+} from "../../types";
 import { TouchableHighlight } from "../../components/ui/Touchables/TouchableHighlight";
 import { MeditationsAndTasksPopup } from "../../components/MeditationsAndTasksPopup";
-import { Pressable } from "react-native";
 import { COLORS, DATA_INPUTS_NOTE } from "../../const";
-import { setNotes } from "../../store/notesSlice";
 import { EmotionsPopup } from "../../components/EmotionsPopup";
+import { useAppDispatch } from "../../hooks/useAppDispatch";
+import { addNote, removeNotes, updateNote } from "../../store/notesSlice";
 
-export function Note() {
+function Note() {
+  const [isRenderOne, setIsRenderOne] = useState(false);
+  const [id, setId] = useState<string | null>(null);
+  const [createdAt, setCreatedAt] = useState<string>("");
+  const [isUpdate, setIsUpdate] = useState(false);
   const [typeEmotions, setTypeEmotions] = useState("");
-  const [savePoints, setSavePoints] = useState([]);
   const route = useRoute();
   const flatListRef = useRef<FlatList>(null);
   const [nameNote, setNameNote] = useState("");
@@ -38,11 +46,23 @@ export function Note() {
   const [underlayColor, setUnderlayColor] = useState(
     COLORS.mainColors.normalPressed
   );
-  const dateOption: Intl.DateTimeFormatOptions = {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  };
+  const [texts, setTexts] = useState(["", "", "", ""]);
+  const navigation = useNavigation<NotesScreenProp>();
+  const dispatch = useAppDispatch();
+  const dataAfterUnmount = useRef({
+    id,
+    emotionsAfter,
+    emotionsBefore,
+    title: nameNote,
+    texts,
+    color,
+    backgroundColor,
+    underlayColor,
+    createdAt,
+  });
+  const isUpdateAfterUnmount = useRef(isUpdate);
+  const isNavigated = useRef(false);
+  const prevStateAfterUnmount = useRef(dataAfterUnmount.current);
 
   const setNameNoteHandle = (
     nameNote: string,
@@ -57,13 +77,91 @@ export function Note() {
     setIsOpenMeditationAndTasksPopup(false);
   };
 
+  const back = () => {
+    isNavigated.current = true;
+    navigation.goBack();
+  };
+
   const onTouchEnd = (id: number) => {
     flatListRef.current?.scrollToIndex({ animated: false, index: id });
   };
 
+  const addNoteHandle = () => {
+    const { emotionsAfter, emotionsBefore, texts, id } =
+      dataAfterUnmount.current;
+
+    if (
+      ((emotionsAfter.length !== 0 ||
+        emotionsBefore.length !== 0 ||
+        texts.some((text) => text !== "")) &&
+        !isUpdateAfterUnmount.current) ||
+      (prevStateAfterUnmount.current !== dataAfterUnmount.current &&
+        isUpdateAfterUnmount.current)
+    ) {
+      if (isUpdateAfterUnmount.current) {
+        dispatch(updateNote(dataAfterUnmount.current));
+      } else {
+        dispatch(addNote(dataAfterUnmount.current));
+      }
+    }
+
+    if (
+      emotionsAfter.length === 0 &&
+      emotionsBefore.length === 0 &&
+      texts.every((text) => text === "")
+    ) {
+      dispatch(removeNotes([id]));
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      return () => {
+        if (!isNavigated.current) {
+          navigation.replace("Notes");
+        }
+      };
+    }, [])
+  );
+
+  useEffect(() => {
+    isUpdateAfterUnmount.current = isUpdate;
+  }, [isUpdate]);
+
+  useEffect(() => {
+    dataAfterUnmount.current = {
+      id,
+      emotionsAfter,
+      emotionsBefore,
+      title: nameNote,
+      texts,
+      color,
+      backgroundColor,
+      underlayColor,
+      createdAt,
+    };
+
+    if (isUpdate && isRenderOne) {
+      prevStateAfterUnmount.current = dataAfterUnmount.current;
+      setIsRenderOne(false);
+    }
+  }, [
+    emotionsAfter,
+    emotionsBefore,
+    nameNote,
+    texts,
+    color,
+    backgroundColor,
+    underlayColor,
+    id,
+    createdAt,
+  ]);
+
   useEffect(() => {
     if (route.params) {
       const { meditation } = route.params as { meditation: MeditationData };
+      const { task } = route.params as { task: TaskType };
+      const { note } = route.params as { note: NoteType };
 
       if (meditation) {
         setColor(COLORS.textColors.meditationCard);
@@ -71,21 +169,49 @@ export function Note() {
         setUnderlayColor(COLORS.backgroundColors.meditationCardPressed);
         setNameNote(`Медитация: ${meditation.title}`);
       }
+
+      if (task) {
+        setColor(COLORS.textColors.taskCard);
+        setBackgroundColor(COLORS.backgroundColors.taskCard);
+        setUnderlayColor(COLORS.backgroundColors.taskCardPressed);
+        setNameNote(`Задание: ${task.title}`);
+      }
+
+      if (note) {
+        setIsUpdate(true);
+        setId(note.id);
+        setNameNote(note.title);
+        setColor(note.color);
+        setBackgroundColor(note.backgroundColor);
+        setUnderlayColor(note.underlayColor);
+        setTexts(note.texts);
+        setEmotionsBefore(note.emotionsBefore);
+        setEmotionsAfter(note.emotionsAfter);
+        setCreatedAt(note.createdAt);
+        setIsRenderOne(true);
+      }
     }
 
-    // return () => setSavePoints([]);
+    const appStateListener = AppState.addEventListener("change", (state) => {
+      if (state !== "active") {
+        navigation.navigate("Notes");
+      }
+    });
+
+    return () => {
+      addNoteHandle();
+      appStateListener.remove();
+    };
   }, []);
 
   return (
     <>
       <GlobalScreen withoutScrollView>
         <CenterContainer>
-          <TopWithBack>
-            <ToolsContainer>
-              <UndoIcon disabled />
-              <RedoIcon disabled />
+          <TopWithBack isCustomPress onPress={back}>
+            <Pressable onPress={back}>
               <CheckIcon />
-            </ToolsContainer>
+            </Pressable>
           </TopWithBack>
           <FlatList
             ref={flatListRef}
@@ -94,8 +220,12 @@ export function Note() {
               return (
                 <>
                   <DateText>
-                    {new Intl.DateTimeFormat("ru", dateOption)
-                      .format(new Date())
+                    {new Date()
+                      .toLocaleString("ru", {
+                        month: "long",
+                        year: "numeric",
+                        day: "numeric",
+                      })
                       .replace(" г.", "")}
                   </DateText>
                   <ButtonContainer>
@@ -156,9 +286,16 @@ export function Note() {
                 <>
                   <TitleInput>{title}</TitleInput>
                   <InputTextareaTransparent
+                    value={texts[id - 1]}
                     onTouchEnd={() => onTouchEnd(id - 1)}
                     placeholder="Начните ввод"
-                    onChangeText={() => {}}
+                    onChangeText={(value) =>
+                      setTexts((prevState) => {
+                        const prevStateCopy = [...prevState];
+                        prevStateCopy[id - 1] = value;
+                        return prevStateCopy;
+                      })
+                    }
                     height={150}
                     borderColor={backgroundColor}
                   />
@@ -205,6 +342,8 @@ export function Note() {
   );
 }
 
+export default memo(Note);
+
 const PressableStyled = styled.Pressable`
   height: 70%;
   width: 70%;
@@ -242,12 +381,6 @@ const TitleInput = styled.Text`
   font-family: "Poppins-Medium";
   font-size: 20px;
   color: ${({ theme }) => theme.color.standard};
-`;
-
-const ToolsContainer = styled.View`
-  flex-direction: row;
-  align-items: center;
-  gap: 20px;
 `;
 
 const BottomSpace = styled.View`

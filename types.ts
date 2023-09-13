@@ -1,3 +1,4 @@
+import { ImageSourcePropType } from "react-native";
 import store from "./store/store";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
@@ -28,14 +29,28 @@ type InfoAndSettingsScreenProp = NativeStackNavigationProp<{
 }>;
 
 type NotesScreenProp = NativeStackNavigationProp<{
-  Note: undefined | { meditation: MeditationData };
+  Note:
+    | undefined
+    | { meditation: MeditationData }
+    | { note: NoteType }
+    | { task: TaskType };
   Notes: undefined;
   NotesStack:
     | undefined
     | {
         screen: string;
         params: { screen: string; meditation: MeditationData };
+      }
+    | {
+        screen: string;
+        params: { screen: string; task: TaskType };
       };
+}>;
+
+type TasksScreenProp = NativeStackNavigationProp<{
+  Task: undefined | { task: TaskType };
+  Tasks: undefined;
+  TasksStack: undefined;
 }>;
 
 type MainCard = {
@@ -70,22 +85,24 @@ type Like = {
   isLike: boolean;
 };
 
-type Note = {
+type NoteType = {
   id: string;
   color: string;
+  backgroundColor: string;
+  underlayColor: string;
+  emotionsBefore: string[];
+  emotionsAfter: string[];
   title: string;
-  text: string;
-  icon: NodeRequire;
+  texts: string[];
   createdAt: string;
-  kind: string;
 };
 
 type TaskContent = {
   type: string;
-  text: string;
+  payload: string & ImageSourcePropType;
 };
 
-type Task = {
+type TaskType = {
   id: number;
   title: string;
   content: TaskContent[];
@@ -118,11 +135,12 @@ export {
   MeditationData,
   MainCard,
   Like,
-  Note,
+  NoteType,
   InfoAndSettingsScreenProp,
   NotesScreenProp,
   DataTime,
   Notification,
-  Task,
+  TaskType,
   DataInput,
+  TasksScreenProp,
 };

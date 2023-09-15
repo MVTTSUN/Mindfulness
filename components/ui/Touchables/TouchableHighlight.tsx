@@ -45,6 +45,7 @@ const TouchableHighlightStyled = styled.TouchableHighlight<{
 `;
 
 const TextStyle = styled.Text<{ $color?: string }>`
+  text-align: center;
   font-family: "Poppins-Medium";
   font-size: 14px;
   line-height: 16px;

@@ -1,5 +1,5 @@
 import { styled } from "styled-components/native";
-import { PropsWithChildren, useEffect } from "react";
+import { PropsWithChildren, memo, useEffect } from "react";
 import { TouchableWithoutFeedback } from "react-native";
 import Animated, {
   interpolateColor,
@@ -15,13 +15,13 @@ type TouchableOptionProps = PropsWithChildren<{
   isActive: boolean;
 }>;
 
-export function TouchableOption({
+function TouchableOption({
   children,
   onPress,
   isActive,
 }: TouchableOptionProps) {
   const theme = useAppSelector((state) => state.theme.value);
-  const backgroundColor = useSharedValue(0);
+  const backgroundColor = useSharedValue(isActive ? 1 : 0);
   const backgroundColorStyle = useAnimatedStyle(() => ({
     backgroundColor: interpolateColor(
       backgroundColor.value,
@@ -34,7 +34,7 @@ export function TouchableOption({
       ]
     ),
   }));
-  const borderColor = useSharedValue(0);
+  const borderColor = useSharedValue(isActive ? 1 : 0);
   const borderColorStyle = useAnimatedStyle(() => ({
     borderWidth: 1,
     borderStyle: "solid",
@@ -51,7 +51,7 @@ export function TouchableOption({
       ]
     ),
   }));
-  const color = useSharedValue(0);
+  const color = useSharedValue(isActive ? 1 : 0);
   const colorStyle = useAnimatedStyle(() => ({
     color: interpolateColor(
       color.value,
@@ -92,6 +92,11 @@ export function TouchableOption({
     </TouchableWithoutFeedback>
   );
 }
+
+export default memo(
+  TouchableOption,
+  (oldProps, newProps) => oldProps.isActive === newProps.isActive
+);
 
 const ViewStyled = styled(Animated.View)<{
   $isActive: boolean;

@@ -2,16 +2,58 @@ import { GlobalScreen } from "../../components/GlobalScreen";
 import { CenterContainer } from "../../components/CenterContainer";
 import { TopWithBack } from "../../components/ui/TopWithBack";
 import { styled } from "styled-components/native";
-import { useNavigation, useRoute } from "@react-navigation/native";
-import { NotesScreenProp, TaskType } from "../../types";
-import AnimatedLottieView from "lottie-react-native";
-import { ScrollView } from "react-native";
+import {
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+} from "@react-navigation/native";
+import { NotesScreenProp, TaskType, TasksScreenProp } from "../../types";
+import { Pressable, ScrollView } from "react-native";
 import { AddIcon } from "../../components/icons/AddIcon";
+import LottieView from "lottie-react-native";
+import { COLORS } from "../../const";
+import { useCallback, useEffect, useState } from "react";
+import { LikeIcon } from "../../components/icons/LikeIcon";
+import { useAppSelector } from "../../hooks/useAppSelector";
+import { useAppDispatch } from "../../hooks/useAppDispatch";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSequence,
+  withSpring,
+} from "react-native-reanimated";
+import { addTaskLike, removeTaskLike } from "../../store/likesSlice";
 
 export function Task() {
   const route = useRoute();
   const { task } = route.params as { task: TaskType };
-  const navigation = useNavigation<NotesScreenProp>();
+  const navigation = useNavigation<NotesScreenProp & TasksScreenProp>();
+  const likes = useAppSelector((state) => state.likes.likesTask);
+  const dispatch = useAppDispatch();
+  const scaleLike = useSharedValue(1);
+  const likeStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scaleLike.value }],
+  }));
+  const [isActive, setIsActive] = useState(false);
+  const theme = useAppSelector((state) => state.theme.value);
+
+  const toggleLike = () => {
+    scaleLike.value = withSequence(
+      withSpring(1),
+      withSpring(1.2),
+      withSpring(1)
+    );
+    if (isActive) {
+      dispatch(removeTaskLike(task.id));
+    } else {
+      dispatch(addTaskLike(task.id));
+    }
+  };
+  console.log(1);
+
+  useEffect(() => {
+    setIsActive(likes.some((like) => like.id === task.id));
+  }, [likes]);
 
   return (
     <>
@@ -19,6 +61,16 @@ export function Task() {
         <CenterContainer>
           <TopWithBack>
             <TextTitle>{task.title}</TextTitle>
+            <Pressable onPress={toggleLike}>
+              <Animated.View
+                style={[{ backgroundColor: "transparent" }, likeStyle]}
+              >
+                <LikeIcon
+                  color={theme === "light" ? "#313131" : "#edecf5"}
+                  isActive={isActive}
+                />
+              </Animated.View>
+            </Pressable>
           </TopWithBack>
           <ScrollView showsVerticalScrollIndicator={false}>
             <Container>
@@ -26,15 +78,21 @@ export function Task() {
                 if (node.type === "text") {
                   return <TextNode key={index}>{node.payload}</TextNode>;
                 } else if (node.type === "image") {
-                  return <ImageNode key={index} source={node.payload} />;
+                  return (
+                    <ImageWrapper key={index}>
+                      <ImageNode source={node.payload} />
+                    </ImageWrapper>
+                  );
                 } else if (node.type === "lottie") {
                   return (
-                    <LottieNode
-                      key={index}
-                      source={node.payload}
-                      autoPlay
-                      loop
-                    />
+                    <LottieWrapper key={index}>
+                      <LottieNode
+                        source={node.payload}
+                        autoPlay
+                        loop
+                        resizeMode="cover"
+                      />
+                    </LottieWrapper>
                   );
                 }
               })}
@@ -84,10 +142,16 @@ const Container = styled.View`
   margin-bottom: 270px;
 `;
 
-const LottieNode = styled(AnimatedLottieView)`
+const LottieWrapper = styled.View`
+  overflow: hidden;
   height: 250px;
   width: 100%;
   border-radius: 25px;
+  border: 7px dotted ${COLORS.backgroundColors.taskCard};
+`;
+
+const LottieNode = styled(LottieView)`
+  flex: 1;
 `;
 
 const TextNode = styled.Text`
@@ -98,9 +162,15 @@ const TextNode = styled.Text`
   color: ${({ theme }) => theme.color.standard};
 `;
 
-const ImageNode = styled.Image`
-  object-fit: cover;
+const ImageWrapper = styled.View`
   height: 250px;
   width: 100%;
   border-radius: 25px;
+  border: 7px dotted ${COLORS.backgroundColors.taskCard};
+  overflow: hidden;
+`;
+
+const ImageNode = styled.Image`
+  width: 100%;
+  flex: 1;
 `;

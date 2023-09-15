@@ -8,6 +8,10 @@ import { DARK_THEME, LIGHT_THEME } from "./const";
 import { useAppSelector } from "./hooks/useAppSelector";
 import { TabNavigator } from "./components/TabNavigator";
 import { useNotifee } from "./hooks/useNotifee";
+import TrackPlayer, {
+  AppKilledPlaybackBehavior,
+  Capability,
+} from "react-native-track-player";
 
 SplashScreen.preventAutoHideAsync();
 

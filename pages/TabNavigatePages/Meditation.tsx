@@ -1,9 +1,5 @@
 import { GlobalScreen } from "../../components/GlobalScreen";
-import {
-  useFocusEffect,
-  useNavigation,
-  useRoute,
-} from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { MeditationScreenProp, MeditationData } from "../../types";
 import { CenterContainer } from "../../components/CenterContainer";
 import { Title } from "../../components/ui/Titles/Title";
@@ -23,7 +19,7 @@ import {
   likeMeditations,
   searchMeditations,
 } from "../../store/meditationsSlice";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { styled } from "styled-components/native";
 import { LikeIcon } from "../../components/icons/LikeIcon";
 import { useAppSelector } from "../../hooks/useAppSelector";
@@ -36,7 +32,6 @@ import TrackPlayer, {
   usePlaybackState,
 } from "react-native-track-player";
 import { PauseIcon } from "../../components/icons/PauseIcon";
-import { init } from "../../store/trackPlayerSlice";
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -50,7 +45,6 @@ export function Meditation() {
   const navigation = useNavigation<MeditationScreenProp>();
   const dispatch = useAppDispatch();
   const route = useRoute();
-  const theme = useAppSelector((state) => state.theme.value);
   const likes = useAppSelector((state) => state.likes.likesMeditation);
   const [isActive, setIsActive] = useState(false);
   const lastMeditationId = useAppSelector(
@@ -59,9 +53,6 @@ export function Meditation() {
   const playbackState = usePlaybackState();
   const borderRadius = useSharedValue(20);
   const rotate = useSharedValue(0);
-  const isInitialized = useAppSelector(
-    (state) => state.trackPlayer.isInitialized
-  );
   const playButtonStyle = useAnimatedStyle(() => ({
     borderRadius: withTiming(borderRadius.value, {
       duration: 500,
@@ -98,7 +89,6 @@ export function Meditation() {
       await TrackPlayer.add([MEDITATIONS_DATA[lastMeditationId - 1]]);
       await TrackPlayer.play();
     }
-
     if (playbackState === State.Paused || playbackState === State.Ready) {
       borderRadius.value = 13;
       rotate.value = withTiming(1, {
@@ -117,7 +107,18 @@ export function Meditation() {
   };
 
   const setup = async () => {
-    await TrackPlayer.setupPlayer();
+    // await TrackPlayer.clearNowPlayingMetadata();
+    // await TrackPlayer.isServiceRunning().then(async (isRunning) => {
+    //   console.log(isRunning);
+    //   if (!isRunning) {
+    //     await TrackPlayer.setupPlayer();
+    //   }
+    // });
+    try {
+      await TrackPlayer.setupPlayer();
+    } catch (e) {
+      await TrackPlayer.clearNowPlayingMetadata();
+    }
     await TrackPlayer.updateOptions({
       android: {
         appKilledPlaybackBehavior:
@@ -129,22 +130,7 @@ export function Meditation() {
         Capability.SkipToPrevious,
       ],
     });
-    dispatch(init(true));
   };
-
-  // useEffect(() => {
-  //   if (!isInitialized) {
-  //     setup();
-  //   }
-  // }, [isInitialized]);
-
-  useFocusEffect(
-    useCallback(() => {
-      return () => {
-        setIsActive(false);
-      };
-    }, [])
-  );
 
   useEffect(() => {
     setup();
@@ -184,7 +170,7 @@ export function Meditation() {
       <CenterContainer>
         <CardListMeditation count={9} />
         <Subtitle>Последняя медитация</Subtitle>
-        <Pressable
+        <LastMeditation
           onPress={() => {
             if (lastMeditationId !== null) {
               navigation.navigate("Audio", {
@@ -192,8 +178,9 @@ export function Meditation() {
               });
             }
           }}
+          underlayColor={COLORS.mainColors.pastelPressed}
         >
-          <LastMeditation $mainColor={MAIN_COLOR.pastel}>
+          <>
             <TextLasMeditation>
               {lastMeditationId === null
                 ? "Вы еще не слушали медитации"
@@ -217,16 +204,17 @@ export function Meditation() {
                 )}
               </PressableStyled>
             </Play>
-          </LastMeditation>
-        </Pressable>
+          </>
+        </LastMeditation>
         <Subtitle>Как медитировать правильно?</Subtitle>
-        <Pressable onPress={() => navigation.navigate("Tips")}>
-          <RuleMeditation>
-            <TextRightMeditation>
-              Есть несколько советов для этого
-            </TextRightMeditation>
-          </RuleMeditation>
-        </Pressable>
+        <RuleMeditation
+          underlayColor={COLORS.mainColors.pastelPressed}
+          onPress={() => navigation.navigate("Tips")}
+        >
+          <TextRightMeditation>
+            Есть несколько советов для этого
+          </TextRightMeditation>
+        </RuleMeditation>
       </CenterContainer>
     </GlobalScreen>
   );
@@ -245,11 +233,11 @@ const FavoritesButton = styled.TouchableHighlight`
   transform: translateY(7px);
 `;
 
-const LastMeditation = styled.View<{ $mainColor: string }>`
+const LastMeditation = styled.TouchableHighlight`
   margin-bottom: 20px;
   padding: 20px 18px 20px 30px;
   border-radius: 30px;
-  background-color: ${({ $mainColor }) => $mainColor};
+  background-color: ${COLORS.mainColors.pastel};
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
@@ -266,7 +254,7 @@ const TextRightMeditation = styled.Text`
   font-family: "Poppins-Medium";
   font-size: 14px;
   line-height: 18px;
-  color: ${COLORS.textColors.meditationCard};
+  color: ${COLORS.textColors.normal};
 `;
 
 const Play = styled(Animated.View)`
@@ -282,11 +270,11 @@ const PressableStyled = styled.Pressable`
   width: 100%;
 `;
 
-const RuleMeditation = styled.View`
+const RuleMeditation = styled.TouchableHighlight`
   margin-bottom: 20px;
   justify-content: space-between;
   align-items: center;
-  background-color: ${({ theme }) => theme.backgroundColor.meditationCard};
+  background-color: ${COLORS.mainColors.pastel};
   padding: 25px 15px;
   border-radius: 30px;
 `;

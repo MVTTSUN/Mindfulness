@@ -13,8 +13,8 @@ export function RadioButton({ color, text, isActive }: RadioButtonProps) {
       <RadioButtonStyled $color={color}>
         {isActive && (
           <Animated.View
-            entering={FadeIn.duration(200)}
-            exiting={FadeOut.duration(200)}
+            entering={FadeIn.duration(100)}
+            exiting={FadeOut.duration(100)}
           >
             <RadioButtonFill $color={color} />
           </Animated.View>

@@ -2,9 +2,31 @@ import styled from "styled-components/native";
 import { CenterContainer } from "../../components/CenterContainer";
 import { GlobalScreen } from "../../components/GlobalScreen";
 import { TopWithBack } from "../../components/ui/TopWithBack";
-import { ScrollView } from "react-native";
+import { Image, ScrollView } from "react-native";
+import LottieView, { AnimationObject } from "lottie-react-native";
+import { COLORS, TIP } from "../../const";
+import { useCallback, useEffect, useState } from "react";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 
 export function Tips() {
+  const [LottieAnim, setLottieAnim] = useState();
+
+  useEffect(() => {
+    fetch(
+      "https://lottie.host/cb7b9c59-545d-4e94-935e-9c9649b31561/swVRk5AsiQ.json",
+      {
+        method: "GET",
+      }
+    )
+      .then((response) => response.json())
+      .then((responseData) => {
+        setLottieAnim(responseData);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, []);
+
   return (
     <GlobalScreen withoutScrollView>
       <CenterContainer>
@@ -12,40 +34,45 @@ export function Tips() {
           <TextTitle>Как медитировать правильно?</TextTitle>
         </TopWithBack>
         <ScrollView showsVerticalScrollIndicator={false}>
-          <ViewText>
-            <ParagraphTips>
-              Правильный выбор техники зависит от личных предпочтений.
-              Медитируют как с открытыми глазами, так и с закрытыми. Заниматься
-              можно сидя, стоя, лёжа и даже при ходьбе. В классическом варианте
-              сидячей медитации многие ошибочно полагают, что поза лотоса — это
-              обязательное и неизменное условие. На самом деле, она не для всех
-              является удобной.
-            </ParagraphTips>
-            <ParagraphTips>
-              Самое важное правило — сохранять позвоночный столб прямым, грудную
-              клетку — свободной, чтобы дыханию ничего не мешало, а тело —
-              максимально расслабленным. Новички могут сесть на стул,
-              облокотиться на спинку и закрыть глаза. А дальше просто дышать,
-              расслаблять мышцы одну за другой и отпускать мысли. Необходимо
-              сохранять привычный для вас темп дыхания: не нужно стараться
-              делать вдохи дольше или глубже, если вы чувствуете от этого
-              неудобство и напряжение. Ведь медитация подразумевает любовь и
-              трепетное отношение к себе и телу, а не насилие.
-            </ParagraphTips>
-            <ParagraphTips>
-              Фраза «отпустить мысли» звучит довольно просто, но это очень
-              сложное умение, которое приобретается с опытом. Главное —
-              запомнить, что в первые разы в голову постоянно будут приходить
-              разные фантазии и воспоминания, отвлекая от процесса расслабления.
-              Это абсолютно нормально. Просто каждый раз мягко переключайте
-              внимание на дыхание, не ругайте себя за неумение сосредоточиться и
-              не думайте, что у вас что-то получается плохо. Так и должно быть:
-              мозг не может быть пустым, он заточен под постоянное размышление.
-              Со временем вы сможете находиться в состоянии покоя вне
-              зависимости от приходящих и уходящих мыслей.
-            </ParagraphTips>
-          </ViewText>
-          <TopAndBottomSpace />
+          <Container>
+            <ImageWrapper>
+              <ImageNode
+                source={{
+                  uri: "https://sportishka.com/uploads/posts/2022-11/1667542667_16-sportishka-com-p-sportkar-khonda-instagram-18.jpg",
+                }}
+              />
+            </ImageWrapper>
+            <LottieWrapper>
+              <LottieNode
+                source={LottieAnim as unknown as AnimationObject}
+                autoPlay
+                loop
+                resizeMode="cover"
+              />
+            </LottieWrapper>
+            {TIP.map((node, index) => {
+              if (node.type === "text") {
+                return <TextNode key={index}>{node.payload}</TextNode>;
+              } else if (node.type === "image") {
+                return (
+                  <ImageWrapper key={index}>
+                    <ImageNode source={node.payload} />
+                  </ImageWrapper>
+                );
+              } else if (node.type === "lottie") {
+                return (
+                  <LottieWrapper key={index}>
+                    <LottieNode
+                      source={node.payload}
+                      autoPlay
+                      loop
+                      resizeMode="cover"
+                    />
+                  </LottieWrapper>
+                );
+              }
+            })}
+          </Container>
         </ScrollView>
       </CenterContainer>
     </GlobalScreen>
@@ -58,16 +85,42 @@ const TextTitle = styled.Text`
   color: ${({ theme }) => theme.color.standard};
 `;
 
-const ParagraphTips = styled.Text`
+const Container = styled.View`
+  gap: 20px;
+  margin-bottom: 270px;
+`;
+
+const LottieWrapper = styled.View`
+  overflow: hidden;
+  height: 250px;
+  width: 100%;
+  border-radius: 25px;
+  border: 7px dotted ${COLORS.mainColors.normal};
+`;
+
+const LottieNode = styled(LottieView)`
+  flex: 1;
+`;
+
+const TextNode = styled.Text`
+  text-align: justify;
   font-family: "Poppins-Regular";
   font-size: 18px;
+  line-height: 24px;
   color: ${({ theme }) => theme.color.standard};
 `;
 
-const ViewText = styled.View`
-  gap: 20px;
+const ImageWrapper = styled.View`
+  height: 250px;
+  width: 100%;
+  border-radius: 25px;
+  border: 7px dotted ${COLORS.mainColors.normal};
+  overflow: hidden;
 `;
 
-const TopAndBottomSpace = styled.View`
+const ImageNode = styled.Image`
+  object-fit: cover;
   height: 250px;
+  width: 100%;
+  border-radius: 25px;
 `;

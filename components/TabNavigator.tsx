@@ -44,6 +44,7 @@ export function TabNavigator() {
       width: 32,
       height: 32,
     },
+    unmountOnBlur: true,
   };
 
   return (
@@ -54,6 +55,9 @@ export function TabNavigator() {
         options={{
           tabBarIcon: ({ color }) => <HomeIcon color={color} />,
         }}
+        listeners={({ navigation }) => ({
+          blur: () => navigation.setParams({ screen: undefined }),
+        })}
       />
       <Tab.Screen
         name="MeditationStack"
@@ -61,6 +65,9 @@ export function TabNavigator() {
         options={{
           tabBarIcon: ({ color }) => <MeditationIcon color={color} />,
         }}
+        listeners={({ navigation }) => ({
+          blur: () => navigation.setParams({ screen: undefined }),
+        })}
       />
       <Tab.Screen
         name="TasksStack"
@@ -68,6 +75,9 @@ export function TabNavigator() {
         options={{
           tabBarIcon: ({ color }) => <TasksIcon color={color} />,
         }}
+        listeners={({ navigation }) => ({
+          blur: () => navigation.setParams({ screen: undefined }),
+        })}
       />
       <Tab.Screen
         name="NotesStack"
@@ -75,6 +85,9 @@ export function TabNavigator() {
         options={{
           tabBarIcon: ({ color }) => <NotesIcon color={color} />,
         }}
+        listeners={({ navigation }) => ({
+          blur: () => navigation.setParams({ screen: undefined }),
+        })}
       />
       <Tab.Screen
         name="InfoAndSettingsStack"
@@ -82,6 +95,9 @@ export function TabNavigator() {
         options={{
           tabBarIcon: ({ color }) => <InfoAndSettingsIcon color={color} />,
         }}
+        listeners={({ navigation }) => ({
+          blur: () => navigation.setParams({ screen: undefined }),
+        })}
       />
     </Tab.Navigator>
   );

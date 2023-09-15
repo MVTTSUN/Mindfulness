@@ -4,6 +4,7 @@ import { Pressable, ScrollView } from "react-native";
 import { COLORS } from "../const";
 import { RadioButton } from "./ui/RadioButton";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
+import { useEffect, useState } from "react";
 
 type MeditationsAndTasksPopupProps = {
   nameNote: string;
@@ -21,6 +22,28 @@ export function MeditationsAndTasksPopup({
 }: MeditationsAndTasksPopupProps) {
   const meditations = useAppSelector((state) => state.meditations.meditations);
   const tasks = useAppSelector((state) => state.tasks.tasks);
+  const [isSelectMeditations, setIsSelectMeditations] = useState(false);
+  const [isSelectTasks, setIsSelectTasks] = useState(false);
+  const [meditationsState, setMeditationsState] = useState(meditations);
+  const [tasksState, setTasksState] = useState(tasks);
+
+  useEffect(() => {
+    if (isSelectMeditations && !isSelectTasks) {
+      setTasksState([]);
+    }
+
+    if (isSelectTasks && !isSelectMeditations) {
+      setMeditationsState([]);
+    }
+
+    if (
+      (isSelectMeditations && isSelectTasks) ||
+      (!isSelectTasks && !isSelectMeditations)
+    ) {
+      setMeditationsState(meditations);
+      setTasksState(tasks);
+    }
+  }, [isSelectMeditations, isSelectTasks]);
 
   return (
     <Animated.View
@@ -29,26 +52,38 @@ export function MeditationsAndTasksPopup({
     >
       <Container>
         <FilterContainer>
-          <FilterTouchableHighlight
-            onPress={() => {}}
-            underlayColor={COLORS.backgroundColors.meditationCardPressed}
-            $backgroundColor={COLORS.backgroundColors.meditationCard}
+          <PressableButton
+            onPress={() => setIsSelectMeditations(!isSelectMeditations)}
           >
-            <TextFilter $color={COLORS.textColors.meditationCard}>
-              Медитации
-            </TextFilter>
-          </FilterTouchableHighlight>
-          <FilterTouchableHighlight
-            onPress={() => {}}
-            underlayColor={COLORS.backgroundColors.taskCardPressed}
-            $backgroundColor={COLORS.backgroundColors.taskCard}
-          >
-            <TextFilter $color={COLORS.textColors.taskCard}>Задания</TextFilter>
-          </FilterTouchableHighlight>
+            <FilterButton
+              $backgroundColor={
+                isSelectMeditations
+                  ? COLORS.backgroundColors.meditationCardPressed
+                  : COLORS.backgroundColors.meditationCard
+              }
+            >
+              <TextFilter $color={COLORS.textColors.meditationCard}>
+                Медитации
+              </TextFilter>
+            </FilterButton>
+          </PressableButton>
+          <PressableButton onPress={() => setIsSelectTasks(!isSelectTasks)}>
+            <FilterButton
+              $backgroundColor={
+                isSelectTasks
+                  ? COLORS.backgroundColors.taskCardPressed
+                  : COLORS.backgroundColors.taskCard
+              }
+            >
+              <TextFilter $color={COLORS.textColors.taskCard}>
+                Задания
+              </TextFilter>
+            </FilterButton>
+          </PressableButton>
         </FilterContainer>
         <ScrollView showsVerticalScrollIndicator={false}>
-          <MeditationsContainer>
-            {meditations.map((meditation) => (
+          <MeditationsAndTasksContainer>
+            {meditationsState.map((meditation) => (
               <Pressable
                 key={`meditation-${meditation.id}`}
                 onPress={() =>
@@ -69,7 +104,7 @@ export function MeditationsAndTasksPopup({
                 />
               </Pressable>
             ))}
-            {tasks.map((task) => (
+            {tasksState.map((task) => (
               <Pressable
                 key={`task-${task.id}`}
                 onPress={() =>
@@ -90,7 +125,7 @@ export function MeditationsAndTasksPopup({
                 />
               </Pressable>
             ))}
-          </MeditationsContainer>
+          </MeditationsAndTasksContainer>
         </ScrollView>
       </Container>
     </Animated.View>
@@ -112,17 +147,21 @@ const FilterContainer = styled.View`
   flex-wrap: wrap;
 `;
 
-const MeditationsContainer = styled.View`
+const MeditationsAndTasksContainer = styled.View`
   gap: 10px;
 `;
 
-const FilterTouchableHighlight = styled.TouchableHighlight<{
-  $backgroundColor: string;
-}>`
-  align-items: center;
-  justify-content: center;
+const PressableButton = styled.Pressable`
   height: 50px;
   width: 47%;
+`;
+
+const FilterButton = styled.View<{
+  $backgroundColor: string;
+}>`
+  height: 100%;
+  align-items: center;
+  justify-content: center;
   padding: 5px;
   background-color: ${({ $backgroundColor }) => $backgroundColor};
   border-radius: 20px;

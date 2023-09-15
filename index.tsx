@@ -3,7 +3,11 @@ import { Provider } from "react-redux";
 import store, { persistor } from "./store/store";
 import { registerRootComponent } from "expo";
 import { PersistGate } from "redux-persist/integration/react";
-import TrackPlayer from "react-native-track-player";
+import TrackPlayer, {
+  AppKilledPlaybackBehavior,
+  Capability,
+} from "react-native-track-player";
+import { useEffect } from "react";
 
 const RNRedux = () => {
   return (

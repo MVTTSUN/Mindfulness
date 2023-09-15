@@ -11,7 +11,7 @@ import { useAppSelector } from "../../hooks/useAppSelector";
 import { memo, useEffect, useRef, useState } from "react";
 import { PauseIcon } from "../icons/PauseIcon";
 import { useAppDispatch } from "../../hooks/useAppDispatch";
-import { init, setLastMeditationId } from "../../store/trackPlayerSlice";
+import { setLastMeditationId } from "../../store/trackPlayerSlice";
 import { Pressable } from "react-native";
 import { LoaderIcon } from "../icons/LoaderIcon";
 import { MAIN_COLOR, MEDITATIONS_DATA } from "../../const";
@@ -60,6 +60,7 @@ export const AudioPlayer = memo(({ id, duration }: AudioPlayerProps) => {
     const currentAudio = await TrackPlayer.getTrack(0);
 
     if (currentAudio?.id !== id) {
+      setPosition(0);
       borderRadius.value = 25;
       rotatePlayButton.value = withTiming(1, {
         duration: 500,
@@ -115,15 +116,11 @@ export const AudioPlayer = memo(({ id, duration }: AudioPlayerProps) => {
   };
 
   const currentAudio = async () => {
-    try {
-      const currentAudio = await TrackPlayer.getTrack(0);
-      if (currentAudio?.id === id) {
-        setIsCurrentAudio(true);
-      } else {
-        setIsCurrentAudio(false);
-      }
-    } catch {
-      dispatch(init(false));
+    const currentAudio = await TrackPlayer.getTrack(0);
+    if (currentAudio?.id === id) {
+      setIsCurrentAudio(true);
+    } else {
+      setIsCurrentAudio(false);
     }
   };
 

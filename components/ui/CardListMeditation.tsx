@@ -12,6 +12,7 @@ import { useAppDispatch } from "../../hooks/useAppDispatch";
 import {
   filterMeditations,
   likeMeditations,
+  searchMeditations,
 } from "../../store/meditationsSlice";
 import { COLORS } from "../../const";
 import deepEqual from "deep-equal";
@@ -48,7 +49,7 @@ export function CardListMeditation({ count }: CardListMeditationProps) {
       return () => {
         dispatch(filterMeditations("Всё"));
         dispatch(likeMeditations(null));
-        setMeditations(meditationsFiltered.slice(0, count));
+        dispatch(searchMeditations(""));
       };
     }, [])
   );

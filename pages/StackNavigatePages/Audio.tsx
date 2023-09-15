@@ -4,7 +4,11 @@ import { CenterContainer } from "../../components/CenterContainer";
 import { styled } from "styled-components/native";
 import { TextIcon } from "../../components/icons/TextIcon";
 import { PlayerImages } from "../../components/icons/PlayerImage";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import {
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+} from "@react-navigation/native";
 import {
   MeditationScreenProp,
   MeditationData,
@@ -14,7 +18,7 @@ import { LikeIcon } from "../../components/icons/LikeIcon";
 import { AudioPlayer } from "../../components/ui/AudioPlayer";
 import { useAppSelector } from "../../hooks/useAppSelector";
 import { useAppDispatch } from "../../hooks/useAppDispatch";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   addMeditationLike,
   removeMeditationLike,

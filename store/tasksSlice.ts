@@ -27,7 +27,23 @@ export const tasksSlice = createSlice({
             task.title
               .toLowerCase()
               .split(" ")
-              .some((el) => el.match(RegExp(`^${action.payload.trim()}`, "i")))
+              .reverse()
+              .reduce(
+                (acc: string[], curr) => (
+                  acc.push(`${curr} ${acc}`.trim()), acc
+                ),
+                []
+              )
+              .some((el) =>
+                el.match(
+                  RegExp(
+                    `^${action.payload
+                      .trim()
+                      .replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&")}`,
+                    "i"
+                  )
+                )
+              )
           ));
     },
     likeTasks(state, action) {

@@ -5,7 +5,7 @@ import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { useState, useEffect, useCallback } from "react";
 import { useAppSelector } from "../../hooks/useAppSelector";
 import { useAppDispatch } from "../../hooks/useAppDispatch";
-import { filterTasks, likeTasks } from "../../store/tasksSlice";
+import { filterTasks, likeTasks, searchTasks } from "../../store/tasksSlice";
 import { COLORS } from "../../const";
 import deepEqual = require("deep-equal");
 
@@ -30,7 +30,7 @@ export function CardListTasks({ count }: CardListTasksProps) {
       return () => {
         dispatch(filterTasks("Всё"));
         dispatch(likeTasks(null));
-        setTasks(tasksFiltered.slice(0, count));
+        dispatch(searchTasks(""));
       };
     }, [])
   );

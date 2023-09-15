@@ -1,19 +1,19 @@
-import { TouchableOption } from "./Touchables/TouchableOption";
+import TouchableOption from "./Touchables/TouchableOption";
 import { OptionData } from "./../../types";
 import { styled } from "styled-components/native";
 import { useCallback, useState } from "react";
 import { ScrollView } from "react-native";
 import { useAppDispatch } from "../../hooks/useAppDispatch";
-import {
-  filterMeditations,
-} from "../../store/meditationsSlice";
-import { useFocusEffect } from "@react-navigation/native";
+import { filterMeditations } from "../../store/meditationsSlice";
+import { useFocusEffect, useRoute } from "@react-navigation/native";
+import { filterTasks } from "../../store/tasksSlice";
 
 type SelectProps = {
   optionsData: OptionData[];
 };
 
 export function Select({ optionsData }: SelectProps) {
+  const route = useRoute();
   const [optionsState, setOptionsState] = useState(optionsData);
   const dispatch = useAppDispatch();
 
@@ -28,24 +28,12 @@ export function Select({ optionsData }: SelectProps) {
       });
     });
 
-    dispatch(filterMeditations(optionsState[id - 1].title));
+    if (route.name === "Meditation" || route.name === "Home") {
+      dispatch(filterMeditations(optionsState[id - 1].title));
+    } else if (route.name === "Tasks") {
+      dispatch(filterTasks(optionsState[id - 1].title));
+    }
   };
-
-  useFocusEffect(
-    useCallback(() => {
-      return () => {
-        setOptionsState((prevState) => {
-          return prevState.map((optionData) => {
-            if (optionData.id === 1) {
-              return { ...optionData, isActive: true };
-            } else {
-              return { ...optionData, isActive: false };
-            }
-          });
-        });
-      };
-    }, [])
-  );
 
   return (
     <ViewStyled>

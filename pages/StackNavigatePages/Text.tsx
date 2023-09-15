@@ -8,7 +8,6 @@ import TrackPlayer from "react-native-track-player";
 import { Pressable, ScrollView } from "react-native";
 import { useEffect, useState } from "react";
 import { useAppDispatch } from "../../hooks/useAppDispatch";
-import { init } from "../../store/trackPlayerSlice";
 
 export function Text() {
   const route = useRoute();
@@ -22,15 +21,11 @@ export function Text() {
   };
 
   const currentAudio = async () => {
-    try {
-      const currentAudio = await TrackPlayer.getTrack(0);
-      if (currentAudio?.id === meditation.id) {
-        setIsCurrentAudio(true);
-      } else {
-        setIsCurrentAudio(false);
-      }
-    } catch {
-      dispatch(init(false));
+    const currentAudio = await TrackPlayer.getTrack(0);
+    if (currentAudio?.id === meditation.id) {
+      setIsCurrentAudio(true);
+    } else {
+      setIsCurrentAudio(false);
     }
   };
 

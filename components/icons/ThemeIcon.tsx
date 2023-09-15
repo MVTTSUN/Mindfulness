@@ -19,6 +19,7 @@ export function ThemeIcon() {
 }
 
 const ViewStyled = styled.View`
+  margin-left: 3px;
   transform: translateY(-2px);
   width: 18px;
   height: 18px;

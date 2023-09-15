@@ -4,11 +4,7 @@ import { CenterContainer } from "../../components/CenterContainer";
 import { Title } from "../../components/ui/Titles/Title";
 import { Input } from "../../components/ui/Input";
 import { AddIcon } from "../../components/icons/AddIcon";
-import {
-  useFocusEffect,
-  useNavigation,
-  useRoute,
-} from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { MeditationData, NotesScreenProp, TaskType } from "../../types";
 import { useCallback, useEffect, useState } from "react";
 import { useAppSelector } from "../../hooks/useAppSelector";
@@ -48,14 +44,6 @@ export function Notes() {
     dispatch(removeNotes(notesId));
     setIsDelete(false);
   };
-
-  useFocusEffect(
-    useCallback(() => {
-      return () => {
-        setIsDelete(false);
-      };
-    }, [])
-  );
 
   useEffect(() => {
     if (route.params) {
@@ -101,7 +89,7 @@ export function Notes() {
             <CountCards>{`Всего заметок: ${notes.length}`}</CountCards>
             <NotesContainer>
               {notes.map((note) => (
-                <CardAnimated key={note.id} exiting={RollOutLeft}>
+                <CardAnimated key={note.id} exiting={RollOutLeft.duration(700)}>
                   <TouchableHighlightNote
                     $backgroundColor={note.backgroundColor}
                     onPress={
@@ -140,9 +128,7 @@ export function Notes() {
                           >
                             <CheckBox
                               color={COLORS.textColors.meditationCard}
-                              backgroundColor={
-                                COLORS.backgroundColors.dark
-                              }
+                              backgroundColor={COLORS.backgroundColors.dark}
                               isActive={notesId.includes(note.id)}
                               isStroke={false}
                               isRound

@@ -28,38 +28,30 @@ export function CheckBox({
   isRound,
   isStroke,
 }: CheckBoxProps) {
-  const opacity = useSharedValue(0);
-  const backgroundColorAnimation = useAnimatedStyle(() => ({
-    backgroundColor: interpolateColor(
-      opacity.value,
-      [0, 1],
-      ["transparent", backgroundColor]
-    ),
-  }));
-
-  useEffect(() => {
-    if (isActive) {
-      opacity.value = withTiming(1, { duration: 200 });
-    } else {
-      opacity.value = withTiming(0, { duration: 200 });
-    }
-  }, [isActive]);
-
   return (
     <Container>
       <CheckBoxStyled
-        style={backgroundColorAnimation}
-        $borderColor={backgroundColor}
+        $backgroundColor={
+          backgroundColor === ""
+            ? COLORS.backgroundColors.meditationCard
+            : backgroundColor
+        }
         $isActive={isActive}
         $isRound={isRound}
       >
         {isActive && (
-          <Animated.View
-            entering={FadeIn.duration(200)}
-            exiting={FadeOut.duration(200)}
+          <Fill
+            $isRound={isRound}
+            $backgroundColor={
+              backgroundColor === ""
+                ? COLORS.backgroundColors.meditationCard
+                : backgroundColor
+            }
+            entering={FadeIn.duration(100)}
+            exiting={FadeOut.duration(100)}
           >
             <CheckIcon color={color} size={20} isStroke={isStroke} />
-          </Animated.View>
+          </Fill>
         )}
       </CheckBoxStyled>
       {text && <TextStyled>{text}</TextStyled>}
@@ -67,8 +59,8 @@ export function CheckBox({
   );
 }
 
-const CheckBoxStyled = styled(Animated.View)<{
-  $borderColor: string;
+const CheckBoxStyled = styled.View<{
+  $backgroundColor: string;
   $isActive: boolean;
   $isRound?: boolean;
 }>`
@@ -76,8 +68,16 @@ const CheckBoxStyled = styled(Animated.View)<{
   justify-content: center;
   height: 25px;
   width: 25px;
-  border: 3px solid ${({ $borderColor }) => $borderColor};
+  border: 3px solid ${({ $backgroundColor }) => $backgroundColor};
   border-radius: ${({ $isRound }) => ($isRound ? "20px" : "5px")};
+`;
+
+const Fill = styled(Animated.View)<{
+  $backgroundColor: string;
+  $isRound?: boolean;
+}>`
+  background-color: ${({ $backgroundColor }) => $backgroundColor};
+  border-radius: ${({ $isRound }) => ($isRound ? "20px" : "0px")};
 `;
 
 const Container = styled.View`

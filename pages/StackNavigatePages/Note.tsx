@@ -21,7 +21,7 @@ import {
 import { TouchableHighlight } from "../../components/ui/Touchables/TouchableHighlight";
 import { MeditationsAndTasksPopup } from "../../components/MeditationsAndTasksPopup";
 import { COLORS, DATA_INPUTS_NOTE } from "../../const";
-import { EmotionsPopup } from "../../components/EmotionsPopup";
+import EmotionsPopup from "../../components/EmotionsPopup";
 import { useAppDispatch } from "../../hooks/useAppDispatch";
 import { addNote, removeNotes, updateNote } from "../../store/notesSlice";
 
@@ -61,7 +61,6 @@ function Note() {
     createdAt,
   });
   const isUpdateAfterUnmount = useRef(isUpdate);
-  const isNavigated = useRef(false);
   const prevStateAfterUnmount = useRef(dataAfterUnmount.current);
 
   const setNameNoteHandle = (
@@ -78,7 +77,6 @@ function Note() {
   };
 
   const back = () => {
-    isNavigated.current = true;
     navigation.goBack();
   };
 
@@ -113,16 +111,6 @@ function Note() {
       dispatch(removeNotes([id]));
     }
   };
-
-  useFocusEffect(
-    useCallback(() => {
-      return () => {
-        if (!isNavigated.current) {
-          navigation.replace("Notes");
-        }
-      };
-    }, [])
-  );
 
   useEffect(() => {
     isUpdateAfterUnmount.current = isUpdate;

@@ -373,145 +373,66 @@ const DATA_INPUTS_NOTE = [
 ];
 
 const EMOTIONS = [
+  "Неловкость",
+  "Смущение",
+  "Стыд",
+  "Вина",
+  "Удовлетворение",
+  "Удовольствие",
+  "Радость",
+  "Восторг",
+  "Досада",
+  "Обида",
+  "Зависть",
+  "Безразличие",
+  "Спокойствие",
+  "Умиротворение",
+  "Разочарование",
+  "Печаль",
+  "Грусть",
+  "Тоска",
+  "Отчаяние",
+  "Горе",
+  "Недовольство",
+  "Неприязнь",
+  "Отвращение",
+  "Беспокойство",
+  "Тревога",
+  "Страх",
+  "Ужас",
+  "Удивление",
+  "Интерес",
+  "Предвкушение",
+  "Воодушевление",
+  "Раздражение",
+  "Злость",
+  "Гнев",
+  "Ярость",
+];
+
+const TIP = [
   {
-    id: 1,
-    text: "Неловкость",
+    type: "text",
+    payload:
+      "Медитация — практика, которая полезна практически всем. Она помогает снижать уровень стресса, справляться с агрессией, тренировать внимание, успокаиваться и прислушиваться к себе. Хотя кажется, что для нее нужны особые условия и инструктор, на самом деле это не так — есть простые техники, которые можно выполнять дома, например дыхательная медитация. Рассказываем, какие это техники и как с ними работать.",
   },
   {
-    id: 2,
-    text: "Смущение",
+    type: "lottie",
+    payload: require("./assets/lottie/animaRound.json"),
   },
   {
-    id: 3,
-    text: "Стыд",
+    type: "text",
+    payload:
+      "Медитация — практика, которая полезна практически всем. Она помогает снижать уровень стресса, справляться с агрессией, тренировать внимание, успокаиваться и прислушиваться к себе. Хотя кажется, что для нее нужны особые условия и инструктор, на самом деле это не так — есть простые техники, которые можно выполнять дома, например дыхательная медитация. Рассказываем, какие это техники и как с ними работать.",
   },
   {
-    id: 4,
-    text: "Вина",
+    type: "image",
+    payload: require("./assets/images/audio-player-image.png"),
   },
   {
-    id: 5,
-    text: "Удовлетворение",
-  },
-  {
-    id: 6,
-    text: "Удовольствие",
-  },
-  {
-    id: 7,
-    text: "Радость",
-  },
-  {
-    id: 8,
-    text: "Восторг",
-  },
-  {
-    id: 9,
-    text: "Досада",
-  },
-  {
-    id: 10,
-    text: "Обида",
-  },
-  {
-    id: 11,
-    text: "Зависть",
-  },
-  {
-    id: 12,
-    text: "Безразличие",
-  },
-  {
-    id: 13,
-    text: "Спокойствие",
-  },
-  {
-    id: 14,
-    text: "Умиротворение",
-  },
-  {
-    id: 15,
-    text: "Разочарование",
-  },
-  {
-    id: 16,
-    text: "Печаль",
-  },
-  {
-    id: 17,
-    text: "Грусть",
-  },
-  {
-    id: 18,
-    text: "Тоска",
-  },
-  {
-    id: 19,
-    text: "Отчаяние",
-  },
-  {
-    id: 20,
-    text: "Горе",
-  },
-  {
-    id: 21,
-    text: "Недовольство",
-  },
-  {
-    id: 22,
-    text: "Неприязнь",
-  },
-  {
-    id: 23,
-    text: "Отвращение",
-  },
-  {
-    id: 24,
-    text: "Беспокойство",
-  },
-  {
-    id: 25,
-    text: "Тревога",
-  },
-  {
-    id: 26,
-    text: "Страх",
-  },
-  {
-    id: 27,
-    text: "Ужас",
-  },
-  {
-    id: 28,
-    text: "Удивление",
-  },
-  {
-    id: 29,
-    text: "Интерес",
-  },
-  {
-    id: 30,
-    text: "Предвкушение",
-  },
-  {
-    id: 31,
-    text: "Воодушевление",
-  },
-  {
-    id: 32,
-    text: "Раздражение",
-  },
-  {
-    id: 33,
-    text: "Злость",
-  },
-  {
-    id: 34,
-    text: "Гнев",
-  },
-  {
-    id: 35,
-    text: "Ярость",
+    type: "text",
+    payload:
+      "Медитация — практика, которая полезна практически всем. Она помогает снижать уровень стресса, справляться с агрессией, тренировать внимание, успокаиваться и прислушиваться к себе. Хотя кажется, что для нее нужны особые условия и инструктор, на самом деле это не так — есть простые техники, которые можно выполнять дома, например дыхательная медитация. Рассказываем, какие это техники и как с ними работать.",
   },
 ];
 
@@ -528,7 +449,7 @@ const TASKS = [
       },
       {
         type: "lottie",
-        payload: require("./assets/lottie/broko.lottie"),
+        payload: require("./assets/lottie/dotlottie.lottie"),
       },
       {
         type: "text",
@@ -568,11 +489,11 @@ const TASKS = [
   {
     id: 3,
     title: "Задача 3",
-    kind: "Тревога",
+    kind: "Депрессия",
     content: [
       {
         type: "lottie",
-        payload: require("./assets/lottie/dotlottie.lottie"),
+        payload: require("./assets/lottie/mind.lottie"),
       },
       {
         type: "text",
@@ -587,12 +508,12 @@ const TASKS = [
   {
     id: 4,
     title: "Задача 4",
-    kind: "Тревога",
+    kind: "Стресс",
     content: [
-      {
-        type: "lottie",
-        payload: require("./assets/lottie/dotlottie.lottie"),
-      },
+      // {
+      //   type: "lottie",
+      //   payload: require("./assets/lottie/dotlottie.lottie"),
+      // },
       {
         type: "text",
         payload: "You need a new clean slate without the dents",
@@ -608,10 +529,10 @@ const TASKS = [
     title: "Задача 5",
     kind: "Тревога",
     content: [
-      {
-        type: "lottie",
-        payload: require("./assets/lottie/dotlottie.lottie"),
-      },
+      // {
+      //   type: "lottie",
+      //   payload: require("./assets/lottie/dotlottie.lottie"),
+      // },
       {
         type: "text",
         payload: "You need a new clean slate without the dents",
@@ -627,10 +548,10 @@ const TASKS = [
     title: "Задача 6",
     kind: "Тревога",
     content: [
-      {
-        type: "lottie",
-        payload: require("./assets/lottie/dotlottie.lottie"),
-      },
+      // {
+      //   type: "lottie",
+      //   payload: require("./assets/lottie/dotlottie.lottie"),
+      // },
       {
         type: "text",
         payload: "You need a new clean slate without the dents",
@@ -646,10 +567,10 @@ const TASKS = [
     title: "Задача 7",
     kind: "Тревога",
     content: [
-      {
-        type: "lottie",
-        payload: require("./assets/lottie/dotlottie.lottie"),
-      },
+      // {
+      //   type: "lottie",
+      //   payload: require("./assets/lottie/dotlottie.lottie"),
+      // },
       {
         type: "text",
         payload: "You need a new clean slate without the dents",
@@ -665,10 +586,10 @@ const TASKS = [
     title: "Задача 8",
     kind: "Тревога",
     content: [
-      {
-        type: "lottie",
-        payload: require("./assets/lottie/dotlottie.lottie"),
-      },
+      // {
+      //   type: "lottie",
+      //   payload: require("./assets/lottie/dotlottie.lottie"),
+      // },
       {
         type: "text",
         payload: "You need a new clean slate without the dents",
@@ -684,10 +605,10 @@ const TASKS = [
     title: "Задача 9",
     kind: "Тревога",
     content: [
-      {
-        type: "lottie",
-        payload: require("./assets/lottie/dotlottie.lottie"),
-      },
+      // {
+      //   type: "lottie",
+      //   payload: require("./assets/lottie/dotlottie.lottie"),
+      // },
       {
         type: "text",
         payload: "You need a new clean slate without the dents",
@@ -703,10 +624,10 @@ const TASKS = [
     title: "Задача 10",
     kind: "Тревога",
     content: [
-      {
-        type: "lottie",
-        payload: require("./assets/lottie/dotlottie.lottie"),
-      },
+      // {
+      //   type: "lottie",
+      //   payload: require("./assets/lottie/dotlottie.lottie"),
+      // },
       {
         type: "text",
         payload: "You need a new clean slate without the dents",
@@ -722,10 +643,10 @@ const TASKS = [
     title: "Задача 11",
     kind: "Тревога",
     content: [
-      {
-        type: "lottie",
-        payload: require("./assets/lottie/dotlottie.lottie"),
-      },
+      // {
+      //   type: "lottie",
+      //   payload: require("./assets/lottie/dotlottie.lottie"),
+      // },
       {
         type: "text",
         payload: "You need a new clean slate without the dents",
@@ -741,10 +662,10 @@ const TASKS = [
     title: "Задача 12",
     kind: "Тревога",
     content: [
-      {
-        type: "lottie",
-        payload: require("./assets/lottie/dotlottie.lottie"),
-      },
+      // {
+      //   type: "lottie",
+      //   payload: require("./assets/lottie/dotlottie.lottie"),
+      // },
       {
         type: "text",
         payload: "You need a new clean slate without the dents",
@@ -760,10 +681,10 @@ const TASKS = [
     title: "Задача 13",
     kind: "Тревога",
     content: [
-      {
-        type: "lottie",
-        payload: require("./assets/lottie/dotlottie.lottie"),
-      },
+      // {
+      //   type: "lottie",
+      //   payload: require("./assets/lottie/dotlottie.lottie"),
+      // },
       {
         type: "text",
         payload: "You need a new clean slate without the dents",
@@ -779,10 +700,10 @@ const TASKS = [
     title: "Задача 14",
     kind: "Тревога",
     content: [
-      {
-        type: "lottie",
-        payload: require("./assets/lottie/dotlottie.lottie"),
-      },
+      // {
+      //   type: "lottie",
+      //   payload: require("./assets/lottie/dotlottie.lottie"),
+      // },
       {
         type: "text",
         payload: "You need a new clean slate without the dents",
@@ -798,10 +719,10 @@ const TASKS = [
     title: "Задача 15",
     kind: "Тревога",
     content: [
-      {
-        type: "lottie",
-        payload: require("./assets/lottie/dotlottie.lottie"),
-      },
+      // {
+      //   type: "lottie",
+      //   payload: require("./assets/lottie/dotlottie.lottie"),
+      // },
       {
         type: "text",
         payload: "You need a new clean slate without the dents",
@@ -817,10 +738,10 @@ const TASKS = [
     title: "Задача 16",
     kind: "Тревога",
     content: [
-      {
-        type: "lottie",
-        payload: require("./assets/lottie/dotlottie.lottie"),
-      },
+      // {
+      //   type: "lottie",
+      //   payload: require("./assets/lottie/dotlottie.lottie"),
+      // },
       {
         type: "text",
         payload: "You need a new clean slate without the dents",
@@ -836,10 +757,10 @@ const TASKS = [
     title: "Задача 17",
     kind: "Тревога",
     content: [
-      {
-        type: "lottie",
-        payload: require("./assets/lottie/dotlottie.lottie"),
-      },
+      // {
+      //   type: "lottie",
+      //   payload: require("./assets/lottie/dotlottie.lottie"),
+      // },
       {
         type: "text",
         payload: "You need a new clean slate without the dents",
@@ -863,4 +784,5 @@ export {
   DATA_INPUTS_NOTE,
   EMOTIONS,
   TASKS,
+  TIP,
 };

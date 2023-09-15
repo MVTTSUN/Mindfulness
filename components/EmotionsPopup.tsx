@@ -2,7 +2,7 @@ import styled from "styled-components/native";
 import { CheckBox } from "./ui/CheckBox";
 import { Pressable, ScrollView } from "react-native";
 import { COLORS, EMOTIONS } from "../const";
-import { useState } from "react";
+import { memo, useState } from "react";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
 type EmotionsPopupProps = {
@@ -15,7 +15,7 @@ type EmotionsPopupProps = {
   typeEmotions: string;
 };
 
-export function EmotionsPopup({
+function EmotionsPopup({
   backgroundColor,
   color,
   emotionsBefore,
@@ -48,19 +48,19 @@ export function EmotionsPopup({
       <Container>
         <ScrollView showsVerticalScrollIndicator={false}>
           <EmotionsContainer>
-            {EMOTIONS.map((emotion) => (
+            {EMOTIONS.map((emotion, index) => (
               <Pressable
-                key={emotion.id}
-                onPress={() => toggleActiveEmotion(emotion.text)}
+                key={index}
+                onPress={() => toggleActiveEmotion(emotion)}
               >
                 <CheckBox
                   color={color}
                   backgroundColor={backgroundColor}
-                  text={emotion.text}
+                  text={emotion}
                   isActive={
                     typeEmotions === "before"
-                      ? emotionsBefore.includes(emotion.text)
-                      : emotionsAfter.includes(emotion.text)
+                      ? emotionsBefore.includes(emotion)
+                      : emotionsAfter.includes(emotion)
                   }
                 />
               </Pressable>
@@ -71,6 +71,8 @@ export function EmotionsPopup({
     </Animated.View>
   );
 }
+
+export default memo(EmotionsPopup);
 
 const Container = styled.View`
   gap: 20px;

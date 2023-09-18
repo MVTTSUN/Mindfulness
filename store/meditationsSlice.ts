@@ -24,7 +24,6 @@ export const meditationsSlice = createSlice({
         ? (state.meditationsSearched = state.meditations)
         : (state.meditationsSearched = state.meditations.filter((meditation) =>
             meditation.title
-              .toLowerCase()
               .split(" ")
               .reverse()
               .reduce(

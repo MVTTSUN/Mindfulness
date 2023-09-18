@@ -34,7 +34,7 @@ export function ThemePopup() {
       exiting={FadeOut.duration(200)}
     >
       <ViewPopup>
-        <TextTheme>Тема</TextTheme>
+        <TextTitle>Тема</TextTitle>
         <ViewVariants>
           {variants.map((variant, index) => (
             <Pressable
@@ -62,7 +62,7 @@ const ViewPopup = styled.View`
   background-color: ${({ theme }) => theme.backgroundColor.main};
 `;
 
-const TextTheme = styled.Text`
+const TextTitle = styled.Text`
   margin-bottom: 10px;
   font-family: "Poppins-Medium";
   font-size: 18px;

@@ -25,7 +25,6 @@ export const tasksSlice = createSlice({
         ? (state.tasksSearched = state.tasks)
         : (state.tasksSearched = state.tasks.filter((task) =>
             task.title
-              .toLowerCase()
               .split(" ")
               .reverse()
               .reduce(

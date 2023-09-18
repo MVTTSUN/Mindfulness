@@ -49,7 +49,6 @@ export function Task() {
       dispatch(addTaskLike(task.id));
     }
   };
-  console.log(1);
 
   useEffect(() => {
     setIsActive(likes.some((like) => like.id === task.id));

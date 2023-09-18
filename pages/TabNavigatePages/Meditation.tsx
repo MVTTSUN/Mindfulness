@@ -1,5 +1,9 @@
 import { GlobalScreen } from "../../components/GlobalScreen";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import {
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+} from "@react-navigation/native";
 import { MeditationScreenProp, MeditationData } from "../../types";
 import { CenterContainer } from "../../components/CenterContainer";
 import { Title } from "../../components/ui/Titles/Title";
@@ -19,7 +23,7 @@ import {
   likeMeditations,
   searchMeditations,
 } from "../../store/meditationsSlice";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { styled } from "styled-components/native";
 import { LikeIcon } from "../../components/icons/LikeIcon";
 import { useAppSelector } from "../../hooks/useAppSelector";
@@ -42,6 +46,7 @@ import Animated, {
 } from "react-native-reanimated";
 
 export function Meditation() {
+  const [text, setText] = useState("");
   const navigation = useNavigation<MeditationScreenProp>();
   const dispatch = useAppDispatch();
   const route = useRoute();
@@ -106,6 +111,11 @@ export function Meditation() {
     }
   };
 
+  const onChangeText = (text: string) => {
+    setText(text);
+    dispatch(searchMeditations(text));
+  };
+
   const setup = async () => {
     // await TrackPlayer.clearNowPlayingMetadata();
     // await TrackPlayer.isServiceRunning().then(async (isRunning) => {
@@ -114,11 +124,13 @@ export function Meditation() {
     //     await TrackPlayer.setupPlayer();
     //   }
     // });
-    try {
-      await TrackPlayer.setupPlayer();
-    } catch (e) {
-      await TrackPlayer.clearNowPlayingMetadata();
-    }
+    // await TrackPlayer.setupPlayer();
+    // try {
+    //   await TrackPlayer.clearNowPlayingMetadata();
+    // } catch (e) {
+    //   await TrackPlayer.setupPlayer();
+    // }
+    await TrackPlayer.setupPlayer();
     await TrackPlayer.updateOptions({
       android: {
         appKilledPlaybackBehavior:
@@ -131,6 +143,14 @@ export function Meditation() {
       ],
     });
   };
+
+  useFocusEffect(
+    useCallback(() => {
+      return () => {
+        setText("");
+      };
+    }, [])
+  );
 
   useEffect(() => {
     setup();
@@ -149,7 +169,8 @@ export function Meditation() {
         <Title>Медитации</Title>
         <SearchView>
           <Input
-            onChangeText={(text) => dispatch(searchMeditations(text))}
+            value={text}
+            onChangeText={onChangeText}
             width="70%"
             placeholder="Поиск"
           />

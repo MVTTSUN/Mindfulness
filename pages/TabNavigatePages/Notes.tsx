@@ -4,7 +4,11 @@ import { CenterContainer } from "../../components/CenterContainer";
 import { Title } from "../../components/ui/Titles/Title";
 import { Input } from "../../components/ui/Input";
 import { AddIcon } from "../../components/icons/AddIcon";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import {
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+} from "@react-navigation/native";
 import { MeditationData, NotesScreenProp, TaskType } from "../../types";
 import { useCallback, useEffect, useState } from "react";
 import { useAppSelector } from "../../hooks/useAppSelector";
@@ -18,17 +22,41 @@ import Animated, {
   ZoomInDown,
   ZoomOut,
   ZoomOutDown,
+  cancelAnimation,
 } from "react-native-reanimated";
 import { useAppDispatch } from "../../hooks/useAppDispatch";
-import { removeNotes } from "../../store/notesSlice";
+import {
+  removeNotes,
+  resetQueries,
+  searchNotes,
+  updateQueries,
+} from "../../store/notesSlice";
+import { NotesFilter } from "../../components/ui/NotesFilter";
+import { TypesPopup } from "../../components/TypesPopup";
+import { MonthsPopup } from "../../components/MonthsPopup";
+import { YearsPopup } from "../../components/YearsPopup";
 
 export function Notes() {
   const navigation = useNavigation<NotesScreenProp>();
   const route = useRoute();
-  const notes = useAppSelector((state) => state.notes.notes);
   const [isDelete, setIsDelete] = useState(false);
   const [notesId, setNotesId] = useState<string[]>([]);
   const dispatch = useAppDispatch();
+  const notes = useAppSelector((state) => state.notes.notesSearched);
+  const [text, setText] = useState("");
+  const [isOpenTypesPopup, setIsOpenTypesPopup] = useState(false);
+  const [isOpenMonthsPopup, setIsOpenMonthsPopup] = useState(false);
+  const [isOpenYearsPopup, setIsOpenYearsPopup] = useState(false);
+
+  useFocusEffect(
+    useCallback(() => {
+      return () => {
+        setText("");
+        dispatch(resetQueries());
+        dispatch(searchNotes());
+      };
+    }, [])
+  );
 
   const toggleCheckbox = (currentId: string) => {
     setNotesId((prevState) => {
@@ -38,6 +66,12 @@ export function Notes() {
         return [...prevState, currentId];
       }
     });
+  };
+
+  const onChangeText = (text: string) => {
+    setText(text);
+    dispatch(updateQueries({ property: "search", value: text }));
+    dispatch(searchNotes());
   };
 
   const deleteNotes = () => {
@@ -81,15 +115,21 @@ export function Notes() {
           </TitleContainer>
           <ScrollView showsVerticalScrollIndicator={false}>
             <Input
+              value={text}
               editable={!isDelete}
-              onChangeText={() => {}}
+              onChangeText={onChangeText}
               width="100%"
               placeholder="Поиск заметок"
+            />
+            <NotesFilter
+              setIsOpenTypesPopup={setIsOpenTypesPopup}
+              setIsOpenYearsPopup={setIsOpenYearsPopup}
+              setIsOpenMonthsPopup={setIsOpenMonthsPopup}
             />
             <CountCards>{`Всего заметок: ${notes.length}`}</CountCards>
             <NotesContainer>
               {notes.map((note) => (
-                <CardAnimated key={note.id} exiting={RollOutLeft.duration(700)}>
+                <CardAnimated key={note.id} exiting={RollOutLeft.duration(600)}>
                   <TouchableHighlightNote
                     $backgroundColor={note.backgroundColor}
                     onPress={
@@ -167,9 +207,46 @@ export function Notes() {
           </PressableStyled>
         </Animated.View>
       )}
+      {isOpenTypesPopup && (
+        <PressableBlur onPress={() => setIsOpenTypesPopup(false)}>
+          <Pressable>
+            <TypesPopup />
+          </Pressable>
+        </PressableBlur>
+      )}
+      {isOpenMonthsPopup && (
+        <PressableBlur onPress={() => setIsOpenMonthsPopup(false)}>
+          <NoPressableStyled>
+            <MonthsPopup />
+          </NoPressableStyled>
+        </PressableBlur>
+      )}
+      {isOpenYearsPopup && (
+        <PressableBlur onPress={() => setIsOpenYearsPopup(false)}>
+          <NoPressableStyled>
+            <YearsPopup />
+          </NoPressableStyled>
+        </PressableBlur>
+      )}
     </>
   );
 }
+
+const PressableBlur = styled.Pressable`
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: ${({ theme }) => theme.backgroundColor.blur};
+`;
+
+const NoPressableStyled = styled.Pressable`
+  height: 70%;
+  width: 70%;
+`;
 
 const CountCards = styled.Text`
   font-family: "Poppins-Medium";

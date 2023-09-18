@@ -13,14 +13,15 @@ import Animated, {
   withSequence,
   withSpring,
 } from "react-native-reanimated";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { useAppDispatch } from "../../hooks/useAppDispatch";
 import { useAppSelector } from "../../hooks/useAppSelector";
 import { likeTasks, searchTasks } from "../../store/tasksSlice";
-import { Pressable } from 'react-native';
+import { useFocusEffect } from "@react-navigation/native";
 
 export function Tasks() {
   const [isActive, setIsActive] = useState(false);
+  const [text, setText] = useState("");
   const scaleLike = useSharedValue(1);
   const dispatch = useAppDispatch();
   const likes = useAppSelector((state) => state.likes.likesTask);
@@ -42,13 +43,27 @@ export function Tasks() {
     setIsActive(!isActive);
   };
 
+  const onChangeText = (text: string) => {
+    setText(text);
+    dispatch(searchTasks(text));
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      return () => {
+        setText("");
+      };
+    }, [])
+  );
+
   return (
     <GlobalScreen>
       <CenterContainer>
         <Title>Задания</Title>
         <SearchView>
           <Input
-            onChangeText={(text) => dispatch(searchTasks(text))}
+            value={text}
+            onChangeText={onChangeText}
             width="70%"
             placeholder="Поиск"
           />

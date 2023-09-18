@@ -18,9 +18,11 @@ type InputProps = {
   height?: string;
   isTextarea?: boolean;
   editable?: boolean;
+  value: string;
 };
 
 export function Input({
+  value,
   width,
   withoutIcon,
   placeholder,
@@ -53,6 +55,7 @@ export function Input({
       {!withoutIcon && <SearchIcon />}
       <FocusOutline style={borderColorAnimated}>
         <TextInputStyled
+          value={value}
           editable={editable}
           onFocus={() => setIsFocus(true)}
           onBlur={() => setIsFocus(false)}

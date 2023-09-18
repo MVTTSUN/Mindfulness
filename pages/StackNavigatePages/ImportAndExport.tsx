@@ -99,9 +99,10 @@ const TextTitle = styled.Text`
 
 const TextInfo = styled.Text`
   margin-bottom: 20px;
-  text-align: center;
+  text-align: justify;
   font-family: "Poppins-Regular";
-  font-size: 18px;
+  font-size: 16px;
+  line-height: 20px;
   color: ${({ theme }) => theme.color.standard};
 `;
 

@@ -29,6 +29,7 @@ type InfoAndSettingsScreenProp = NativeStackNavigationProp<{
 }>;
 
 type NotesScreenProp = NativeStackNavigationProp<{
+  Statistics: undefined;
   Note:
     | undefined
     | { meditation: MeditationData }

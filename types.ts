@@ -128,6 +128,18 @@ type DataInput = {
   title: string;
 };
 
+type CountsEmotion = {
+  all: number;
+  meditation: number;
+  task: number;
+  unknown: number;
+};
+
+type ProcessEmotions = {
+  title: string;
+  counts: CountsEmotion;
+};
+
 export {
   RootState,
   AppDispatch,
@@ -144,4 +156,5 @@ export {
   TaskType,
   DataInput,
   TasksScreenProp,
+  ProcessEmotions,
 };

@@ -61,11 +61,6 @@ export const AudioPlayer = memo(({ id, duration }: AudioPlayerProps) => {
 
     if (currentAudio?.id !== id) {
       setPosition(0);
-      borderRadius.value = 25;
-      rotatePlayButton.value = withTiming(1, {
-        duration: 500,
-        easing: Easing.bezier(0.25, -0.5, 0.25, 1),
-      });
       await TrackPlayer.reset();
       await TrackPlayer.add([MEDITATIONS_DATA[id - 1]]);
       await TrackPlayer.play();
@@ -75,20 +70,10 @@ export const AudioPlayer = memo(({ id, duration }: AudioPlayerProps) => {
 
     if (currentAudio?.id === id && currentAudio?.id !== null) {
       if (playbackState === State.Paused || playbackState === State.Ready) {
-        borderRadius.value = 25;
-        rotatePlayButton.value = withTiming(1, {
-          duration: 500,
-          easing: Easing.bezier(0.25, -0.5, 0.25, 1),
-        });
         await TrackPlayer.play();
         setIsCurrentAudio(true);
         dispatch(setLastMeditationId(id));
       } else if (playbackState === State.Playing) {
-        borderRadius.value = 35;
-        rotatePlayButton.value = withTiming(0, {
-          duration: 500,
-          easing: Easing.bezier(0.25, -0.5, 0.25, 1),
-        });
         await TrackPlayer.pause();
       }
     }
@@ -149,6 +134,12 @@ export const AudioPlayer = memo(({ id, duration }: AudioPlayerProps) => {
         easing: Easing.bezier(0.25, -0.5, 0.25, 1),
       });
       borderRadius.value = 25;
+    } else {
+      borderRadius.value = 35;
+      rotatePlayButton.value = withTiming(0, {
+        duration: 500,
+        easing: Easing.bezier(0.25, -0.5, 0.25, 1),
+      });
     }
   }, [playbackState, isCurrentAudio]);
 

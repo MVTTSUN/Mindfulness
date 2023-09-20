@@ -408,7 +408,7 @@ const EMOTIONS = [
   "Злость",
   "Гнев",
   "Ярость",
-];
+].sort();
 
 const TIP = [
   {

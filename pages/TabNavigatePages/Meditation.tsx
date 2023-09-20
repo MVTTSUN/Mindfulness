@@ -86,27 +86,12 @@ export function Meditation() {
 
   const toggleAudio = async () => {
     if (playbackState === State.None && lastMeditationId !== null) {
-      borderRadius.value = 13;
-      rotate.value = withTiming(1, {
-        duration: 500,
-        easing: Easing.bezier(0.25, -0.5, 0.25, 1),
-      });
       await TrackPlayer.add([MEDITATIONS_DATA[lastMeditationId - 1]]);
       await TrackPlayer.play();
     }
     if (playbackState === State.Paused || playbackState === State.Ready) {
-      borderRadius.value = 13;
-      rotate.value = withTiming(1, {
-        duration: 500,
-        easing: Easing.bezier(0.25, -0.5, 0.25, 1),
-      });
       await TrackPlayer.play();
     } else if (playbackState === State.Playing) {
-      borderRadius.value = 20;
-      rotate.value = withTiming(0, {
-        duration: 500,
-        easing: Easing.bezier(0.25, -0.5, 0.25, 1),
-      });
       await TrackPlayer.pause();
     }
   };
@@ -151,6 +136,22 @@ export function Meditation() {
       };
     }, [])
   );
+
+  useEffect(() => {
+    if (playbackState === State.Playing) {
+      borderRadius.value = 13;
+      rotate.value = withTiming(1, {
+        duration: 500,
+        easing: Easing.bezier(0.25, -0.5, 0.25, 1),
+      });
+    } else {
+      borderRadius.value = 20;
+      rotate.value = withTiming(0, {
+        duration: 500,
+        easing: Easing.bezier(0.25, -0.5, 0.25, 1),
+      });
+    }
+  }, [playbackState]);
 
   useEffect(() => {
     setup();

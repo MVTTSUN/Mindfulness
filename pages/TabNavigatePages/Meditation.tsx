@@ -102,20 +102,24 @@ export function Meditation() {
   };
 
   const setup = async () => {
-    // await TrackPlayer.clearNowPlayingMetadata();
-    // await TrackPlayer.isServiceRunning().then(async (isRunning) => {
-    //   console.log(isRunning);
-    //   if (!isRunning) {
-    //     await TrackPlayer.setupPlayer();
-    //   }
-    // });
+    await TrackPlayer.isServiceRunning().then(async (isRunning) => {
+      console.log(isRunning);
+      if (!isRunning) {
+        await TrackPlayer.setupPlayer();
+      } else {
+        await TrackPlayer.clearNowPlayingMetadata();
+      }
+    });
     // await TrackPlayer.setupPlayer();
     // try {
     //   await TrackPlayer.clearNowPlayingMetadata();
     // } catch (e) {
     //   await TrackPlayer.setupPlayer();
     // }
-    await TrackPlayer.setupPlayer();
+    // try {
+    //   await TrackPlayer.clearNowPlayingMetadata();
+    //   await TrackPlayer.setupPlayer();
+    // } catch (e) {}
     await TrackPlayer.updateOptions({
       android: {
         appKilledPlaybackBehavior:

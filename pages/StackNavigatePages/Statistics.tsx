@@ -140,7 +140,7 @@ const TextTitle = styled.Text`
 `;
 
 const ScrollViewStyled = styled.ScrollView`
-  height: ${(Dimensions.get("window").height / 100) * 31};
+  height: ${Math.floor((Dimensions.get("window").height / 100) * 31)}px;
   margin-bottom: 10px;
 `;
 

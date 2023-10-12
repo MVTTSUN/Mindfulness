@@ -47,7 +47,17 @@ const patchUserCelebrate = celebrate({
 
 const postTipCelebrate = celebrate({
   body: Joi.object().keys({
-    content: Joi.array().required(),
+    type: Joi.alternatives().try(
+      Joi.string().required(),
+      Joi.array().items(Joi.string()).required()
+    ),
+    text: Joi.alternatives().try(Joi.string(), Joi.array().items(Joi.string())),
+  }),
+});
+
+const postEmotionCelebrate = celebrate({
+  body: Joi.object().keys({
+    data: Joi.array().items(Joi.string()).required(),
   }),
 });
 
@@ -58,4 +68,5 @@ module.exports = {
   deleteMovieCelebrate,
   patchUserCelebrate,
   postTipCelebrate,
+  postEmotionCelebrate,
 };

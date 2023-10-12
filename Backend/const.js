@@ -12,7 +12,7 @@ const errorMessages = {
   UNAUTHORIZED: 'Необходима авторизация',
   FORBIDDEN: 'Доступ запрещен',
   NOT_FOUND_DATA: 'Данные не найдены',
-  WRONG_PATH: 'Неправильный путь',
+  WRONG_PATH: 'Такого пути у сервера нет',
   CONFLICT: 'Данные уже существуют',
   DEFAULT: 'На сервере произошла ошибка',
   UNAUTHORIZED_AUTH: 'Неправильные почта или пароль',

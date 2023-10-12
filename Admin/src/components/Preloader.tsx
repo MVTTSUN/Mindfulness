@@ -2,23 +2,12 @@ import styled from "styled-components";
 
 export function Preloader() {
   return (
-    <Blur>
-      <LdsRipple>
-        <Div></Div>
-        <Div></Div>
-      </LdsRipple>
-    </Blur>
+    <LdsRipple>
+      <Div></Div>
+      <Div></Div>
+    </LdsRipple>
   );
 }
-
-const Blur = styled.div`
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.5);
-`;
 
 const LdsRipple = styled.div`
   position: relative;

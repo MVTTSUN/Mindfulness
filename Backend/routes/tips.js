@@ -1,10 +1,10 @@
 const router = require('express').Router();
-const upload = require('../middlewares/gridfs');
-// const { postTipCelebrate } = require('../middlewares/celebrate');
-const { getTips, postTips, deleteTips } = require('../controllers/tips');
+const { uploadTips } = require('../middlewares/gridfs');
+const { postTipCelebrate } = require('../middlewares/celebrate');
+const { postTips, getTips, getTipFile } = require('../controllers/tips');
 
 router.get('/tips', getTips);
-router.post('/tips', upload.single('file'), postTips);
-router.delete('/tips', deleteTips);
+router.get('/tips/:filename', getTipFile);
+router.post('/tips', postTipCelebrate, uploadTips.array('file'), postTips);
 
 module.exports = router;

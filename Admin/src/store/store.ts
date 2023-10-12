@@ -2,6 +2,7 @@ import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import currentAudioReducer from "./currentAudioSlice";
 import { Slice } from "../const";
 import { mindfulnessApi } from "../services/api";
+import { rtkQueryErrorLogger } from "./rtkQueryErrorLogger";
 
 const rootReducer = combineReducers({
   [Slice.CurrentAudio]: currentAudioReducer,
@@ -11,5 +12,8 @@ const rootReducer = combineReducers({
 export const store = configureStore({
   reducer: rootReducer,
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(mindfulnessApi.middleware),
+    getDefaultMiddleware().concat([
+      mindfulnessApi.middleware,
+      rtkQueryErrorLogger,
+    ]),
 });

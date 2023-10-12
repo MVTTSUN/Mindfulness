@@ -18,10 +18,15 @@ import { ErrorField } from "./ErrorField";
 import { Textarea } from "./Textarea";
 import { Button } from "./Button";
 import { useAddTipsMutation } from "../services/api";
-import { createPortal } from "react-dom";
-import { Preloader } from "./Preloader";
+import { ElementTextLottieImage } from "../types/get-results";
+import { BASE_URL } from "../const";
 
-export function FormTextLottieImage() {
+type FormTextLottieImageProps = {
+  data?: ElementTextLottieImage[];
+};
+
+export function FormTextLottieImage(props: FormTextLottieImageProps) {
+  const { data } = props;
   const {
     handleSubmit,
     control,
@@ -31,12 +36,22 @@ export function FormTextLottieImage() {
     resolver: yupResolver(
       schemaTextLottieImage
     ) as unknown as Resolver<FormTextLottieImage>,
+    defaultValues: {
+      fields:
+        data &&
+        data.map((item) => ({
+          type: item.type,
+          payload: (item.type === "text"
+            ? item.payload
+            : `${BASE_URL}/tips/${item.payload}`) as string,
+        })),
+    },
   });
   const { fields, append, remove } = useFieldArray({
     control,
     name: "fields",
   } as { name: string }) as {
-    fields: Record<"id" | "type", string>[];
+    fields: Record<"id" | "type" | "payload", string>[];
     append: UseFieldArrayAppend<FieldValues, string>;
     remove: UseFieldArrayRemove;
   };
@@ -44,15 +59,6 @@ export function FormTextLottieImage() {
 
   const onSubmit = handleSubmit((data) => {
     addTips(data);
-
-    // fetch("http://localhost:3000/tips", {
-    //   method: "POST",
-    //   body: formData,
-    //   headers: {
-    //     "Content-Type": "multipart/form-data",
-    //     Accept: "image/*",
-    //   },
-    // });
   });
 
   return (
@@ -71,6 +77,7 @@ export function FormTextLottieImage() {
                         id={field.id}
                         type="image"
                         onChange={onChange}
+                        src={field.payload}
                       />
                     );
                   }}
@@ -110,6 +117,7 @@ export function FormTextLottieImage() {
                         id={field.id}
                         type="lottie"
                         onChange={onChange}
+                        src={field.payload}
                       />
                     );
                   }}
@@ -144,8 +152,9 @@ export function FormTextLottieImage() {
           + JSON
         </Button>
       </ContainerButtonsAdd>
-      <Button isPrimary>Загрузить</Button>
-      {isLoading && createPortal(<Preloader />, document.body)}
+      <Button isDisabled={isLoading} isPrimary isLoading={isLoading}>
+        {isLoading ? "Сохранение" : "Загрузить"}
+      </Button>
     </Form>
   );
 }

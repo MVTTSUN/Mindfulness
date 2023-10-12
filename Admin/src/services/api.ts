@@ -1,12 +1,28 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { BASE_URL } from "../const";
 import { FormTextLottieImage } from "../types/form";
+import { DataTextLottieImage } from "../types/get-results";
 
 export const mindfulnessApi = createApi({
-  reducerPath: "pokemonApi",
+  reducerPath: "mindfulnessApi",
   tagTypes: ["Meditations", "Tasks"],
   baseQuery: fetchBaseQuery({ baseUrl: BASE_URL }),
   endpoints: (builder) => ({
+    getTips: builder.query<DataTextLottieImage[], void>({
+      query: () => {
+        return "tips";
+      },
+      providesTags: (result) =>
+        result
+          ? [
+              ...result.map(({ _id }) => ({
+                type: "Meditations" as const,
+                id: _id,
+              })),
+              { type: "Meditations", id: "LIST" },
+            ]
+          : [{ type: "Meditations", id: "LIST" }],
+    }),
     addTips: builder.mutation<void, FormTextLottieImage>({
       query: (data) => {
         const formData = new FormData();
@@ -16,13 +32,10 @@ export const mindfulnessApi = createApi({
             formData.append("file", field.payload);
             formData.append("type", field.type);
           } else {
-            formData.append("text", field.payload);
+            const text = field.payload as string;
+            formData.append("text", text.trim());
             formData.append("type", field.type);
           }
-        }
-
-        for (const obj in formData) {
-          console.log(obj);
         }
 
         return {
@@ -31,8 +44,9 @@ export const mindfulnessApi = createApi({
           body: formData,
         };
       },
+      invalidatesTags: [{ type: "Meditations", id: "LIST" }],
     }),
   }),
 });
 
-export const { useAddTipsMutation } = mindfulnessApi;
+export const { useAddTipsMutation, useGetTipsQuery } = mindfulnessApi;

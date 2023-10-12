@@ -65,6 +65,7 @@ const TextareaAutosizeStyled = styled(TextareaAutosize)<{
   outline-color: transparent;
   outline-offset: 5px;
   transition: outline-color 0.3s ease;
+  color: ${Color.TextStandard};
 
   &:focus {
     outline-color: ${Color.Dark};

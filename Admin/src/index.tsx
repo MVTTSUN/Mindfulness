@@ -7,6 +7,8 @@ import { createGlobalStyle } from "styled-components";
 import { Color } from "./const.ts";
 import { Provider } from "react-redux";
 import { store } from "./store/store.ts";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.min.css";
 
 const GlobalStyle = createGlobalStyle`
   body {
@@ -33,5 +35,16 @@ root.render(
         <App />
       </BrowserRouter>
     </Provider>
+    <ToastContainer
+      position="bottom-center"
+      hideProgressBar={false}
+      newestOnTop={false}
+      closeOnClick
+      rtl={false}
+      pauseOnFocusLoss
+      draggable
+      pauseOnHover
+      theme="dark"
+    />
   </React.StrictMode>
 );

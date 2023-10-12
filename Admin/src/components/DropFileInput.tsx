@@ -23,14 +23,15 @@ type DropFileInputProps = {
   labelText?: string;
   isNotArray?: boolean;
   name?: string;
+  src?: string;
 };
 
 export const DropFileInput = forwardRef(
   (props: DropFileInputProps, ref: ForwardedRef<HTMLInputElement>) => {
-    const { onChange, type, id, isNotArray, withLabel, labelText, name } =
+    const { onChange, type, id, isNotArray, withLabel, labelText, name, src } =
       props;
     const [isDrag, setIsDrag] = useState(false);
-    const [imagePreview, setImagePreview] = useState(imageDefault);
+    const [imagePreview, setImagePreview] = useState(src ? src : imageDefault);
     const [audioPreview, setAudioPreview] = useState("");
     const [lottiePreview, setLottiePreview] = useState(EmptyLottie);
     const lottieRef = useRef(null);
@@ -88,6 +89,38 @@ export const DropFileInput = forwardRef(
       convertToLocalFile(e.target);
     };
 
+    const createFile = async () => {
+      if (src) {
+        let extension = src.split(".").pop();
+        const extensionName = extension;
+        if (extension === "jpg") {
+          extension = "jpeg";
+        }
+
+        if (type === "image") {
+          const response = await fetch(src);
+          const data = await response.blob();
+          const file = new File([data], `image.${extensionName}`, {
+            type: `image/${extension}`,
+          });
+          onChange(file);
+        } else {
+          const response = await fetch(src);
+          const dataJson = await response.json();
+          setLottiePreview(dataJson);
+          const str = JSON.stringify(dataJson);
+          const bytes = new TextEncoder().encode(str);
+          const blob = new Blob([bytes], {
+            type: "application/json;charset=utf-8",
+          });
+          const file = new File([blob], `lottie.json`, {
+            type: "application/json",
+          });
+          onChange(file);
+        }
+      }
+    };
+
     useEffect(() => {
       if (lottieRef.current) {
         const lottieRefCurrent = lottieRef.current as {
@@ -98,6 +131,12 @@ export const DropFileInput = forwardRef(
         lottieRefCurrent.play();
       }
     }, [lottiePreview]);
+
+    useEffect(() => {
+      if (src) {
+        createFile();
+      }
+    }, []);
 
     return (
       <>

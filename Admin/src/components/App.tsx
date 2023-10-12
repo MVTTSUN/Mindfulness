@@ -13,6 +13,7 @@ import { Player } from "./Player";
 import { useAppSelector } from "../hooks/useAppSelector";
 import { getAudioSrc, getIsPause } from "../store/currentAudioSelectors";
 import { useEffect, useState } from "react";
+import { HelmetProvider } from "react-helmet-async";
 
 export function App() {
   const isPause = useAppSelector(getIsPause);
@@ -26,7 +27,7 @@ export function App() {
   }, [isPause]);
 
   return (
-    <>
+    <HelmetProvider>
       <Header />
       <Main>
         <CenterContainer>
@@ -56,7 +57,7 @@ export function App() {
         </CenterContainer>
       </Main>
       {isFirstPlayAudio && srcAudio !== "" && <Player />}
-    </>
+    </HelmetProvider>
   );
 }
 

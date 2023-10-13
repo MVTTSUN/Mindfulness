@@ -9,7 +9,7 @@ import {
 } from "react";
 import styled from "styled-components";
 import { FontSizeStandard } from "../mixins";
-import { Color } from "../const";
+import { Color, MAX_SIZE_IMAGE } from "../const";
 import imageDefault from "/images/image.svg";
 import Lottie from "react-lottie-player";
 import EmptyLottie from "/public/lottie/empty.json";
@@ -23,7 +23,7 @@ type DropFileInputProps = {
   labelText?: string;
   isNotArray?: boolean;
   name?: string;
-  src?: string;
+  src?: string | File;
 };
 
 export const DropFileInput = forwardRef(
@@ -36,25 +36,29 @@ export const DropFileInput = forwardRef(
     const [lottiePreview, setLottiePreview] = useState(EmptyLottie);
     const lottieRef = useRef(null);
 
-    const convertToLocalFile = (obj: DataTransfer | EventTarget) => {
-      if ("files" in obj) {
-        onChange(obj.files[0]);
+    const convertToLocalFile = (file: File) => {
+      onChange(file);
 
-        if (type === "image") {
-          URL.revokeObjectURL(imagePreview);
-          setImagePreview(URL.createObjectURL(obj.files[0]));
-        } else if (type === "lottie") {
-          const reader = new FileReader();
-          reader.onload = (event: ProgressEvent<FileReader>) => {
-            const str = event.target?.result as string;
-            const json = JSON.parse(str);
-            setLottiePreview(json);
-          };
-          reader.readAsText(obj.files[0]);
-        } else {
-          URL.revokeObjectURL(audioPreview);
-          setAudioPreview(URL.createObjectURL(obj.files[0]));
-        }
+      if (type === "image") {
+        URL.revokeObjectURL(imagePreview as string);
+        setImagePreview(URL.createObjectURL(file));
+      } else if (type === "lottie") {
+        const reader = new FileReader();
+        reader.onload = (event: ProgressEvent<FileReader>) => {
+          const str = event.target?.result as string;
+          const json = JSON.parse(str);
+          setLottiePreview(json);
+        };
+        reader.readAsText(file);
+      } else {
+        URL.revokeObjectURL(audioPreview);
+        setAudioPreview(URL.createObjectURL(file));
+      }
+    };
+
+    const convertToLocalFileAfterDrop = (obj: DataTransfer | EventTarget) => {
+      if ("files" in obj) {
+        convertToLocalFile(obj.files[0]);
         setIsDrag(false);
       }
     };
@@ -82,15 +86,15 @@ export const DropFileInput = forwardRef(
     const onDropHandler = (e: DragEvent) => {
       e.preventDefault();
 
-      convertToLocalFile(e.dataTransfer);
+      convertToLocalFileAfterDrop(e.dataTransfer);
     };
 
     const onChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
-      convertToLocalFile(e.target);
+      convertToLocalFileAfterDrop(e.target);
     };
 
     const createFile = async () => {
-      if (src) {
+      if (src && typeof src === "string") {
         let extension = src.split(".").pop();
         const extensionName = extension;
         if (extension === "jpg") {
@@ -133,8 +137,10 @@ export const DropFileInput = forwardRef(
     }, [lottiePreview]);
 
     useEffect(() => {
-      if (src) {
+      if (src && typeof src === "string") {
         createFile();
+      } else if (src) {
+        convertToLocalFile(src as File);
       }
     }, []);
 
@@ -161,11 +167,19 @@ export const DropFileInput = forwardRef(
             {isDrag
               ? "Опустите файл, чтобы загрузить"
               : "Нажмите или перетащите файл, чтобы загрузить"}
+            {type !== "audio" && `(${MAX_SIZE_IMAGE}кб)`}
           </Label>
-          {type === "image" && <ImgPreview src={imagePreview} alt="Превью" />}
+          {type === "image" && (
+            <ImgPreview src={imagePreview as string} alt="Превью" />
+          )}
           {type === "lottie" && (
             <LottieWrapper>
-              <Lottie ref={lottieRef} loop animationData={lottiePreview} play />
+              <LottieStyled
+                ref={lottieRef}
+                loop
+                animationData={lottiePreview}
+                play
+              />
             </LottieWrapper>
           )}
           {type === "audio" && <Audio src={audioPreview} />}
@@ -191,7 +205,6 @@ const Container = styled.div<{ $isNotArray?: boolean }>`
 const Label = styled.label<{ $isDrag: boolean }>`
   ${FontSizeStandard}
   font-size: 12px;
-  width: 205px;
   cursor: pointer;
   display: flex;
   flex-direction: column;
@@ -201,7 +214,7 @@ const Label = styled.label<{ $isDrag: boolean }>`
   padding: 10px;
   text-align: center;
   background-color: ${({ $isDrag }) =>
-    $isDrag ? `${Color.Primary}70` : "transparent"};
+    $isDrag ? `${Color.Primary}70` : Color.BackgroundMain};
   border: 5px dashed ${Color.Primary};
   border-radius: 25px;
   transition: background-color 0.6s ease, border 0.6s ease;
@@ -215,23 +228,35 @@ const Label = styled.label<{ $isDrag: boolean }>`
 
 const ImgPreview = styled.img`
   ${FontSizeStandard}
-  object-fit: cover;
-  box-sizing: border-box;
-  width: 150px;
-  padding: 10px;
-  border: 5px dashed ${Color.Primary};
-  border-radius: 25px;
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: 10px;
+  box-sizing: border-box;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  height: 100%;
+  border-radius: 25px;
+  border: 5px dashed ${Color.Primary};
+  background: ${Color.BackgroundMain};
 `;
 
 const LottieWrapper = styled.div`
-  overflow: hidden;
-  width: 150px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   padding: 10px;
-  border: 5px dashed ${Color.Primary};
+  max-width: 150px;
+  box-sizing: border-box;
+  height: 150px;
+  overflow: hidden;
   border-radius: 25px;
+  border: 5px dashed ${Color.Primary};
+  background: ${Color.BackgroundMain};
+`;
+
+const LottieStyled = styled(Lottie)`
+  border-radius: 10px;
 `;
 
 const LabelText = styled.label`

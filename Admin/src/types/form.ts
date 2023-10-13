@@ -20,7 +20,7 @@ type FormInformation = {
   secondNamePsycho: string;
   surnamePsycho: string;
   info: string;
-  avatarPsycho: FileList;
+  avatarPsycho: string | File;
   nicknameInstagram: string;
   nicknameTelegram: string;
   nicknameVK: string;
@@ -28,7 +28,7 @@ type FormInformation = {
   firstNameDevelop: string;
   secondNameDevelop: string;
   surnameDevelop: string;
-  avatarDevelop: FileList;
+  avatarDevelop: string | File;
   emailDevelop: string;
 };
 

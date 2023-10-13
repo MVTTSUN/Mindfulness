@@ -36,19 +36,8 @@ export function FormMeditation() {
   } as { name: string });
 
   const onSubmit = handleSubmit((data) => {
-    // const formData = new FormData();
-    // formData.append("file", data.file[0]);
     console.log(data);
     console.log(1);
-
-    // fetch("http://localhost:3000/tips", {
-    //   method: "POST",
-    //   body: formData,
-    //   headers: {
-    //     "Content-Type": "multipart/form-data",
-    //     Accept: "image/*",
-    //   },
-    // });
   });
 
   const getIsActiveInput = (index: number) => {
@@ -126,7 +115,7 @@ export function FormMeditation() {
           </InputContainer>
           <TimeInputsContainer>
             <TimeInputContainer>
-              <Label htmlFor={`textLines.${index}.timeAt`}>Начало (s.ms)</Label>
+              <Label htmlFor={`textLines.${index}.timeAt`}>Начало(с.мс)</Label>
               <Input
                 isNotArray
                 {...register(`textLines.${index}.timeAt` as never)}
@@ -135,7 +124,7 @@ export function FormMeditation() {
               />
             </TimeInputContainer>
             <TimeInputContainer>
-              <Label htmlFor={`textLines.${index}.timeTo`}>Конец (s.ms)</Label>
+              <Label htmlFor={`textLines.${index}.timeTo`}>Конец(с.мс)</Label>
               <Input
                 isNotArray
                 {...register(`textLines.${index}.timeTo` as never)}

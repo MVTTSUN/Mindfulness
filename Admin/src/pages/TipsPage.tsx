@@ -8,9 +8,10 @@ import { useGetTipsQuery } from "../services/api";
 import { Helmet } from "react-helmet-async";
 
 export function TipsPage() {
-  const { data } = useGetTipsQuery();
+  const { data, error } = useGetTipsQuery();
   const [isEdit, setIsEdit] = useState(false);
   const textEdit = data && data[0]?.data.length ? "Редактировать" : "Добавить";
+  const errorError = error && "error" in error ? error.error : "";
 
   return (
     <>
@@ -19,13 +20,17 @@ export function TipsPage() {
       </Helmet>
       <Subtitle>Советы</Subtitle>
       <ContainerOneSide>
-        <Button type="button" onClick={() => setIsEdit(!isEdit)} isPrimary>
-          {data && !isEdit ? textEdit : "Назад"}
-        </Button>
-        {!data || isEdit ? (
-          <FormTextLottieImage data={data && data[0]?.data} />
-        ) : (
-          <DisplayResultTips />
+        {!errorError && (
+          <>
+            <Button type="button" onClick={() => setIsEdit(!isEdit)} isPrimary>
+              {data && !isEdit ? textEdit : "Назад"}
+            </Button>
+            {!data || isEdit ? (
+              <FormTextLottieImage data={data && data[0]?.data} />
+            ) : (
+              <DisplayResultTips />
+            )}
+          </>
         )}
       </ContainerOneSide>
     </>

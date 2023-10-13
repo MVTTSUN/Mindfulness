@@ -101,7 +101,8 @@ export function Audio(props: AudioProps) {
 const PlayButton = styled.button`
   ${ResetButton}
   padding: 40px;
-  flex: auto;
+  aspect-ratio: 1 / 1;
+  height: 100%;
   border-radius: 100px;
   background-color: ${Color.Primary};
 `;

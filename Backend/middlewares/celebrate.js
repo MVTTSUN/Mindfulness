@@ -61,6 +61,29 @@ const postEmotionCelebrate = celebrate({
   }),
 });
 
+const deleteEmotionCelebrate = celebrate({
+  params: Joi.object().keys({
+    id: Joi.number().required(),
+  }),
+});
+
+const postInfoCelebrate = celebrate({
+  body: Joi.object().keys({
+    firstNamePsycho: Joi.string(),
+    secondNamePsycho: Joi.string(),
+    surnamePsycho: Joi.string(),
+    info: Joi.string(),
+    nicknameInstagram: Joi.string(),
+    nicknameTelegram: Joi.string(),
+    nicknameVK: Joi.string(),
+    emailPsycho: Joi.string().email(),
+    firstNameDevelop: Joi.string(),
+    secondNameDevelop: Joi.string(),
+    surnameDevelop: Joi.string(),
+    emailDevelop: Joi.string().email(),
+  }),
+});
+
 module.exports = {
   signinCelebrate,
   signupCelebrate,
@@ -69,4 +92,6 @@ module.exports = {
   patchUserCelebrate,
   postTipCelebrate,
   postEmotionCelebrate,
+  deleteEmotionCelebrate,
+  postInfoCelebrate,
 };

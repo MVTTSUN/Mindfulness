@@ -9,9 +9,17 @@ import { ErrorField } from "./ErrorField";
 import { Textarea } from "./Textarea";
 import { DropFileInput } from "./DropFileInput";
 import styled from "styled-components";
-import { Color } from "../const";
+import { BASE_URL, Color } from "../const";
+import { useAddInfoMutation } from "../services/api";
+import { DataInformation } from "../types/get-results";
+import { FontSizeHeading } from "../mixins";
 
-export function FormInformation() {
+type FormInformationProps = {
+  data?: DataInformation;
+};
+
+export function FormInformation(props: FormInformationProps) {
+  const { data } = props;
   const {
     handleSubmit,
     register,
@@ -21,22 +29,27 @@ export function FormInformation() {
     resolver: yupResolver(
       schemaInformation
     ) as unknown as Resolver<FormInformation>,
+    defaultValues: {
+      secondNamePsycho: data ? data.secondNamePsycho : "",
+      firstNamePsycho: data ? data.firstNamePsycho : "",
+      surnamePsycho: data ? data.surnamePsycho : "",
+      info: data ? data.info : "",
+      avatarPsycho: data ? `${BASE_URL}/info/${data?.avatarPsycho}` : "",
+      nicknameInstagram: data ? data.nicknameInstagram : "",
+      nicknameTelegram: data ? data.nicknameTelegram : "",
+      nicknameVK: data ? data.nicknameVK : "",
+      emailPsycho: data ? data.emailPsycho : "",
+      secondNameDevelop: data ? data.secondNameDevelop : "",
+      firstNameDevelop: data ? data.firstNameDevelop : "",
+      surnameDevelop: data ? data.surnameDevelop : "",
+      avatarDevelop: data ? `${BASE_URL}/info/${data?.avatarDevelop}` : "",
+      emailDevelop: data ? data.emailDevelop : "",
+    },
   });
+  const [addInfo, { isLoading }] = useAddInfoMutation();
 
   const onSubmit = handleSubmit((data) => {
-    // const formData = new FormData();
-    // formData.append("file", data.file[0]);
-    console.log(data);
-    console.log(1);
-
-    // fetch("http://localhost:3000/tips", {
-    //   method: "POST",
-    //   body: formData,
-    //   headers: {
-    //     "Content-Type": "multipart/form-data",
-    //     Accept: "image/*",
-    //   },
-    // });
+    addInfo(data);
   });
 
   return (
@@ -74,7 +87,7 @@ export function FormInformation() {
       <Controller
         name="avatarPsycho"
         control={control}
-        render={({ field: { onChange } }) => {
+        render={({ field: { onChange, value } }) => {
           return (
             <DropFileInput
               labelText="Аватар"
@@ -83,6 +96,7 @@ export function FormInformation() {
               name="avatarPsycho"
               type="image"
               onChange={onChange}
+              src={value}
             />
           );
         }}
@@ -141,7 +155,7 @@ export function FormInformation() {
       <Controller
         name="avatarDevelop"
         control={control}
-        render={({ field: { onChange } }) => {
+        render={({ field: { onChange, value } }) => {
           return (
             <DropFileInput
               labelText="Аватар"
@@ -150,6 +164,7 @@ export function FormInformation() {
               name="avatarDevelop"
               type="image"
               onChange={onChange}
+              src={value}
             />
           );
         }}
@@ -162,17 +177,17 @@ export function FormInformation() {
         isNotArray
       />
       <ErrorField>{errors.emailDevelop?.message}</ErrorField>
-      <Button isPrimary>Загрузить</Button>
+      <Button isDisabled={isLoading} isPrimary isLoading={isLoading}>
+        {isLoading ? "Сохранение" : "Загрузить"}
+      </Button>
     </Form>
   );
 }
 
 const Strong = styled.p`
+  ${FontSizeHeading}
   text-align: center;
-  margin: 0;
   padding: 5px 0;
   font-size: 20px;
-  font-weight: 600;
-  line-height: 1.2;
   color: ${Color.TextStandard};
 `;

@@ -8,35 +8,28 @@ import { Button } from "./Button";
 import styled from "styled-components";
 import { ResetButton } from "../mixins";
 import { ErrorField } from "./ErrorField";
+import { useAddEmotionsMutation } from "../services/api";
 
 export function FormEmotion() {
   const {
     handleSubmit,
     control,
     register,
+    reset,
     formState: { errors },
   } = useForm<FormEmotion>({
     resolver: yupResolver(schemaEmotion) as unknown as Resolver<FormEmotion>,
   });
-  const { fields, append, remove } = useFieldArray({
+  const { fields, append, remove, replace } = useFieldArray({
     control,
     name: "fields",
   } as { name: string });
+  const [addEmotions, { isLoading }] = useAddEmotionsMutation();
 
   const onSubmit = handleSubmit((data) => {
-    // const formData = new FormData();
-    // formData.append("file", data.file[0]);
-    console.log(data);
-    console.log(1);
-
-    // fetch("http://localhost:3000/tips", {
-    //   method: "POST",
-    //   body: formData,
-    //   headers: {
-    //     "Content-Type": "multipart/form-data",
-    //     Accept: "image/*",
-    //   },
-    // });
+    addEmotions(data);
+    replace([]);
+    reset();
   });
 
   return (
@@ -56,7 +49,9 @@ export function FormEmotion() {
       <Button type="button" onClick={() => append({ value: "" })}>
         + Эмоция
       </Button>
-      <Button isPrimary>Загрузить</Button>
+      <Button isDisabled={isLoading} isPrimary isLoading={isLoading}>
+        {isLoading ? "Сохранение" : "Загрузить"}
+      </Button>
     </Form>
   );
 }

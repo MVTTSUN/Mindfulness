@@ -24,23 +24,42 @@ const storageTips = new GridFsStorage({
   },
 });
 
-const storageTasks = new GridFsStorage({
+const storageInfo = new GridFsStorage({
   url: NODE_ENV === 'production' ? DATABASE_URL : DEV_DATABASE_URL,
-  file: async (req, file) =>
-    new Promise((resolve) => {
+  file: async (req, file) => {
+    await mongoose.connection.collection('uploads/info.chunks').deleteMany();
+    await mongoose.connection.collection('uploads/info.files').deleteMany();
+
+    return new Promise((resolve) => {
       const filename = uuidv4() + path.extname(file.originalname);
       const fileInfo = {
         filename,
-        bucketName: 'tasks/tips',
+        bucketName: 'uploads/info',
       };
       resolve(fileInfo);
-    }),
+    });
+  },
 });
 
+// const storageTasks = new GridFsStorage({
+//   url: NODE_ENV === 'production' ? DATABASE_URL : DEV_DATABASE_URL,
+//   file: async (req, file) =>
+//     new Promise((resolve) => {
+//       const filename = uuidv4() + path.extname(file.originalname);
+//       const fileInfo = {
+//         filename,
+//         bucketName: 'tasks/tips',
+//       };
+//       resolve(fileInfo);
+//     }),
+// });
+
 const uploadTips = multer({ storage: storageTips });
-const uploadTasks = multer({ storage: storageTasks });
+const uploadInfo = multer({ storage: storageInfo });
+// const uploadTasks = multer({ storage: storageTasks });
 
 module.exports = {
   uploadTips,
-  uploadTasks,
+  uploadInfo,
+  // uploadTasks,
 };

@@ -48,7 +48,8 @@ const InputStyled = styled.input<{
   padding: 10px;
   border: 5px dashed ${Color.Primary};
   border-radius: 25px;
-  background: ${({ $isActive }) => ($isActive ? Color.Primary : "none")};
+  background: ${({ $isActive }) =>
+    $isActive ? Color.Primary : Color.BackgroundMain};
   outline-style: dashed;
   outline-width: 3px;
   outline-color: transparent;
@@ -58,6 +59,11 @@ const InputStyled = styled.input<{
 
   &:focus {
     outline-color: ${Color.Dark};
+  }
+
+  &::placeholder {
+    color: ${Color.TextStandard};
+    opacity: 0.5;
   }
 `;
 

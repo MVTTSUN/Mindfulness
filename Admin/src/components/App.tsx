@@ -8,12 +8,14 @@ import { CenterContainer } from "./CenterContainer";
 import { TasksPage } from "../pages/TasksPage";
 import { MeditationsPage } from "../pages/MeditationsPage";
 import { EmotionsPage } from "../pages/EmotionsPage";
-import { InformationPage } from "../pages/Information";
+import { InformationPage } from "../pages/InformationPage";
 import { Player } from "./Player";
 import { useAppSelector } from "../hooks/useAppSelector";
 import { getAudioSrc, getIsPause } from "../store/currentAudioSelectors";
 import { useEffect, useState } from "react";
 import { HelmetProvider } from "react-helmet-async";
+import { Statistics } from "../pages/Statistics";
+import { Auth } from "../pages/Auth";
 
 export function App() {
   const isPause = useAppSelector(getIsPause);
@@ -35,7 +37,7 @@ export function App() {
             <Route path={BrowserRoute.Main}>
               <Route
                 index
-                element={<Navigate to={BrowserRoute.Meditation} replace />}
+                element={<Navigate to={BrowserRoute.Statistic} replace />}
               />
               <Route path={BrowserRoute.Tip} element={<TipsPage />} />
               <Route path={BrowserRoute.Task} element={<TasksPage />} />
@@ -48,6 +50,9 @@ export function App() {
                 path={BrowserRoute.Information}
                 element={<InformationPage />}
               />
+              <Route path={BrowserRoute.Statistic} element={<Statistics />} />
+              <Route path={BrowserRoute.Login} element={<Auth />} />
+              <Route path={BrowserRoute.Register} element={<Auth />} />
             </Route>
             <Route
               path={BrowserRoute.NotFoundPage}

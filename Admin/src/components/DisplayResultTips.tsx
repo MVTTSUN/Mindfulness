@@ -2,17 +2,14 @@ import styled from "styled-components";
 import { BASE_URL, Color } from "../const";
 import { useGetTipsQuery } from "../services/api";
 import Lottie from "react-lottie-player";
-import { Preloader } from "./Preloader";
 import { FontSizeStandard } from "../mixins";
 
 export function DisplayResultTips() {
-  const { data, isFetching } = useGetTipsQuery();
+  const { data } = useGetTipsQuery();
 
   return (
     <Container>
-      {isFetching && <Preloader />}
-      {!isFetching &&
-        data &&
+      {data &&
         data[0]?.data.map((item, index) => {
           if (item.type === "text") {
             return <Text key={index}>{item.payload as string}</Text>;
@@ -22,9 +19,9 @@ export function DisplayResultTips() {
             );
           } else {
             return (
-              <WrapperFile key={index}>
+              <WrapperLottie key={index}>
                 <Lottie loop path={`${BASE_URL}/tips/${item.payload}`} play />
-              </WrapperFile>
+              </WrapperLottie>
             );
           }
         })}
@@ -56,7 +53,7 @@ const Image = styled.img`
   border: 5px dashed ${Color.Primary};
 `;
 
-const WrapperFile = styled.div`
+const WrapperLottie = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;

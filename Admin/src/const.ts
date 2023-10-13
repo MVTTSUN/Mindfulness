@@ -1,6 +1,8 @@
 enum BrowserRoute {
   Main = "/",
-  Login = "/login",
+  Login = "/signin",
+  Register = "/signup",
+  Statistic = "/statistic",
   NotFoundPage = "*",
   Tip = "/tip",
   Task = "/task",
@@ -33,4 +35,6 @@ enum Slice {
 
 const BASE_URL = "http://localhost:3000";
 
-export { BrowserRoute, Color, ErrorText, Slice, BASE_URL };
+const MAX_SIZE_IMAGE = 200;
+
+export { BrowserRoute, Color, ErrorText, Slice, BASE_URL, MAX_SIZE_IMAGE };

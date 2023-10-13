@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const Tip = require('../models/tip');
+const Info = require('../models/info');
 const IncorrectError = require('../errors/incorrectError');
 const { errorMessages } = require('../const');
 const { DEV_DATABASE_URL } = require('../config');
@@ -19,22 +19,22 @@ const connect = mongoose.createConnection(
 
 connect.once('open', () => {
   gfs = new mongoose.mongo.GridFSBucket(connect.db, {
-    bucketName: 'uploads/tips',
+    bucketName: 'uploads/info',
   });
 });
 
-const getTips = async (req, res, next) => {
+const getInfo = async (req, res, next) => {
   try {
     const files = await gfs.find({}).toArray();
     files.map((file) => gfs.openDownloadStreamByName(file.filename).pipe(res));
-    const tips = await Tip.find({});
-    return res.send(tips);
+    const info = await Info.find({});
+    return res.send(info);
   } catch (err) {
     next(err);
   }
 };
 
-const getTipFile = async (req, res, next) => {
+const getInfoFile = async (req, res, next) => {
   try {
     const file = await gfs.find({ filename: req.params.filename }).toArray();
     res.set('Content-Type', file[0].contentType);
@@ -44,31 +44,17 @@ const getTipFile = async (req, res, next) => {
   }
 };
 
-const postTips = async (req, res, next) => {
-  let data = [];
-  let cntTexts = 0;
-  let cntFiles = 0;
-  const types = Array.isArray(req.body.type) ? [...req.body.type] : [req.body.type];
-  const texts = Array.isArray(req.body.text) ? [...req.body.text] : [req.body.text];
-  const files = [...req.files];
+const postInfo = async (req, res, next) => {
+  const data = {
+    ...req.body,
+    avatarPsycho: req.files[0].filename,
+    avatarDevelop: req.files[1].filename,
+  };
 
-  data = types.map((type) => {
-    let result;
-
-    if (type === 'text') {
-      result = { type, payload: texts[cntTexts] };
-      cntTexts += 1;
-      return result;
-    }
-    result = { type, payload: files[cntFiles].filename };
-    cntFiles += 1;
-    return result;
-  });
-
-  await Tip.deleteMany();
+  await Info.deleteMany();
   try {
-    const tips = await Tip.create({ data });
-    res.send(tips);
+    const info = await Info.create(data);
+    res.send(info);
   } catch (err) {
     if (err instanceof mongoose.Error.ValidationError) {
       next(new IncorrectError(errorMessages.INCORRECT_DATA));
@@ -79,7 +65,7 @@ const postTips = async (req, res, next) => {
 };
 
 module.exports = {
-  getTips,
-  postTips,
-  getTipFile,
+  getInfo,
+  postInfo,
+  getInfoFile,
 };

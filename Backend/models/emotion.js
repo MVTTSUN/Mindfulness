@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const emotionSchema = new mongoose.Schema({
-  data: [String],
+  value: String,
 });
 
 module.exports = mongoose.model('emotion', emotionSchema);

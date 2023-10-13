@@ -28,7 +28,7 @@ const root = ReactDOM.createRoot(
 );
 
 root.render(
-  <React.StrictMode>
+  <>
     <GlobalStyle />
     <Provider store={store}>
       <BrowserRouter>
@@ -46,5 +46,5 @@ root.render(
       pauseOnHover
       theme="dark"
     />
-  </React.StrictMode>
+  </>
 );

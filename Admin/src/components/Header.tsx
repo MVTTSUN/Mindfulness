@@ -16,14 +16,19 @@ export function Header() {
     <HeaderStyled>
       <CenterContainer>
         <NavStyled>
-          {pathname === BrowserRoute.Meditation ? (
+          {pathname === BrowserRoute.Statistic ? (
             <Heading>Mindfulness</Heading>
           ) : (
-            <LinkStyled to={BrowserRoute.Meditation}>
+            <LinkStyled to={BrowserRoute.Statistic}>
               <Heading>Mindfulness</Heading>
             </LinkStyled>
           )}
           <ListNav>
+            <li>
+              <NavLinkStyled end to={BrowserRoute.Statistic}>
+                Статистика
+              </NavLinkStyled>
+            </li>
             <li>
               <NavLinkStyled end to={BrowserRoute.Meditation}>
                 Медитации
@@ -48,6 +53,9 @@ export function Header() {
               <NavLinkStyled end to={BrowserRoute.Information}>
                 Информация
               </NavLinkStyled>
+            </li>
+            <li>
+              <LinkStyled to={BrowserRoute.Information}>Выход</LinkStyled>
             </li>
           </ListNav>
         </NavStyled>

@@ -1,5 +1,5 @@
 import { array, mixed, object, string } from "yup";
-import { ErrorText } from "../const";
+import { ErrorText, MAX_SIZE_IMAGE } from "../const";
 
 const schemaTextLottieImage = object({
   fields: array()
@@ -13,11 +13,11 @@ const schemaTextLottieImage = object({
               const file = value as File;
               const { size }: { size: number } = file as File;
 
-              if (size / 1024 > 200) {
+              if (size / 1024 > MAX_SIZE_IMAGE) {
                 return createError({
-                  message: `${ErrorText.SizeFile} ${200}кб, у вас ${Math.ceil(
-                    size / 1024
-                  )}кб`,
+                  message: `${
+                    ErrorText.SizeFile
+                  } ${MAX_SIZE_IMAGE}кб, у вас ${Math.ceil(size / 1024)}кб`,
                 });
               }
             }
@@ -55,14 +55,14 @@ const schemaInformation = object({
     .required(ErrorText.Required)
     .test((value, { createError }) => {
       if (typeof value !== "string") {
-        const fileList = value as FileList;
-        const { size }: { size: number } = fileList[0] as File;
+        const file = value as File;
+        const { size }: { size: number } = file as File;
 
-        if (size / 1024 > 200) {
+        if (size / 1024 > MAX_SIZE_IMAGE) {
           return createError({
-            message: `${ErrorText.SizeFile} ${200}кб, у вас ${Math.ceil(
-              size / 1024
-            )}кб`,
+            message: `${
+              ErrorText.SizeFile
+            } ${MAX_SIZE_IMAGE}кб, у вас ${Math.ceil(size / 1024)}кб`,
           });
         }
       }
@@ -87,14 +87,14 @@ const schemaInformation = object({
     .required(ErrorText.Required)
     .test((value, { createError }) => {
       if (typeof value !== "string") {
-        const fileList = value as FileList;
-        const { size }: { size: number } = fileList[0] as File;
+        const file = value as File;
+        const { size }: { size: number } = file as File;
 
-        if (size / 1024 > 200) {
+        if (size / 1024 > MAX_SIZE_IMAGE) {
           return createError({
-            message: `${ErrorText.SizeFile} ${200}кб, у вас ${Math.ceil(
-              size / 1024
-            )}кб`,
+            message: `${
+              ErrorText.SizeFile
+            } ${MAX_SIZE_IMAGE}кб, у вас ${Math.ceil(size / 1024)}кб`,
           });
         }
       }
@@ -114,11 +114,11 @@ const schemaMeditation = object({
         const fileList = value as FileList;
         const { size }: { size: number } = fileList[0] as File;
 
-        if (size / 1024 > 200) {
+        if (size / 1024 > MAX_SIZE_IMAGE) {
           return createError({
-            message: `${ErrorText.SizeFile} ${200}кб, у вас ${Math.ceil(
-              size / 1024
-            )}кб`,
+            message: `${
+              ErrorText.SizeFile
+            } ${MAX_SIZE_IMAGE}кб, у вас ${Math.ceil(size / 1024)}кб`,
           });
         }
       }

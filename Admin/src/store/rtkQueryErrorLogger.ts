@@ -4,9 +4,17 @@ import { toast } from "react-toastify";
 
 export const rtkQueryErrorLogger: Middleware = () => (next) => (action) => {
   if (isRejectedWithValue(action)) {
-    toast.error(action.payload.data.message, { autoClose: 2000 });
+    if (action.payload.error) {
+      toast.error("Не удалось связаться с сервером", { autoClose: 3000 });
+    } else {
+      toast.error(action.payload.data.message, { autoClose: 3000 });
+    }
   } else if (isFulfilled(action)) {
-    if (action.meta.arg.endpointName === "addTips") {
+    if (
+      action.meta.arg.endpointName === "addTips" ||
+      action.meta.arg.endpointName === "addEmotions" ||
+      action.meta.arg.endpointName === "addInfo"
+    ) {
       toast.success("Данные успешно отправлены!", { autoClose: 1000 });
     }
   }

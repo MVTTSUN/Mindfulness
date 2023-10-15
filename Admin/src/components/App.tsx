@@ -16,6 +16,12 @@ import { useEffect, useState } from "react";
 import { HelmetProvider } from "react-helmet-async";
 import { Statistics } from "../pages/Statistics";
 import { Auth } from "../pages/Auth";
+import { TaskPage } from "../pages/TaskPage";
+import { DisplayResultTips } from "./DisplayResultTips";
+import { FormTextLottieImage } from "./FormTextLottieImage";
+import { DisplayResultInfo } from "./DisplayResultInfo";
+import { FormInformation } from "./FormInformation";
+import { DisplayResultTask } from "./DisplayResultTask";
 
 export function App() {
   const isPause = useAppSelector(getIsPause);
@@ -39,8 +45,23 @@ export function App() {
                 index
                 element={<Navigate to={BrowserRoute.Statistic} replace />}
               />
-              <Route path={BrowserRoute.Tip} element={<TipsPage />} />
-              <Route path={BrowserRoute.Task} element={<TasksPage />} />
+              <Route path={BrowserRoute.Tip} element={<TipsPage />}>
+                <Route index element={<DisplayResultTips />} />
+                <Route
+                  path={BrowserRoute.Tip + BrowserRoute.Edit}
+                  element={<FormTextLottieImage />}
+                />
+              </Route>
+              <Route path={BrowserRoute.Task}>
+                <Route index element={<TasksPage />} />
+                <Route path=":id" element={<TaskPage />}>
+                  <Route index element={<DisplayResultTask />} />
+                  <Route
+                    path={BrowserRoute.Task + "/:id" + BrowserRoute.Edit}
+                    element={<FormTextLottieImage />}
+                  />
+                </Route>
+              </Route>
               <Route
                 path={BrowserRoute.Meditation}
                 element={<MeditationsPage />}
@@ -49,7 +70,13 @@ export function App() {
               <Route
                 path={BrowserRoute.Information}
                 element={<InformationPage />}
-              />
+              >
+                <Route index element={<DisplayResultInfo />} />
+                <Route
+                  path={BrowserRoute.Information + BrowserRoute.Edit}
+                  element={<FormInformation />}
+                />
+              </Route>
               <Route path={BrowserRoute.Statistic} element={<Statistics />} />
               <Route path={BrowserRoute.Login} element={<Auth />} />
               <Route path={BrowserRoute.Register} element={<Auth />} />

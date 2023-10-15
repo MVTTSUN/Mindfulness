@@ -4,7 +4,7 @@ const { postTipCelebrate } = require('../middlewares/celebrate');
 const { postTips, getTips, getTipFile } = require('../controllers/tips');
 
 router.get('/tips', getTips);
-router.get('/tips/:filename', getTipFile);
+router.get('/tips/filename/:filename', getTipFile);
 router.post('/tips', postTipCelebrate, uploadTips.array('file'), postTips);
 
 module.exports = router;

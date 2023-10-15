@@ -6,7 +6,7 @@ const otherRouter = require('./other');
 const tipRouter = require('./tips');
 const emotionRouter = require('./emotions');
 const infoRouter = require('./info');
-// const taskRouter = require('./tasks');
+const taskRouter = require('./tasks');
 // const authMiddleware = require('../middlewares/auth');
 
 // router.use(authRouter);
@@ -15,7 +15,7 @@ const infoRouter = require('./info');
 router.use(infoRouter);
 router.use(tipRouter);
 router.use(emotionRouter);
-// router.use(taskRouter);
+router.use(taskRouter);
 router.use(otherRouter);
 
 module.exports = router;

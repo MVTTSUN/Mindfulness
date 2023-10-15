@@ -142,7 +142,7 @@ export const DropFileInput = forwardRef(
       } else if (src) {
         convertToLocalFile(src as File);
       }
-    }, []);
+    }, [src]);
 
     return (
       <>

@@ -11,6 +11,7 @@ import {
   UseFieldArrayMove,
   useFieldArray,
   useForm,
+  UseFieldArrayReplace,
 } from "react-hook-form";
 import { FormTextLottieImage } from "../types/form";
 import { schemaTextLottieImage } from "../utils/yup";
@@ -18,44 +19,52 @@ import { DropFileInput } from "./DropFileInput";
 import { ErrorField } from "./ErrorField";
 import { Textarea } from "./Textarea";
 import { Button } from "./Button";
-import { useAddTipsMutation } from "../services/api";
-import { ElementTextLottieImage } from "../types/get-results";
-import { BASE_URL } from "../const";
+import {
+  useAddTaskMutation,
+  useAddTipsMutation,
+  useUpdateTaskMutation,
+} from "../services/api";
+import { BASE_URL, BrowserRoute } from "../const";
 import {
   DragDropContext,
   Droppable,
   Draggable,
   OnDragEndResponder,
-} from "react-beautiful-dnd";
-import { useRef } from "react";
+} from "@hello-pangea/dnd";
+import { useEffect, useRef } from "react";
+import { Input } from "./Input";
+import { useLocation, useNavigate, useOutletContext } from "react-router-dom";
+import { DataTextLottieImage } from "../types/get-results";
 
-type FormTextLottieImageProps = {
-  data?: ElementTextLottieImage[];
-};
-
-export function FormTextLottieImage(props: FormTextLottieImageProps) {
-  const { data } = props;
+export function FormTextLottieImage() {
+  const data = useOutletContext<DataTextLottieImage[]>();
+  const { pathname } = useLocation();
+  const routeName =
+    pathname === BrowserRoute.Tip + BrowserRoute.Edit ? "tips" : "tasks";
   const {
     handleSubmit,
     control,
     register,
+    reset,
+    setValue,
     formState: { errors },
   } = useForm<FormTextLottieImage>({
     resolver: yupResolver(
-      schemaTextLottieImage
+      schemaTextLottieImage(pathname.includes(BrowserRoute.Task))
     ) as unknown as Resolver<FormTextLottieImage>,
     defaultValues: {
+      title: pathname.includes(BrowserRoute.Task) ? data && data[0]?.title : "",
       fields:
         data &&
-        data.map((item) => ({
+        data[0]?.data.map((item) => ({
           type: item.type,
           payload: (item.type === "text"
             ? item.payload
-            : `${BASE_URL}/tips/${item.payload}`) as string,
+            : `${BASE_URL}/${routeName}/filename/${item.payload}`) as string,
         })),
     },
   });
-  const { fields, append, remove, move } = useFieldArray({
+  const { fields, append, remove, move, replace } = useFieldArray({
     control,
     name: "fields",
   } as { name: string }) as {
@@ -63,14 +72,28 @@ export function FormTextLottieImage(props: FormTextLottieImageProps) {
     append: UseFieldArrayAppend<FieldValues, string>;
     remove: UseFieldArrayRemove;
     move: UseFieldArrayMove;
+    replace: UseFieldArrayReplace<FieldValues, string>;
   };
-  const [addTips, { isLoading }] = useAddTipsMutation();
-  const dataRef = useRef(data);
+  const [addTips, { isLoading: isLoadingTips }] = useAddTipsMutation();
+  const [addTask, { isLoading: isLoadingTask }] = useAddTaskMutation();
+  const [patchTask, { isLoading: isLoadingPatch }] = useUpdateTaskMutation();
+  const dataRef = useRef(data && data[0]?.data);
   const sourceFileIndexRef = useRef<number | null>(null);
   const destinationFileIndexRef = useRef<number | null>(null);
+  const navigate = useNavigate();
 
-  const onSubmit = handleSubmit((data) => {
-    addTips(data);
+  const onSubmit = handleSubmit(async (dataForm) => {
+    if (pathname === BrowserRoute.Task) {
+      await addTask(dataForm);
+      replace([]);
+      reset();
+    } else if (pathname.includes(BrowserRoute.Task)) {
+      await patchTask({ id: data[0]._id, data: dataForm });
+      navigate(-1);
+    } else if (pathname === BrowserRoute.Tip + BrowserRoute.Edit) {
+      await addTips(dataForm);
+      navigate(-1);
+    }
   });
 
   const handleDrag: OnDragEndResponder = ({ source, destination }) => {
@@ -87,8 +110,34 @@ export function FormTextLottieImage(props: FormTextLottieImageProps) {
     }
   };
 
+  useEffect(() => {
+    if (data) {
+      data && data[0]?.title && setValue("title", data[0]?.title);
+      replace(
+        data &&
+          data[0]?.data.map((item) => ({
+            type: item.type,
+            payload: (item.type === "text"
+              ? item.payload
+              : `${BASE_URL}/${routeName}/filename/${item.payload}`) as string,
+          }))
+      );
+    }
+  }, [data]);
+
   return (
     <Form onSubmit={onSubmit}>
+      {pathname.includes(BrowserRoute.Task) && (
+        <>
+          <Input
+            {...register("title")}
+            labelText="Название"
+            withLabel
+            isNotArray
+          />
+          <ErrorField>{errors.title?.message}</ErrorField>
+        </>
+      )}
       <DragDropContext onDragEnd={handleDrag}>
         <div>
           <Droppable droppableId="test-fields">
@@ -106,7 +155,6 @@ export function FormTextLottieImage(props: FormTextLottieImageProps) {
                     >
                       {(provided) => (
                         <FieldContainer
-                          key={field.id}
                           ref={provided.innerRef}
                           {...provided.draggableProps}
                         >
@@ -126,7 +174,7 @@ export function FormTextLottieImage(props: FormTextLottieImageProps) {
                                         dataRef.current &&
                                         field.payload !== "" &&
                                         typeof field.payload === "string"
-                                          ? `${BASE_URL}/tips/${dataRef.current[index].payload}`
+                                          ? `${BASE_URL}/${routeName}/filename/${dataRef.current[index].payload}`
                                           : field.payload
                                       }
                                     />
@@ -156,7 +204,7 @@ export function FormTextLottieImage(props: FormTextLottieImageProps) {
                                         dataRef.current &&
                                         field.payload !== "" &&
                                         typeof field.payload === "string"
-                                          ? `${BASE_URL}/tips/${dataRef.current[index].payload}`
+                                          ? `${BASE_URL}/${routeName}/filename/${dataRef.current[index].payload}`
                                           : field.payload
                                       }
                                     />
@@ -205,8 +253,14 @@ export function FormTextLottieImage(props: FormTextLottieImageProps) {
           + JSON
         </Button>
       </ContainerButtonsAdd>
-      <Button isDisabled={isLoading} isPrimary isLoading={isLoading}>
-        {isLoading ? "Сохранение" : "Загрузить"}
+      <Button
+        isDisabled={isLoadingTask || isLoadingTips || isLoadingPatch}
+        isPrimary
+        isLoading={isLoadingTask || isLoadingTips || isLoadingPatch}
+      >
+        {isLoadingTask || isLoadingTips || isLoadingPatch
+          ? "Сохранение"
+          : "Загрузить"}
       </Button>
     </Form>
   );

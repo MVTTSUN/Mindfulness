@@ -9,7 +9,7 @@ const { DATABASE_URL, NODE_ENV } = process.env;
 
 const storageTips = new GridFsStorage({
   url: NODE_ENV === 'production' ? DATABASE_URL : DEV_DATABASE_URL,
-  file: async (req, file) => {
+  file: async (_, file) => {
     await mongoose.connection.collection('uploads/tips.chunks').deleteMany();
     await mongoose.connection.collection('uploads/tips.files').deleteMany();
 
@@ -26,7 +26,7 @@ const storageTips = new GridFsStorage({
 
 const storageInfo = new GridFsStorage({
   url: NODE_ENV === 'production' ? DATABASE_URL : DEV_DATABASE_URL,
-  file: async (req, file) => {
+  file: async (_, file) => {
     await mongoose.connection.collection('uploads/info.chunks').deleteMany();
     await mongoose.connection.collection('uploads/info.files').deleteMany();
 
@@ -41,25 +41,25 @@ const storageInfo = new GridFsStorage({
   },
 });
 
-// const storageTasks = new GridFsStorage({
-//   url: NODE_ENV === 'production' ? DATABASE_URL : DEV_DATABASE_URL,
-//   file: async (req, file) =>
-//     new Promise((resolve) => {
-//       const filename = uuidv4() + path.extname(file.originalname);
-//       const fileInfo = {
-//         filename,
-//         bucketName: 'tasks/tips',
-//       };
-//       resolve(fileInfo);
-//     }),
-// });
+const storageTasks = new GridFsStorage({
+  url: NODE_ENV === 'production' ? DATABASE_URL : DEV_DATABASE_URL,
+  file: async (_, file) =>
+    new Promise((resolve) => {
+      const filename = uuidv4() + path.extname(file.originalname);
+      const fileInfo = {
+        filename,
+        bucketName: 'uploads/tasks',
+      };
+      resolve(fileInfo);
+    }),
+});
 
 const uploadTips = multer({ storage: storageTips });
 const uploadInfo = multer({ storage: storageInfo });
-// const uploadTasks = multer({ storage: storageTasks });
+const uploadTasks = multer({ storage: storageTasks });
 
 module.exports = {
   uploadTips,
   uploadInfo,
-  // uploadTasks,
+  uploadTasks,
 };

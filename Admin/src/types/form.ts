@@ -4,6 +4,7 @@ type FieldTextLottieImage = {
 };
 
 type FormTextLottieImage = {
+  title?: string;
   fields: FieldTextLottieImage[];
 };
 
@@ -52,4 +53,5 @@ export type {
   FormInformation,
   FormMeditation,
   TextLine,
+  FieldTextLottieImage,
 };

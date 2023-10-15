@@ -13,17 +13,16 @@ import { BASE_URL, Color } from "../const";
 import { useAddInfoMutation } from "../services/api";
 import { DataInformation } from "../types/get-results";
 import { FontSizeHeading } from "../mixins";
+import { useNavigate, useOutletContext } from "react-router-dom";
+import { useEffect } from "react";
 
-type FormInformationProps = {
-  data?: DataInformation;
-};
-
-export function FormInformation(props: FormInformationProps) {
-  const { data } = props;
+export function FormInformation() {
+  const data = useOutletContext<DataInformation>();
   const {
     handleSubmit,
     register,
     control,
+    setValue,
     formState: { errors },
   } = useForm<FormInformation>({
     resolver: yupResolver(
@@ -34,7 +33,9 @@ export function FormInformation(props: FormInformationProps) {
       firstNamePsycho: data ? data.firstNamePsycho : "",
       surnamePsycho: data ? data.surnamePsycho : "",
       info: data ? data.info : "",
-      avatarPsycho: data ? `${BASE_URL}/info/${data?.avatarPsycho}` : "",
+      avatarPsycho: data
+        ? `${BASE_URL}/info/filename/${data?.avatarPsycho}`
+        : "",
       nicknameInstagram: data ? data.nicknameInstagram : "",
       nicknameTelegram: data ? data.nicknameTelegram : "",
       nicknameVK: data ? data.nicknameVK : "",
@@ -42,15 +43,44 @@ export function FormInformation(props: FormInformationProps) {
       secondNameDevelop: data ? data.secondNameDevelop : "",
       firstNameDevelop: data ? data.firstNameDevelop : "",
       surnameDevelop: data ? data.surnameDevelop : "",
-      avatarDevelop: data ? `${BASE_URL}/info/${data?.avatarDevelop}` : "",
+      avatarDevelop: data
+        ? `${BASE_URL}/info/filename/${data?.avatarDevelop}`
+        : "",
       emailDevelop: data ? data.emailDevelop : "",
     },
   });
   const [addInfo, { isLoading }] = useAddInfoMutation();
+  const navigate = useNavigate();
 
-  const onSubmit = handleSubmit((data) => {
-    addInfo(data);
+  const onSubmit = handleSubmit(async (data) => {
+    await addInfo(data);
+    navigate(-1);
   });
+
+  useEffect(() => {
+    if (data) {
+      setValue("secondNamePsycho", data.secondNamePsycho);
+      setValue("firstNamePsycho", data.firstNamePsycho);
+      setValue("surnamePsycho", data.surnamePsycho);
+      setValue("info", data.info);
+      setValue(
+        "avatarPsycho",
+        `${BASE_URL}/info/filename/${data.avatarPsycho}`
+      );
+      setValue("nicknameInstagram", data.nicknameInstagram);
+      setValue("nicknameTelegram", data.nicknameTelegram);
+      setValue("nicknameVK", data.nicknameVK);
+      setValue("emailPsycho", data.emailPsycho);
+      setValue("secondNameDevelop", data.secondNameDevelop);
+      setValue("firstNameDevelop", data.firstNameDevelop);
+      setValue("surnameDevelop", data.surnameDevelop);
+      setValue(
+        "avatarDevelop",
+        `${BASE_URL}/info/filename/${data.avatarDevelop}`
+      );
+      setValue("emailDevelop", data.emailDevelop);
+    }
+  }, [data]);
 
   return (
     <Form onSubmit={onSubmit}>

@@ -63,7 +63,7 @@ const InputStyled = styled.input<{
 
   &::placeholder {
     color: ${Color.TextStandard};
-    opacity: 0.5;
+    opacity: 0.4;
   }
 `;
 

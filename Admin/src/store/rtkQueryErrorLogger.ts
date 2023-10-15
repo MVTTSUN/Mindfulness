@@ -13,7 +13,9 @@ export const rtkQueryErrorLogger: Middleware = () => (next) => (action) => {
     if (
       action.meta.arg.endpointName === "addTips" ||
       action.meta.arg.endpointName === "addEmotions" ||
-      action.meta.arg.endpointName === "addInfo"
+      action.meta.arg.endpointName === "addInfo" ||
+      action.meta.arg.endpointName === "addTask" ||
+      action.meta.arg.endpointName === "updateTask"
     ) {
       toast.success("Данные успешно отправлены!", { autoClose: 1000 });
     }

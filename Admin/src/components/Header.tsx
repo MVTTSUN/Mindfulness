@@ -30,19 +30,15 @@ export function Header() {
               </NavLinkStyled>
             </li>
             <li>
-              <NavLinkStyled end to={BrowserRoute.Meditation}>
+              <NavLinkStyled to={BrowserRoute.Meditation}>
                 Медитации
               </NavLinkStyled>
             </li>
             <li>
-              <NavLinkStyled end to={BrowserRoute.Tip}>
-                Советы
-              </NavLinkStyled>
+              <NavLinkStyled to={BrowserRoute.Tip}>Советы</NavLinkStyled>
             </li>
             <li>
-              <NavLinkStyled end to={BrowserRoute.Task}>
-                Задания
-              </NavLinkStyled>
+              <NavLinkStyled to={BrowserRoute.Task}>Задания</NavLinkStyled>
             </li>
             <li>
               <NavLinkStyled end to={BrowserRoute.Emotion}>
@@ -50,7 +46,7 @@ export function Header() {
               </NavLinkStyled>
             </li>
             <li>
-              <NavLinkStyled end to={BrowserRoute.Information}>
+              <NavLinkStyled to={BrowserRoute.Information}>
                 Информация
               </NavLinkStyled>
             </li>
@@ -90,9 +86,7 @@ const NavLinkStyled = styled(NavLink)`
   ${FontSizeStandard}
 
   &.active {
-    cursor: auto;
     font-weight: 600;
-    opacity: 1;
   }
 `;
 

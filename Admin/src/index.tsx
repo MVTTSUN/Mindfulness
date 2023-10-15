@@ -1,7 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { App } from "./components/App.tsx";
-import { BrowserRouter } from "react-router-dom";
 import "normalize.css";
 import { createGlobalStyle } from "styled-components";
 import { Color } from "./const.ts";
@@ -9,6 +8,8 @@ import { Provider } from "react-redux";
 import { store } from "./store/store.ts";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.min.css";
+import { HistoryRouter } from "./components/HistoryRouter.tsx";
+import { browserHistory } from "./utils/browserHistory.ts";
 
 const GlobalStyle = createGlobalStyle`
   body {
@@ -28,23 +29,23 @@ const root = ReactDOM.createRoot(
 );
 
 root.render(
-  <>
+  <React.StrictMode>
     <GlobalStyle />
     <Provider store={store}>
-      <BrowserRouter>
+      <HistoryRouter history={browserHistory}>
+        <ToastContainer
+          position="bottom-center"
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="dark"
+        />
         <App />
-      </BrowserRouter>
+      </HistoryRouter>
     </Provider>
-    <ToastContainer
-      position="bottom-center"
-      hideProgressBar={false}
-      newestOnTop={false}
-      closeOnClick
-      rtl={false}
-      pauseOnFocusLoss
-      draggable
-      pauseOnHover
-      theme="dark"
-    />
-  </>
+  </React.StrictMode>
 );

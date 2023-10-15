@@ -10,82 +10,70 @@ import {
   DataInformation,
   DataTextLottieImage,
 } from "../types/get-results";
+import {
+  addEmotionsAdapter,
+  addInfoAdapter,
+  addTaskAdapter,
+  addTipsAdapter,
+} from "../utils/adapters";
+import { toast } from "react-toastify";
+
+const providesTags = <T>(
+  result: T | undefined,
+  type: "Tips" | "Emotions" | "Info" | "Tasks" | "Meditations"
+) => {
+  return result && Array.isArray(result)
+    ? [...result.map(({ _id }) => ({ type, id: _id })), { type, id: "LIST" }]
+    : [{ type, id: "LIST" }];
+};
 
 export const mindfulnessApi = createApi({
   reducerPath: "mindfulnessApi",
-  tagTypes: ["Tips", "Emotions", "Info"],
+  tagTypes: ["Tips", "Emotions", "Info", "Tasks", "Meditations"],
   baseQuery: fetchBaseQuery({ baseUrl: BASE_URL }),
   endpoints: (builder) => ({
     getTips: builder.query<DataTextLottieImage[], void>({
       query: () => {
         return "tips";
       },
-      providesTags: (result) =>
-        result
-          ? [
-              ...result.map(({ _id }) => ({
-                type: "Tips" as const,
-                id: _id,
-              })),
-              { type: "Tips", id: "LIST" },
-            ]
-          : [{ type: "Tips", id: "LIST" }],
+      providesTags: (result) => providesTags(result, "Tips"),
     }),
     addTips: builder.mutation<void, FormTextLottieImage>({
       query: (data) => {
-        const formData = new FormData();
-
-        for (const field of data.fields) {
-          if (field.type === "lottie" || field.type === "image") {
-            formData.append("file", field.payload);
-            formData.append("type", field.type);
-          } else {
-            const text = field.payload as string;
-            formData.append("text", text.trim());
-            formData.append("type", field.type);
-          }
-        }
-
         return {
           url: "tips",
           method: "POST",
-          body: formData,
+          body: addTipsAdapter(data),
         };
       },
       invalidatesTags: [{ type: "Tips", id: "LIST" }],
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          dispatch(
+            mindfulnessApi.util.upsertQueryData(
+              "getTips",
+              undefined,
+              data as unknown as DataTextLottieImage[]
+            )
+          );
+        } catch (err) {
+          toast.error("Не удалось связаться с сервером", { autoClose: 3000 });
+        }
+      },
     }),
     getEmotions: builder.query<DataEmotion[], void>({
       query: () => {
         return "emotions";
       },
-      providesTags: (result) =>
-        result
-          ? [
-              ...result.map(({ _id }) => ({
-                type: "Emotions" as const,
-                id: _id,
-              })),
-              { type: "Emotions", id: "LIST" },
-            ]
-          : [{ type: "Emotions", id: "LIST" }],
+      providesTags: (result) => providesTags(result, "Emotions"),
     }),
     addEmotions: builder.mutation<void, FormEmotion>({
       query: (data) => {
-        const body: { data: string[] } = { data: [] };
-
-        data.fields.map((field) => {
-          body.data.push(
-            (
-              field.value.charAt(0).toUpperCase() +
-              field.value.slice(1).toLowerCase()
-            ).trim()
-          );
-        });
-
         return {
           url: "emotions",
           method: "POST",
-          body,
+          body: addEmotionsAdapter(data),
         };
       },
       invalidatesTags: [{ type: "Emotions", id: "LIST" }],
@@ -103,79 +91,90 @@ export const mindfulnessApi = createApi({
       query: () => {
         return "info";
       },
-      providesTags: (result) =>
-        result
-          ? [
-              ...result.map(({ _id }) => ({
-                type: "Info" as const,
-                id: _id,
-              })),
-              { type: "Info", id: "LIST" },
-            ]
-          : [{ type: "Info", id: "LIST" }],
+      providesTags: (result) => providesTags(result, "Info"),
     }),
     addInfo: builder.mutation<void, FormInformation>({
       query: (data) => {
-        const formData = new FormData();
-
-        formData.append(
-          "firstNamePsycho",
-          (
-            data.firstNamePsycho.charAt(0).toUpperCase() +
-            data.firstNamePsycho.slice(1).toLowerCase()
-          ).trim()
-        );
-        formData.append(
-          "secondNamePsycho",
-          (
-            data.secondNamePsycho.charAt(0).toUpperCase() +
-            data.secondNamePsycho.slice(1).toLowerCase()
-          ).trim()
-        );
-        formData.append(
-          "surnamePsycho",
-          (
-            data.surnamePsycho.charAt(0).toUpperCase() +
-            data.surnamePsycho.slice(1).toLowerCase()
-          ).trim()
-        );
-        formData.append("info", data.info.trim());
-        formData.append("file", data.avatarPsycho);
-        formData.append("nicknameInstagram", data.nicknameInstagram.trim());
-        formData.append("nicknameTelegram", data.nicknameTelegram.trim());
-        formData.append("nicknameVK", data.nicknameVK.trim());
-        formData.append("emailPsycho", data.emailPsycho.trim());
-        formData.append(
-          "firstNameDevelop",
-          (
-            data.firstNameDevelop.charAt(0).toUpperCase() +
-            data.firstNameDevelop.slice(1).toLowerCase()
-          ).trim()
-        );
-        formData.append(
-          "secondNameDevelop",
-          (
-            data.secondNameDevelop.charAt(0).toUpperCase() +
-            data.secondNameDevelop.slice(1).toLowerCase()
-          ).trim()
-        );
-        formData.append(
-          "surnameDevelop",
-          (
-            data.surnameDevelop.charAt(0).toUpperCase() +
-            data.surnameDevelop.slice(1).toLowerCase()
-          ).trim()
-        );
-        formData.append("file", data.avatarDevelop);
-        formData.append("emailDevelop", data.emailDevelop.trim());
-
         return {
           url: "info",
           method: "POST",
-          body: formData,
+          body: addInfoAdapter(data),
         };
       },
       invalidatesTags: [{ type: "Info", id: "LIST" }],
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          dispatch(
+            mindfulnessApi.util.upsertQueryData(
+              "getInfo",
+              undefined,
+              data as unknown as DataInformation[]
+            )
+          );
+        } catch (err) {
+          toast.error("Не удалось связаться с сервером", { autoClose: 3000 });
+        }
+      },
+    }),
+    getTasks: builder.query<DataTextLottieImage[], void>({
+      query: () => {
+        return "tasks";
+      },
+      providesTags: (result) => providesTags(result, "Tasks"),
+    }),
+    getTask: builder.query<DataTextLottieImage, string>({
+      query: (id) => {
+        return `tasks/${id}`;
+      },
+      providesTags: (result) => providesTags(result, "Tasks"),
+    }),
+    addTask: builder.mutation<void, FormTextLottieImage>({
+      query: (data) => {
+        return {
+          url: "tasks",
+          method: "POST",
+          body: addTaskAdapter(data),
+        };
+      },
+      invalidatesTags: [{ type: "Tasks", id: "LIST" }],
+    }),
+    deleteTask: builder.mutation<DataTextLottieImage, string>({
+      query: (id) => {
+        return {
+          url: `tasks/${id}`,
+          method: "DELETE",
+        };
+      },
+      invalidatesTags: [{ type: "Tasks", id: "LIST" }],
+    }),
+    updateTask: builder.mutation<
+      void,
+      { id: string; data: FormTextLottieImage }
+    >({
+      query: ({ id, data }) => {
+        return {
+          url: `tasks/${id}`,
+          method: "PATCH",
+          body: addTaskAdapter(data),
+        };
+      },
+      invalidatesTags: [{ type: "Tasks", id: "LIST" }],
+      async onQueryStarted({ id }, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+
+          dispatch(
+            mindfulnessApi.util.upsertQueryData(
+              "getTask",
+              id,
+              data as unknown as DataTextLottieImage
+            )
+          );
+        } catch {
+          toast.error("Не удалось связаться с сервером", { autoClose: 3000 });
+        }
+      },
     }),
   }),
 });
@@ -188,4 +187,9 @@ export const {
   useDeleteEmotionMutation,
   useGetInfoQuery,
   useAddInfoMutation,
+  useGetTasksQuery,
+  useGetTaskQuery,
+  useAddTaskMutation,
+  useDeleteTaskMutation,
+  useUpdateTaskMutation,
 } = mindfulnessApi;

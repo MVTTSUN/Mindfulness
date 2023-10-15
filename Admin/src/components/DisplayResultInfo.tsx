@@ -1,62 +1,65 @@
 import styled from "styled-components";
 import { BASE_URL, Color } from "../const";
-import { useGetInfoQuery } from "../services/api";
 import { FontSizeHeading, FontSizeStandard } from "../mixins";
 import Lottie from "react-lottie-player";
 import LottieCircle from "/public/lottie/animaRound.json";
+import { useOutletContext } from "react-router-dom";
+import { DataInformation } from "../types/get-results";
 
 export function DisplayResultInfo() {
-  const { data } = useGetInfoQuery();
+  const data = useOutletContext<DataInformation>();
 
   return (
     <Container>
       <Strong>Информация о психотерапевте</Strong>
       <Text>
-        <TextStrong>Фамилия:</TextStrong> {data && data[0]?.secondNamePsycho}
+        <TextStrong>Фамилия:</TextStrong> {data?.secondNamePsycho}
       </Text>
       <Text>
-        <TextStrong>Имя:</TextStrong> {data && data[0]?.firstNamePsycho}
+        <TextStrong>Имя:</TextStrong> {data?.firstNamePsycho}
       </Text>
       <Text>
-        <TextStrong>Отчество:</TextStrong> {data && data[0]?.surnamePsycho}
+        <TextStrong>Отчество:</TextStrong> {data?.surnamePsycho}
       </Text>
       <Text>
-        <TextStrong>Краткая информация:</TextStrong> {data && data[0]?.info}
+        <TextStrong>Краткая информация:</TextStrong> {data?.info}
       </Text>
       <WrapperImageAndLottie>
-        <Image src={`${BASE_URL}/info/${data && data[0]?.avatarPsycho}`} />
+        <Image
+          src={data ? `${BASE_URL}/info/filename/${data?.avatarPsycho}` : ""}
+        />
         <LottieStyled loop animationData={LottieCircle} play />
       </WrapperImageAndLottie>
       <Text>
-        <TextStrong>Никнейм Instagram:</TextStrong>{" "}
-        {data && data[0]?.nicknameInstagram}
+        <TextStrong>Никнейм Instagram:</TextStrong> {data?.nicknameInstagram}
       </Text>
       <Text>
-        <TextStrong>Никнейм Telegram:</TextStrong>{" "}
-        {data && data[0]?.nicknameTelegram}
+        <TextStrong>Никнейм Telegram:</TextStrong> {data?.nicknameTelegram}
       </Text>
       <Text>
-        <TextStrong>Никнейм VK:</TextStrong> {data && data[0]?.nicknameVK}
+        <TextStrong>Никнейм VK:</TextStrong> {data?.nicknameVK}
       </Text>
       <Text>
-        <TextStrong>Почта:</TextStrong> {data && data[0]?.emailPsycho}
+        <TextStrong>Почта:</TextStrong> {data?.emailPsycho}
       </Text>
       <Strong>Информация о разработчике</Strong>
       <Text>
-        <TextStrong>Фамилия:</TextStrong> {data && data[0]?.secondNameDevelop}
+        <TextStrong>Фамилия:</TextStrong> {data?.secondNameDevelop}
       </Text>
       <Text>
-        <TextStrong>Имя:</TextStrong> {data && data[0]?.firstNameDevelop}
+        <TextStrong>Имя:</TextStrong> {data?.firstNameDevelop}
       </Text>
       <Text>
-        <TextStrong>Отчество:</TextStrong> {data && data[0]?.surnameDevelop}
+        <TextStrong>Отчество:</TextStrong> {data?.surnameDevelop}
       </Text>
       <WrapperImageAndLottie>
-        <Image src={`${BASE_URL}/info/${data && data[0]?.avatarDevelop}`} />
+        <Image
+          src={data ? `${BASE_URL}/info/filename/${data?.avatarDevelop}` : ""}
+        />
         <LottieStyled loop animationData={LottieCircle} play />
       </WrapperImageAndLottie>
       <Text>
-        <TextStrong>Почта:</TextStrong> {data && data[0]?.emailDevelop}
+        <TextStrong>Почта:</TextStrong> {data?.emailDevelop}
       </Text>
     </Container>
   );

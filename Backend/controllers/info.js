@@ -23,12 +23,13 @@ connect.once('open', () => {
   });
 });
 
-const getInfo = async (req, res, next) => {
+const getInfo = async (_, res, next) => {
   try {
     const files = await gfs.find({}).toArray();
-    files.map((file) => gfs.openDownloadStreamByName(file.filename).pipe(res));
     const info = await Info.find({});
-    return res.send(info);
+
+    files.map((file) => gfs.openDownloadStreamByName(file.filename).pipe(res));
+    res.send(info);
   } catch (err) {
     next(err);
   }
@@ -36,24 +37,26 @@ const getInfo = async (req, res, next) => {
 
 const getInfoFile = async (req, res, next) => {
   try {
-    const file = await gfs.find({ filename: req.params.filename }).toArray();
+    const { filename } = req.params;
+    const file = await gfs.find({ filename }).toArray();
+
     res.set('Content-Type', file[0].contentType);
-    gfs.openDownloadStreamByName(req.params.filename).pipe(res);
+    gfs.openDownloadStreamByName(filename).pipe(res);
   } catch (err) {
     next(err);
   }
 };
 
 const postInfo = async (req, res, next) => {
-  const data = {
-    ...req.body,
-    avatarPsycho: req.files[0].filename,
-    avatarDevelop: req.files[1].filename,
-  };
-
-  await Info.deleteMany();
   try {
+    const data = {
+      ...req.body,
+      avatarPsycho: req.files[0].filename,
+      avatarDevelop: req.files[1].filename,
+    };
+    await Info.deleteMany();
     const info = await Info.create(data);
+
     res.send(info);
   } catch (err) {
     if (err instanceof mongoose.Error.ValidationError) {

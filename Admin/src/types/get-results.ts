@@ -4,6 +4,7 @@ type ElementTextLottieImage = {
 };
 
 type DataTextLottieImage = {
+  title?: string;
   data: ElementTextLottieImage[];
   _id: string;
 };

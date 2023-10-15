@@ -1,92 +1,194 @@
-// const mongoose = require('mongoose');
-// const Tip = require('../models/tip');
-// const IncorrectError = require('../errors/incorrectError');
-// const { errorMessages } = require('../const');
-// const { DEV_DATABASE_URL } = require('../config');
-// require('dotenv').config();
+const mongoose = require('mongoose');
+const Task = require('../models/task');
+const IncorrectError = require('../errors/incorrectError');
+const NotFoundDataError = require('../errors/notFoundDataError');
+const { errorMessages } = require('../const');
+const { DEV_DATABASE_URL } = require('../config');
+require('dotenv').config();
 
-// const { DATABASE_URL, NODE_ENV } = process.env;
+const { DATABASE_URL, NODE_ENV } = process.env;
 
-// let gfs;
+let gfs;
 
-// const connect = mongoose.createConnection(
-//   NODE_ENV === 'production' ? DATABASE_URL : DEV_DATABASE_URL,
-//   {
-//     useNewUrlParser: true,
-//     useUnifiedTopology: true,
-//   }
-// );
+const connect = mongoose.createConnection(
+  NODE_ENV === 'production' ? DATABASE_URL : DEV_DATABASE_URL,
+  {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  }
+);
 
-// connect.once('open', () => {
-//   gfs = new mongoose.mongo.GridFSBucket(connect.db, {
-//     bucketName: 'uploads/tips',
-//   });
-// });
+connect.once('open', () => {
+  gfs = new mongoose.mongo.GridFSBucket(connect.db, {
+    bucketName: 'uploads/tasks',
+  });
+});
 
-// const getTasks = async (req, res, next) => {
-//   try {
-//     const tips = await Tip.find({});
-//     return res.send(tips);
-//   } catch (err) {
-//     next(err);
-//   }
-// };
+const getTasks = async (_, res, next) => {
+  try {
+    const tasks = await Task.find({});
 
-// const getTask = async (req, res, next) => {
-//   try {
-//     const tips = await Tip.find({});
-//     return res.send(tips);
-//   } catch (err) {
-//     next(err);
-//   }
-// };
+    res.send(tasks);
+  } catch (err) {
+    next(err);
+  }
+};
 
-// const getTaskFile = async (req, res, next) => {
-//   try {
-//     const file = await gfs.find({ filename: req.params.filename }).toArray();
-//     res.set('Content-Type', file[0].contentType);
-//     gfs.openDownloadStreamByName(req.params.filename).pipe(res);
-//   } catch (err) {
-//     next(err);
-//   }
-// };
+const getTask = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const task = await Task.findOne({ _id: id });
 
-// const postTask = async (req, res, next) => {
-//   let data = [];
-//   let cntTexts = 0;
-//   let cntFiles = 0;
-//   const types = Array.isArray(req.body.type) ? [...req.body.type] : [req.body.type];
-//   const texts = Array.isArray(req.body.text) ? [...req.body.text] : [req.body.text];
-//   const files = [...req.files];
+    if (task) {
+      res.send(task);
+    } else {
+      throw new NotFoundDataError(errorMessages.NOT_FOUND_DATA);
+    }
+  } catch (err) {
+    if (err instanceof mongoose.Error.CastError) {
+      next(new IncorrectError(errorMessages.INCORRECT_DATA));
+    } else {
+      next(err);
+    }
+  }
+};
 
-//   data = types.map((type) => {
-//     let result;
+const getTaskFile = async (req, res, next) => {
+  try {
+    const { filename } = req.params;
+    const file = await gfs.find({ filename }).toArray();
 
-//     if (type === 'text') {
-//       result = { type, payload: texts[cntTexts] };
-//       cntTexts += 1;
-//       return result;
-//     }
-//     result = { type, payload: files[cntFiles].filename };
-//     cntFiles += 1;
-//     return result;
-//   });
+    res.set('Content-Type', file[0].contentType);
+    gfs.openDownloadStreamByName(filename).pipe(res);
+  } catch (err) {
+    next(err);
+  }
+};
 
-//   try {
-//     await Tip.create({ data });
-//     res.status(200).send({ message: 'success' });
-//   } catch (err) {
-//     if (err instanceof mongoose.Error.ValidationError) {
-//       next(new IncorrectError(errorMessages.INCORRECT_DATA));
-//     } else {
-//       next(err);
-//     }
-//   }
-// };
+const postTask = async (req, res, next) => {
+  try {
+    const { title, type, text } = req.body;
+    let data = [];
+    let cntTexts = 0;
+    let cntFiles = 0;
+    const types = Array.isArray(type) ? [...type] : [type];
+    const texts = Array.isArray(text) ? [...text] : [text];
+    const files = [...req.files];
 
-// module.exports = {
-//   getTasks,
-//   getTask,
-//   postTask,
-//   getTaskFile,
-// };
+    data = types.map((item) => {
+      let result;
+
+      if (item === 'text') {
+        result = { type: item, payload: texts[cntTexts] };
+        cntTexts += 1;
+        return result;
+      }
+      result = { type: item, payload: files[cntFiles].filename };
+      cntFiles += 1;
+      return result;
+    });
+
+    const task = await Task.create({ title, data });
+
+    res.send(task);
+  } catch (err) {
+    if (err instanceof mongoose.Error.ValidationError) {
+      next(new IncorrectError(errorMessages.INCORRECT_DATA));
+    } else {
+      next(err);
+    }
+  }
+};
+
+const deleteTask = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const task = await Task.findOne({ _id: id });
+
+    if (task) {
+      task.data.map(async (item) => {
+        if (item.type !== 'text') {
+          const file = await gfs.find({ filename: item.payload }).toArray();
+
+          await gfs.delete(file[0]._id);
+        }
+      });
+      await Task.findOneAndRemove({ _id: id });
+    } else {
+      throw new NotFoundDataError(errorMessages.NOT_FOUND_DATA);
+    }
+
+    res.send(task);
+  } catch (err) {
+    if (err instanceof mongoose.Error.CastError) {
+      next(new IncorrectError(errorMessages.INCORRECT_DATA));
+    } else {
+      next(err);
+    }
+  }
+};
+
+const patchTask = async (req, res, next) => {
+  try {
+    const { title, type, text } = req.body;
+    const { id } = req.params;
+    let data = [];
+    let cntTexts = 0;
+    let cntFiles = 0;
+    const types = Array.isArray(type) ? [...type] : [type];
+    const texts = Array.isArray(text) ? [...text] : [text];
+    const files = [...req.files];
+
+    data = types.map((item) => {
+      let result;
+
+      if (item === 'text') {
+        result = { type: item, payload: texts[cntTexts] };
+        cntTexts += 1;
+        return result;
+      }
+      result = { type: item, payload: files[cntFiles].filename };
+      cntFiles += 1;
+      return result;
+    });
+
+    const task = await Task.findOne({ _id: id });
+
+    if (task) {
+      task.data.map(async (item) => {
+        if (item.type !== 'text') {
+          const file = await gfs.find({ filename: item.payload }).toArray();
+
+          await gfs.delete(file[0]._id);
+        }
+      });
+    } else {
+      throw new NotFoundDataError(errorMessages.NOT_FOUND_DATA);
+    }
+
+    const updateTask = await Task.findByIdAndUpdate(
+      req.params.id,
+      { title, data },
+      { new: true, runValidators: true }
+    );
+
+    res.send(updateTask);
+  } catch (err) {
+    if (err instanceof mongoose.Error.ValidationError) {
+      next(new IncorrectError(errorMessages.INCORRECT_DATA));
+    } else if (err instanceof mongoose.Error.DocumentNotFoundError) {
+      next(new NotFoundDataError(errorMessages.NOT_FOUND_DATA));
+    } else {
+      next(err);
+    }
+  }
+};
+
+module.exports = {
+  postTask,
+  getTask,
+  getTasks,
+  getTaskFile,
+  deleteTask,
+  patchTask,
+};

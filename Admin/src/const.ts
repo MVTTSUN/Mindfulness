@@ -9,6 +9,7 @@ enum BrowserRoute {
   Meditation = "/meditation",
   Emotion = "/emotion",
   Information = "/information",
+  Edit = "/edit",
 }
 
 enum Color {
@@ -16,9 +17,11 @@ enum Color {
   Pastel = "#d4f4ef",
   Dark = "#283957",
   Meditation = "#469ab2",
+  Task = "#d2f2d0",
   Errors = "#ff6868",
   TextStandard = "#313131",
   BackgroundMain = "#f5f4fa",
+  TextWhite = "#edecf5",
 }
 
 enum ErrorText {

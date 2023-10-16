@@ -67,7 +67,7 @@ const getTaskFile = async (req, res, next) => {
 
 const postTask = async (req, res, next) => {
   try {
-    const { title, type, text } = req.body;
+    const { title, kind, type, text } = req.body;
     let data = [];
     let cntTexts = 0;
     let cntFiles = 0;
@@ -88,7 +88,7 @@ const postTask = async (req, res, next) => {
       return result;
     });
 
-    const task = await Task.create({ title, data });
+    const task = await Task.create({ title, kind, data });
 
     res.send(task);
   } catch (err) {
@@ -130,7 +130,7 @@ const deleteTask = async (req, res, next) => {
 
 const patchTask = async (req, res, next) => {
   try {
-    const { title, type, text } = req.body;
+    const { title, kind, type, text } = req.body;
     const { id } = req.params;
     let data = [];
     let cntTexts = 0;
@@ -168,7 +168,7 @@ const patchTask = async (req, res, next) => {
 
     const updateTask = await Task.findByIdAndUpdate(
       req.params.id,
-      { title, data },
+      { title, kind, data },
       { new: true, runValidators: true }
     );
 

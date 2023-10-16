@@ -3,16 +3,19 @@ import { BASE_URL } from "../const";
 import {
   FormEmotion,
   FormInformation,
+  FormMeditation,
   FormTextLottieImage,
 } from "../types/form";
 import {
   DataEmotion,
   DataInformation,
+  DataMeditation,
   DataTextLottieImage,
 } from "../types/get-results";
 import {
   addEmotionsAdapter,
   addInfoAdapter,
+  addMeditationAdapter,
   addTaskAdapter,
   addTipsAdapter,
 } from "../utils/adapters";
@@ -176,6 +179,65 @@ export const mindfulnessApi = createApi({
         }
       },
     }),
+    getMeditations: builder.query<DataMeditation[], void>({
+      query: () => {
+        return "meditations";
+      },
+      providesTags: (result) => providesTags(result, "Meditations"),
+    }),
+    getMeditation: builder.query<DataMeditation, string>({
+      query: (id) => {
+        return `meditations/${id}`;
+      },
+      providesTags: (result) => providesTags(result, "Meditations"),
+    }),
+    addMeditation: builder.mutation<void, FormMeditation>({
+      query: (data) => {
+        return {
+          url: "meditations",
+          method: "POST",
+          body: addMeditationAdapter(data),
+        };
+      },
+      invalidatesTags: [{ type: "Meditations", id: "LIST" }],
+    }),
+    deleteMeditation: builder.mutation<DataMeditation, string>({
+      query: (id) => {
+        return {
+          url: `meditations/${id}`,
+          method: "DELETE",
+        };
+      },
+      invalidatesTags: [{ type: "Meditations", id: "LIST" }],
+    }),
+    updateMeditation: builder.mutation<
+      void,
+      { id: string; data: FormMeditation }
+    >({
+      query: ({ id, data }) => {
+        return {
+          url: `meditations/${id}`,
+          method: "PATCH",
+          body: addMeditationAdapter(data),
+        };
+      },
+      invalidatesTags: [{ type: "Meditations", id: "LIST" }],
+      async onQueryStarted({ id }, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+
+          dispatch(
+            mindfulnessApi.util.upsertQueryData(
+              "getMeditation",
+              id,
+              data as unknown as DataMeditation
+            )
+          );
+        } catch {
+          toast.error("Не удалось связаться с сервером", { autoClose: 3000 });
+        }
+      },
+    }),
   }),
 });
 
@@ -192,4 +254,9 @@ export const {
   useAddTaskMutation,
   useDeleteTaskMutation,
   useUpdateTaskMutation,
+  useGetMeditationsQuery,
+  useGetMeditationQuery,
+  useAddMeditationMutation,
+  useDeleteMeditationMutation,
+  useUpdateMeditationMutation,
 } = mindfulnessApi;

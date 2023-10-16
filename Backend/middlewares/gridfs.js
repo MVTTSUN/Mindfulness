@@ -54,12 +54,27 @@ const storageTasks = new GridFsStorage({
     }),
 });
 
+const storageMeditations = new GridFsStorage({
+  url: NODE_ENV === 'production' ? DATABASE_URL : DEV_DATABASE_URL,
+  file: async (_, file) =>
+    new Promise((resolve) => {
+      const filename = uuidv4() + path.extname(file.originalname);
+      const fileInfo = {
+        filename,
+        bucketName: 'uploads/meditations',
+      };
+      resolve(fileInfo);
+    }),
+});
+
 const uploadTips = multer({ storage: storageTips });
 const uploadInfo = multer({ storage: storageInfo });
 const uploadTasks = multer({ storage: storageTasks });
+const uploadMeditations = multer({ storage: storageMeditations });
 
 module.exports = {
   uploadTips,
   uploadInfo,
   uploadTasks,
+  uploadMeditations,
 };

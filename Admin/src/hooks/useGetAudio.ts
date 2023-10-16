@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import { useAppSelector } from "./useAppSelector";
 import { getIsPause } from "../store/currentAudioSelectors";
 
-export function useGetAudio(id: string) {
+export const useGetAudio = (id: string) => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const isPause = useAppSelector(getIsPause);
 
@@ -13,4 +13,4 @@ export function useGetAudio(id: string) {
   }, [isPause]);
 
   return audioRef.current;
-}
+};

@@ -1,10 +1,18 @@
 import { array, mixed, object, string } from "yup";
 import { ErrorText, MAX_SIZE_IMAGE } from "../const";
 
-const schemaTextLottieImage = (isTitleField?: boolean) =>
+const schemaTextLottieImage = (isTask?: boolean) =>
   object({
     title: string().test((value, { createError }) => {
-      if (isTitleField && !value) {
+      if (isTask && !value) {
+        return createError({
+          message: ErrorText.Required,
+        });
+      }
+      return true;
+    }),
+    kind: string().test((value, { createError }) => {
+      if (isTask && !value) {
         return createError({
           message: ErrorText.Required,
         });
@@ -120,8 +128,8 @@ const schemaMeditation = object({
     .required(ErrorText.Required)
     .test((value, { createError }) => {
       if (typeof value !== "string") {
-        const fileList = value as FileList;
-        const { size }: { size: number } = fileList[0] as File;
+        const file = value as File;
+        const { size }: { size: number } = file as File;
 
         if (size / 1024 > MAX_SIZE_IMAGE) {
           return createError({
@@ -142,8 +150,7 @@ const schemaMeditation = object({
         timeAt: string().required(ErrorText.Required),
         timeTo: string().required(ErrorText.Required),
       })
-    )
-    .min(1, ErrorText.MinOneField),
+    ),
 });
 
 export {

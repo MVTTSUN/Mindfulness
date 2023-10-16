@@ -22,11 +22,20 @@ import { FormTextLottieImage } from "./FormTextLottieImage";
 import { DisplayResultInfo } from "./DisplayResultInfo";
 import { FormInformation } from "./FormInformation";
 import { DisplayResultTask } from "./DisplayResultTask";
+import { getIsLoadingServer } from "../store/isLoadingServer";
+import { useSelector } from "react-redux";
+import { Preloader } from "./Preloader";
+import { useDeferredRender } from "../hooks/useDeferredRender";
+import { DisplayResultMeditation } from "./DisplayResultMeditation";
+import { MeditationPage } from "../pages/MeditationPage";
+import { FormMeditation } from "./FormMeditation";
 
 export function App() {
+  const isLoadingServer = useSelector(getIsLoadingServer);
   const isPause = useAppSelector(getIsPause);
   const srcAudio = useAppSelector(getAudioSrc);
   const [isFirstPlayAudio, setIsFirstPlayAudio] = useState(false);
+  const isActivePreloader = useDeferredRender(isLoadingServer, 1000);
 
   useEffect(() => {
     if (!isPause) {
@@ -62,10 +71,16 @@ export function App() {
                   />
                 </Route>
               </Route>
-              <Route
-                path={BrowserRoute.Meditation}
-                element={<MeditationsPage />}
-              />
+              <Route path={BrowserRoute.Meditation}>
+                <Route index element={<MeditationsPage />} />
+                <Route path=":id" element={<MeditationPage />}>
+                  <Route index element={<DisplayResultMeditation />} />
+                  <Route
+                    path={BrowserRoute.Meditation + "/:id" + BrowserRoute.Edit}
+                    element={<FormMeditation />}
+                  />
+                </Route>
+              </Route>
               <Route path={BrowserRoute.Emotion} element={<EmotionsPage />} />
               <Route
                 path={BrowserRoute.Information}
@@ -89,10 +104,12 @@ export function App() {
         </CenterContainer>
       </Main>
       {isFirstPlayAudio && srcAudio !== "" && <Player />}
+      {isActivePreloader && <Preloader />}
     </HelmetProvider>
   );
 }
 
 const Main = styled.main`
   margin-bottom: 120px;
+  padding-top: 100px;
 `;

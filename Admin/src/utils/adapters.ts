@@ -1,6 +1,7 @@
 import {
   FormEmotion,
   FormInformation,
+  FormMeditation,
   FormTextLottieImage,
 } from "../types/form";
 
@@ -94,9 +95,29 @@ const addInfoAdapter = (data: FormInformation) => {
 
 const addTaskAdapter = (data: FormTextLottieImage) => {
   const formData = addTipsAdapter(data);
-  data.title && formData.append("title", data.title);
+
+  data.title && formData.append("title", data.title.trim());
+  data.kind && formData.append("kind", data.kind);
 
   return formData;
 };
 
-export { addTipsAdapter, addEmotionsAdapter, addInfoAdapter, addTaskAdapter };
+const addMeditationAdapter = (data: FormMeditation) => {
+  const formData = new FormData();
+
+  formData.append("title", data.title.trim());
+  formData.append("kind", data.kind);
+  formData.append("file", data.image);
+  formData.append("file", data.audio);
+  formData.append("textLines", JSON.stringify(data.textLines));
+
+  return formData;
+};
+
+export {
+  addTipsAdapter,
+  addEmotionsAdapter,
+  addInfoAdapter,
+  addTaskAdapter,
+  addMeditationAdapter,
+};

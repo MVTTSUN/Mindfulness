@@ -11,6 +11,7 @@ import {
   setAudioSrc,
   setDuration,
 } from "../store/currentAudioSlice";
+import { useFrameInterval } from "../hooks/useFrameInterval";
 
 type AudioProps = {
   src: string;
@@ -22,7 +23,11 @@ export function Audio(props: AudioProps) {
   const isPause = useAppSelector(getIsPause);
   const refAudio = useRef<HTMLAudioElement | null>(null);
   const [isFirstPlay, setIsFirstPlay] = useState(true);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const { startAnimating, stopAnimating } = useFrameInterval(100, () => {
+    if (refAudio.current) {
+      dispatch(changeCurrentTime(refAudio.current.currentTime));
+    }
+  });
 
   const togglePlayAndPause = () => {
     if (refAudio?.current?.paused && src) {
@@ -30,15 +35,11 @@ export function Audio(props: AudioProps) {
       setIsFirstPlay(false);
       dispatch(changeIsPause(false));
       refAudio.current.play();
-      intervalRef.current = setInterval(() => {
-        if (refAudio.current) {
-          dispatch(changeCurrentTime(refAudio.current.currentTime));
-        }
-      }, 100);
+      startAnimating();
     } else {
       dispatch(changeIsPause(true));
       refAudio?.current?.pause();
-      intervalRef.current && clearInterval(intervalRef.current);
+      stopAnimating();
     }
   };
 
@@ -47,14 +48,14 @@ export function Audio(props: AudioProps) {
   };
 
   const handleOnEnded = () => {
-    intervalRef.current && clearInterval(intervalRef.current);
+    stopAnimating();
     dispatch(changeIsPause(true));
     dispatch(changeCurrentTime(0));
   };
 
   useEffect(() => {
     return () => {
-      intervalRef.current && clearInterval(intervalRef.current);
+      stopAnimating();
       dispatch(changeIsPause(true));
       dispatch(changeCurrentTime(0));
       dispatch(setAudioSrc(""));
@@ -63,7 +64,7 @@ export function Audio(props: AudioProps) {
 
   useEffect(() => {
     if (isPause) {
-      intervalRef.current && clearInterval(intervalRef.current);
+      stopAnimating();
     }
   }, [isPause]);
 
@@ -87,7 +88,11 @@ export function Audio(props: AudioProps) {
       >
         <source src={src} type="audio/mp3" />
       </audio>
-      <PlayButton type="button" onClick={togglePlayAndPause}>
+      <PlayButton
+        type="button"
+        onClick={togglePlayAndPause}
+        disabled={src === ""}
+      >
         {isPause ? (
           <img src="/images/play.svg" alt="Играть" />
         ) : (
@@ -105,4 +110,9 @@ const PlayButton = styled.button`
   height: 100%;
   border-radius: 100px;
   background-color: ${Color.Primary};
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 `;

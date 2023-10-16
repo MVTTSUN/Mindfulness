@@ -2,6 +2,7 @@ import styled from "styled-components";
 import { ResetButton } from "../mixins";
 import { PropsWithChildren, useEffect, useRef, useState } from "react";
 import { Color } from "../const";
+import { useFrameInterval } from "../hooks/useFrameInterval";
 
 type ButtonProps = PropsWithChildren<{
   onClick?: () => void;
@@ -13,24 +14,24 @@ type ButtonProps = PropsWithChildren<{
 
 export function Button(props: ButtonProps) {
   const { children, isPrimary, onClick, type, isDisabled, isLoading } = props;
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const [text, setText] = useState<string>(children as string);
   const cntRef = useRef(0);
+  const { startAnimating, stopAnimating } = useFrameInterval(500, () => {
+    setText((prevState) => {
+      if (cntRef.current % 4 !== 0) {
+        return prevState + ".";
+      } else {
+        return text.replaceAll(".", "");
+      }
+    });
+    cntRef.current += 1;
+  });
 
   useEffect(() => {
     if (isLoading) {
-      intervalRef.current = setInterval(() => {
-        setText((prevState) => {
-          if (cntRef.current % 4 !== 0) {
-            return prevState + ".";
-          } else {
-            return text.replaceAll(".", "");
-          }
-        });
-        cntRef.current += 1;
-      }, 500);
+      startAnimating();
     } else {
-      intervalRef.current && clearInterval(intervalRef.current);
+      stopAnimating();
     }
   }, [isLoading]);
 

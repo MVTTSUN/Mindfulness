@@ -7,6 +7,7 @@ const elementSchema = new mongoose.Schema({
 
 const taskSchema = new mongoose.Schema({
   title: { type: String, required: true },
+  kind: { type: String, required: true },
   data: { type: [elementSchema], required: true },
 });
 

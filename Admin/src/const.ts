@@ -40,4 +40,16 @@ const BASE_URL = "http://localhost:3000";
 
 const MAX_SIZE_IMAGE = 200;
 
-export { BrowserRoute, Color, ErrorText, Slice, BASE_URL, MAX_SIZE_IMAGE };
+const OPTIONS_KIND_MEDITATIONS = ["Легкая", "Средняя", "Сложная"];
+const OPTIONS_KIND_TASKS = ["Легкое", "Среднее", "Сложное"];
+
+export {
+  BrowserRoute,
+  Color,
+  ErrorText,
+  Slice,
+  BASE_URL,
+  MAX_SIZE_IMAGE,
+  OPTIONS_KIND_MEDITATIONS,
+  OPTIONS_KIND_TASKS,
+};

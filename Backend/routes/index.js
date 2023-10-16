@@ -1,6 +1,6 @@
 const router = require('express').Router();
 // const userRouter = require('./users');
-// const movieRouter = require('./movies');
+const meditationRouter = require('./meditations');
 const otherRouter = require('./other');
 // const authRouter = require('./auth');
 const tipRouter = require('./tips');
@@ -16,6 +16,7 @@ router.use(infoRouter);
 router.use(tipRouter);
 router.use(emotionRouter);
 router.use(taskRouter);
+router.use(meditationRouter);
 router.use(otherRouter);
 
 module.exports = router;

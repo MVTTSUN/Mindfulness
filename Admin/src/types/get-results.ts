@@ -1,3 +1,5 @@
+import { TextLine } from "./form";
+
 type ElementTextLottieImage = {
   type: "text" | "image" | "lottie";
   payload: string | object;
@@ -5,6 +7,7 @@ type ElementTextLottieImage = {
 
 type DataTextLottieImage = {
   title?: string;
+  kind?: string;
   data: ElementTextLottieImage[];
   _id: string;
 };
@@ -32,9 +35,19 @@ type DataInformation = {
   _id: string;
 };
 
+type DataMeditation = {
+  title: string;
+  kind: string;
+  image: string;
+  audio: string;
+  textLines: TextLine[];
+  _id: string;
+};
+
 export type {
   ElementTextLottieImage,
   DataTextLottieImage,
   DataEmotion,
   DataInformation,
+  DataMeditation,
 };

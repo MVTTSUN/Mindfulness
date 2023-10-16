@@ -20,6 +20,4 @@ const errorMessages = {
   INVALID_URL: 'Некорректная ссылка',
 };
 
-const LINK_REG_EXP = /^(https?:\/\/)?([\w-]{1,32}\.[\w-]{1,32})[^\s@]*$/;
-
-module.exports = { codesError, errorMessages, LINK_REG_EXP };
+module.exports = { codesError, errorMessages };

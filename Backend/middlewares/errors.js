@@ -1,6 +1,6 @@
 const { codesError, errorMessages } = require('../const');
 
-const errors = (err, req, res, next) => {
+const errors = (err, _, res, next) => {
   const { statusCode = codesError.DEFAULT, message } = err;
 
   res.status(statusCode).send({

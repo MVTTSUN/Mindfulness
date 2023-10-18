@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const express = require('express');
+const http = require('http');
 const { errors } = require('celebrate');
 const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
@@ -14,6 +15,14 @@ require('dotenv').config();
 const { PORT = 3000, DATABASE_URL, NODE_ENV } = process.env;
 
 const app = express();
+const server = http.createServer(app).listen(PORT);
+const { io } = require('./utils/socket');
+
+io.attach(server, {
+  cors: {
+    origin: ['https://localhost:5173', 'http://localhost:5173'],
+  },
+});
 
 mongoose.connect(NODE_ENV === 'production' ? DATABASE_URL : DEV_DATABASE_URL);
 
@@ -34,4 +43,4 @@ app.use(errorLogger);
 app.use(errors());
 app.use(errorsMiddleware);
 
-app.listen(PORT);
+// app.listen(PORT);

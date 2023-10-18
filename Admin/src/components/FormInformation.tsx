@@ -25,6 +25,7 @@ export function FormInformation() {
     setValue,
     formState: { errors },
   } = useForm<FormInformation>({
+    mode: "onChange",
     resolver: yupResolver(
       schemaInformation
     ) as unknown as Resolver<FormInformation>,

@@ -10,6 +10,7 @@ import {
   DataEmotion,
   DataInformation,
   DataMeditation,
+  DataStatistics,
   DataTextLottieImage,
 } from "../types/get-results";
 import {
@@ -20,6 +21,7 @@ import {
   addTipsAdapter,
 } from "../utils/adapters";
 import { toast } from "react-toastify";
+import { io } from "socket.io-client";
 
 const providesTags = <T>(
   result: T | undefined,
@@ -33,7 +35,7 @@ const providesTags = <T>(
 export const mindfulnessApi = createApi({
   reducerPath: "mindfulnessApi",
   tagTypes: ["Tips", "Emotions", "Info", "Tasks", "Meditations"],
-  baseQuery: fetchBaseQuery({ baseUrl: BASE_URL }),
+  baseQuery: fetchBaseQuery({ baseUrl: BASE_URL, credentials: "include" }),
   endpoints: (builder) => ({
     getTips: builder.query<DataTextLottieImage[], void>({
       query: () => {
@@ -238,6 +240,25 @@ export const mindfulnessApi = createApi({
         }
       },
     }),
+    getStatistics: builder.query<DataStatistics[], void>({
+      query: () => "statistics",
+      async onCacheEntryAdded(
+        _,
+        { cacheEntryRemoved, updateCachedData, cacheDataLoaded }
+      ) {
+        const socket = io(BASE_URL);
+        await cacheDataLoaded;
+
+        socket.on("statistics", (data) =>
+          updateCachedData((draft) => {
+            draft.push(data);
+          })
+        );
+
+        await cacheEntryRemoved;
+        socket.close();
+      },
+    }),
   }),
 });
 
@@ -259,4 +280,5 @@ export const {
   useAddMeditationMutation,
   useDeleteMeditationMutation,
   useUpdateMeditationMutation,
+  useGetStatisticsQuery,
 } = mindfulnessApi;

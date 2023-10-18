@@ -14,5 +14,4 @@ const getIsLoadingServer = (state: State) =>
   Object.values(state.mindfulnessApi.mutations).some((mutation) => {
     return mutation && mutation.status === QueryStatus.pending;
   });
-
 export { getIsLoadingServer };

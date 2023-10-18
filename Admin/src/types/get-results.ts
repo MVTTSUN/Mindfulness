@@ -1,5 +1,3 @@
-import { TextLine } from "./form";
-
 type ElementTextLottieImage = {
   type: "text" | "image" | "lottie";
   payload: string | object;
@@ -35,12 +33,26 @@ type DataInformation = {
   _id: string;
 };
 
+type TextLine = {
+  timeAt: string;
+  timeTo: string;
+  text: string;
+};
+
 type DataMeditation = {
   title: string;
   kind: string;
   image: string;
   audio: string;
-  textLines: TextLine[];
+  textLines?: TextLine[];
+  _id: string;
+};
+
+type DataStatistics = {
+  title: string;
+  kind: string;
+  created: string;
+  device: string;
   _id: string;
 };
 
@@ -50,4 +62,5 @@ export type {
   DataEmotion,
   DataInformation,
   DataMeditation,
+  DataStatistics,
 };

@@ -35,6 +35,7 @@ export const DropFileInput = forwardRef(
     const [audioPreview, setAudioPreview] = useState("");
     const [lottiePreview, setLottiePreview] = useState(EmptyLottie);
     const lottieRef = useRef(null);
+    const [isChangeFile, setIsChangeFile] = useState(false);
 
     const convertToLocalFile = (file: File) => {
       onChange(file);
@@ -44,6 +45,7 @@ export const DropFileInput = forwardRef(
         setImagePreview(URL.createObjectURL(file));
       } else if (type === "lottie") {
         const reader = new FileReader();
+
         reader.onload = (event: ProgressEvent<FileReader>) => {
           const str = event.target?.result as string;
           const json = JSON.parse(str);
@@ -90,6 +92,7 @@ export const DropFileInput = forwardRef(
     };
 
     const onChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
+      setIsChangeFile(true);
       convertToLocalFileAfterDrop(e.target);
     };
 
@@ -108,7 +111,7 @@ export const DropFileInput = forwardRef(
             type: `image/${extension}`,
           });
           onChange(file);
-        } else {
+        } else if (type === "lottie") {
           const response = await fetch(src);
           const dataJson = await response.json();
           setLottiePreview(dataJson);
@@ -119,6 +122,13 @@ export const DropFileInput = forwardRef(
           });
           const file = new File([blob], `lottie.json`, {
             type: "application/json",
+          });
+          onChange(file);
+        } else {
+          const response = await fetch(src);
+          const data = await response.blob();
+          const file = new File([data], `audio.${extensionName}`, {
+            type: `audio/${extension}`,
           });
           onChange(file);
         }
@@ -137,10 +147,14 @@ export const DropFileInput = forwardRef(
     }, [lottiePreview]);
 
     useEffect(() => {
-      if (src && typeof src === "string") {
+      if (src && typeof src === "string" && !isChangeFile) {
         createFile();
-      } else if (src) {
+      } else if (src && !isChangeFile) {
         convertToLocalFile(src as File);
+      }
+      if (!src) {
+        setImagePreview(imageDefault);
+        setAudioPreview("");
       }
     }, [src]);
 

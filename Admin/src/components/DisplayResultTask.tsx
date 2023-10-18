@@ -10,6 +10,7 @@ export function DisplayResultTask() {
 
   return (
     <Container>
+      <Text>Вид: {data && data[0]?.kind}</Text>
       {data &&
         data[0]?.data.map((item, index) => {
           if (item.type === "text") {

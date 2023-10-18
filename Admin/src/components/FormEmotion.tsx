@@ -18,6 +18,7 @@ export function FormEmotion() {
     reset,
     formState: { errors },
   } = useForm<FormEmotion>({
+    mode: "onChange",
     resolver: yupResolver(schemaEmotion) as unknown as Resolver<FormEmotion>,
   });
   const { fields, append, remove, replace } = useFieldArray({

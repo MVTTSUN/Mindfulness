@@ -1,17 +1,28 @@
+import { useSelector } from "react-redux";
 import styled from "styled-components";
+import { getIsLoadingServer } from "../store/isLoadingServer";
+import { useDeferredRender } from "../hooks/useDeferredRender";
 
 export function Preloader() {
+  const isLoadingServer = useSelector(getIsLoadingServer);
+  const isActivePreloader = useDeferredRender(isLoadingServer, 1000);
+
   return (
-    <Blur>
-      <LdsRipple>
-        <Div></Div>
-        <Div></Div>
-      </LdsRipple>
-    </Blur>
+    <>
+      {isActivePreloader && (
+        <Blur>
+          <LdsRipple>
+            <Div></Div>
+            <Div></Div>
+          </LdsRipple>
+        </Blur>
+      )}
+    </>
   );
 }
 
 const Blur = styled.div`
+  z-index: 100;
   position: fixed;
   inset: 0;
   display: flex;

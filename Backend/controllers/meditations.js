@@ -60,7 +60,7 @@ const getMeditationFile = async (req, res, next) => {
 
     res.set('Content-Type', file[0].contentType);
 
-    if (file[0] && file[0].contentType.includes('audio')) {
+    if (file[0] && req.headers.range) {
       const fileLength = file[0].length;
       const parts = req.headers.range.replace(/bytes=/, '').split('-');
       const partialStart = parts[0];
@@ -167,7 +167,13 @@ const patchMeditation = async (req, res, next) => {
 
     const updateMeditation = await Meditation.findByIdAndUpdate(
       req.params.id,
-      { title, kind, image: req.files[0].filename, audio: req.files[1].filename, textLines },
+      {
+        title,
+        kind,
+        image: req.files[0].filename,
+        audio: req.files[1].filename,
+        textLines: JSON.parse(textLines),
+      },
       { new: true, runValidators: true }
     );
 

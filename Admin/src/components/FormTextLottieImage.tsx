@@ -40,6 +40,9 @@ import { InputSelect } from "./InputSelect";
 
 export function FormTextLottieImage() {
   const data = useOutletContext<DataTextLottieImage[]>();
+  const { pathname } = useLocation();
+  const routeName =
+    pathname === BrowserRoute.Tip + BrowserRoute.Edit ? "tips" : "tasks";
   const dataFieldsAdapted =
     data &&
     data[0]?.data.map((item) => ({
@@ -48,15 +51,15 @@ export function FormTextLottieImage() {
         ? item.payload
         : `${BASE_URL}/${routeName}/filename/${item.payload}`) as string,
     }));
-  const { pathname } = useLocation();
-  const routeName =
-    pathname === BrowserRoute.Tip + BrowserRoute.Edit ? "tips" : "tasks";
+
   const methods = useForm<FormTextLottieImage>({
+    mode: "onChange",
     resolver: yupResolver(
       schemaTextLottieImage(pathname.includes(BrowserRoute.Task))
     ) as unknown as Resolver<FormTextLottieImage>,
     defaultValues: {
       title: pathname.includes(BrowserRoute.Task) ? data && data[0]?.title : "",
+      kind: data && data[0]?.kind,
       fields: dataFieldsAdapted,
     },
   });
@@ -118,10 +121,17 @@ export function FormTextLottieImage() {
 
   useEffect(() => {
     if (data) {
-      data && data[0]?.title && setValue("title", data[0]?.title);
+      setValue("title", data[0]?.title);
+      setValue("kind", data[0]?.kind);
       replace(dataFieldsAdapted);
     }
   }, [data]);
+
+  useEffect(() => {
+    if (fields.length === 0 && !fields[0]?.type) {
+      replace([]);
+    }
+  }, []);
 
   return (
     <FormProvider {...methods}>
@@ -178,9 +188,10 @@ export function FormTextLottieImage() {
                                         onChange={onChange}
                                         src={
                                           dataRef.current &&
+                                          dataRef.current[index] &&
                                           field.payload !== "" &&
                                           typeof field.payload === "string"
-                                            ? `${BASE_URL}/${routeName}/filename/${dataRef.current[index].payload}`
+                                            ? `${BASE_URL}/${routeName}/filename/${dataRef.current[index]?.payload}`
                                             : field.payload
                                         }
                                       />
@@ -208,9 +219,10 @@ export function FormTextLottieImage() {
                                         onChange={onChange}
                                         src={
                                           dataRef.current &&
+                                          dataRef.current[index] &&
                                           field.payload !== "" &&
                                           typeof field.payload === "string"
-                                            ? `${BASE_URL}/${routeName}/filename/${dataRef.current[index].payload}`
+                                            ? `${BASE_URL}/${routeName}/filename/${dataRef.current[index]?.payload}`
                                             : field.payload
                                         }
                                       />

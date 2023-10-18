@@ -37,7 +37,7 @@ export function Player() {
     }
   };
 
-  const changeDuration = (evt: ChangeEvent<HTMLInputElement>) => {
+  const changeTimeAudio = (evt: ChangeEvent<HTMLInputElement>) => {
     if (audio) {
       const value = Number(evt.target.value);
 
@@ -103,7 +103,7 @@ export function Player() {
           <Time>{currentTime.toFixed(1)}</Time>
           <LineBar
             value={currentTime}
-            onChange={changeDuration}
+            onChange={changeTimeAudio}
             step={1}
             min={0}
             max={Math.floor(duration)}
@@ -117,6 +117,7 @@ export function Player() {
 }
 
 const PlayerStyled = styled.div`
+  z-index: 10;
   box-sizing: border-box;
   padding: 10px 0;
   display: flex;

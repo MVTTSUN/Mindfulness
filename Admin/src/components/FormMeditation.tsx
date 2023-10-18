@@ -16,7 +16,12 @@ import { DropFileInput } from "./DropFileInput";
 import { Textarea } from "./Textarea";
 import styled from "styled-components";
 import { FontSizeStandard, ResetButton } from "../mixins";
-import { BrowserRoute, Color, OPTIONS_KIND_MEDITATIONS } from "../const";
+import {
+  BASE_URL,
+  BrowserRoute,
+  Color,
+  OPTIONS_KIND_MEDITATIONS,
+} from "../const";
 import { useEffect, useState } from "react";
 import { useAppSelector } from "../hooks/useAppSelector";
 import { getCurrentTime, getIsPause } from "../store/currentAudioSelectors";
@@ -25,16 +30,32 @@ import {
   useAddMeditationMutation,
   useUpdateMeditationMutation,
 } from "../services/api";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useOutletContext } from "react-router-dom";
+import { DataMeditation } from "../types/get-results";
+import {
+  DragDropContext,
+  Draggable,
+  Droppable,
+  OnDragEndResponder,
+} from "@hello-pangea/dnd";
 
 export function FormMeditation() {
+  const data = useOutletContext<DataMeditation>();
   const [textLines, setTextLines] = useState<TextLine[]>([]);
   const isPause = useAppSelector(getIsPause);
   const currentTime = useAppSelector(getCurrentTime);
   const methods = useForm<FormMeditation>({
+    mode: "onChange",
     resolver: yupResolver(
       schemaMeditation
     ) as unknown as Resolver<FormMeditation>,
+    defaultValues: {
+      title: data ? data.title : "",
+      kind: data ? data.kind : "",
+      image: data ? `${BASE_URL}/meditations/filename/${data?.image}` : "",
+      audio: data ? `${BASE_URL}/meditations/filename/${data?.audio}` : "",
+      textLines: data ? data.textLines : [],
+    },
   });
   const {
     register,
@@ -42,9 +63,10 @@ export function FormMeditation() {
     control,
     getValues,
     reset,
+    setValue,
     formState: { errors },
   } = methods;
-  const { fields, append, remove, replace } = useFieldArray({
+  const { fields, append, remove, replace, move } = useFieldArray({
     control,
     name: "textLines",
   } as { name: string });
@@ -56,17 +78,20 @@ export function FormMeditation() {
     useUpdateMeditationMutation();
   const isLoading = isLoadingAdd || isLoadingPatch;
 
-  const onSubmit = handleSubmit(async (data) => {
+  const onSubmit = handleSubmit(async (dataForm) => {
     if (pathname === BrowserRoute.Meditation) {
-      await addMeditation(data);
+      await addMeditation(dataForm);
       reset();
       replace([]);
+    } else if (pathname.includes(BrowserRoute.Meditation)) {
+      await patchMeditation({ id: data._id, data: dataForm });
+      navigate(-1);
     }
   });
 
   const getIsActiveInput = (index: number) => {
-    const timeAt = textLines[index]?.timeAt;
-    const timeTo = textLines[index]?.timeTo;
+    const timeAt = textLines[index]?.timeAt as number;
+    const timeTo = textLines[index]?.timeTo as number;
 
     if (timeAt && timeTo) {
       return timeAt <= currentTime && timeTo >= currentTime;
@@ -74,11 +99,27 @@ export function FormMeditation() {
     return false;
   };
 
+  const handleDrag: OnDragEndResponder = ({ source, destination }) => {
+    if (destination) {
+      move(source.index, destination.index);
+    }
+  };
+
   useEffect(() => {
     if (!isPause) {
       setTextLines(getValues("textLines"));
     }
   }, [isPause]);
+
+  useEffect(() => {
+    if (data) {
+      setValue("title", data?.title);
+      setValue("kind", data?.kind);
+      setValue("image", `${BASE_URL}/meditations/filename/${data?.image}`);
+      setValue("audio", `${BASE_URL}/meditations/filename/${data?.audio}`);
+      replace(data.textLines);
+    }
+  }, [data]);
 
   return (
     <FormProvider {...methods}>
@@ -100,7 +141,7 @@ export function FormMeditation() {
         <Controller
           name="image"
           control={control}
-          render={({ field: { onChange } }) => {
+          render={({ field: { onChange, value } }) => {
             return (
               <DropFileInput
                 labelText="Изображение"
@@ -109,6 +150,7 @@ export function FormMeditation() {
                 name="image"
                 type="image"
                 onChange={onChange}
+                src={value}
               />
             );
           }}
@@ -117,7 +159,7 @@ export function FormMeditation() {
         <Controller
           name="audio"
           control={control}
-          render={({ field: { onChange } }) => {
+          render={({ field: { onChange, value } }) => {
             return (
               <DropFileInput
                 labelText="Аудио"
@@ -126,53 +168,86 @@ export function FormMeditation() {
                 name="audio"
                 type="audio"
                 onChange={onChange}
+                src={value}
               />
             );
           }}
         />
         <ErrorField>{errors.audio?.message}</ErrorField>
         <Label htmlFor="textLines.0.text">Строчки аудиозаписи</Label>
-        {fields.map((field, index) => (
-          <FieldContainer key={field.id}>
-            <InputContainer>
-              <Textarea
-                {...register(`textLines.${index}.text` as never)}
-                rows={1}
-                isAutosize
-                isActive={getIsActiveInput(index)}
-              />
-              <ButtonClose onClick={() => remove(index)} />
-            </InputContainer>
-            <TimeInputsContainer>
-              <TimeInputContainer>
-                <Label htmlFor={`textLines.${index}.timeAt`}>
-                  Начало(с.мс)
-                </Label>
-                <Input
-                  isNotArray
-                  {...register(`textLines.${index}.timeAt` as never)}
-                  isActive={getIsActiveInput(index)}
-                  type="number"
-                />
-              </TimeInputContainer>
-              <TimeInputContainer>
-                <Label htmlFor={`textLines.${index}.timeTo`}>Конец(с.мс)</Label>
-                <Input
-                  isNotArray
-                  {...register(`textLines.${index}.timeTo` as never)}
-                  isActive={getIsActiveInput(index)}
-                  type="number"
-                />
-              </TimeInputContainer>
-            </TimeInputsContainer>
-            <ErrorField>
-              {errors.textLines &&
-                (errors.textLines[index]?.text?.message ||
-                  errors.textLines[index]?.timeAt?.message ||
-                  errors.textLines[index]?.timeTo?.message)}
-            </ErrorField>
-          </FieldContainer>
-        ))}
+        <DragDropContext onDragEnd={handleDrag}>
+          <div>
+            <Droppable droppableId="test-fields">
+              {(provided) => (
+                <FieldsContainer
+                  {...provided.droppableProps}
+                  ref={provided.innerRef}
+                >
+                  {fields.map((_, index) => (
+                    <Draggable
+                      key={`test[${index}]`}
+                      draggableId={`field-${index}`}
+                      index={index}
+                    >
+                      {(provided) => (
+                        <FieldContainer
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                        >
+                          <InputContainer>
+                            <ButtonMove {...provided.dragHandleProps} />
+                            <Textarea
+                              {...register(`textLines.${index}.text` as never)}
+                              rows={1}
+                              isAutosize
+                              isActive={getIsActiveInput(index)}
+                            />
+                            <ButtonClose onClick={() => remove(index)} />
+                          </InputContainer>
+                          <TimeInputsContainer>
+                            <TimeInputContainer>
+                              <Label htmlFor={`textLines.${index}.timeAt`}>
+                                Начало(с.мс)
+                              </Label>
+                              <Input
+                                isNotArray
+                                {...register(
+                                  `textLines.${index}.timeAt` as never
+                                )}
+                                isActive={getIsActiveInput(index)}
+                                type="number"
+                              />
+                            </TimeInputContainer>
+                            <TimeInputContainer>
+                              <Label htmlFor={`textLines.${index}.timeTo`}>
+                                Конец(с.мс)
+                              </Label>
+                              <Input
+                                isNotArray
+                                {...register(
+                                  `textLines.${index}.timeTo` as never
+                                )}
+                                isActive={getIsActiveInput(index)}
+                                type="number"
+                              />
+                            </TimeInputContainer>
+                          </TimeInputsContainer>
+                          <ErrorField>
+                            {errors.textLines &&
+                              (errors.textLines[index]?.text?.message ||
+                                errors.textLines[index]?.timeAt?.message ||
+                                errors.textLines[index]?.timeTo?.message)}
+                          </ErrorField>
+                        </FieldContainer>
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
+                </FieldsContainer>
+              )}
+            </Droppable>
+          </div>
+        </DragDropContext>
         <Button
           type="button"
           onClick={() => {
@@ -182,7 +257,7 @@ export function FormMeditation() {
 
             append({
               text: "",
-              timeAt: lastTimeTo ? (Number(lastTimeTo) + 0.1).toFixed(1) : null,
+              timeAt: lastTimeTo ? Number(lastTimeTo) : null,
               timeTo: null,
             });
           }}
@@ -228,9 +303,22 @@ const TimeInputContainer = styled.div`
   gap: 10px;
 `;
 
+const ButtonMove = styled.div`
+  ${ResetButton}
+  width: 30px;
+  height: 30px;
+  background: url(/images/move.svg) no-repeat center;
+`;
+
 const ButtonClose = styled.button`
   ${ResetButton}
   width: 30px;
   height: 30px;
   background: url(/images/close.svg) no-repeat center;
+`;
+
+const FieldsContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 `;

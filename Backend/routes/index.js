@@ -7,6 +7,7 @@ const tipRouter = require('./tips');
 const emotionRouter = require('./emotions');
 const infoRouter = require('./info');
 const taskRouter = require('./tasks');
+const statisticRouter = require('./statistics');
 // const authMiddleware = require('../middlewares/auth');
 
 // router.use(authRouter);
@@ -17,6 +18,8 @@ router.use(tipRouter);
 router.use(emotionRouter);
 router.use(taskRouter);
 router.use(meditationRouter);
+router.use(statisticRouter);
+
 router.use(otherRouter);
 
 module.exports = router;

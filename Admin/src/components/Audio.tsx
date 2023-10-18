@@ -12,13 +12,17 @@ import {
   setDuration,
 } from "../store/currentAudioSlice";
 import { useFrameInterval } from "../hooks/useFrameInterval";
+import { Player } from "./Player";
+import { createPortal } from "react-dom";
 
 type AudioProps = {
   src: string;
+  paddingButton?: string;
 };
 
 export function Audio(props: AudioProps) {
-  const { src } = props;
+  const [isOpen, setIsOpen] = useState(false);
+  const { src, paddingButton } = props;
   const dispatch = useAppDispatch();
   const isPause = useAppSelector(getIsPause);
   const refAudio = useRef<HTMLAudioElement | null>(null);
@@ -30,6 +34,7 @@ export function Audio(props: AudioProps) {
   });
 
   const togglePlayAndPause = () => {
+    setIsOpen(true);
     if (refAudio?.current?.paused && src) {
       isFirstPlay && refAudio.current?.load();
       setIsFirstPlay(false);
@@ -91,7 +96,8 @@ export function Audio(props: AudioProps) {
       <PlayButton
         type="button"
         onClick={togglePlayAndPause}
-        disabled={src === ""}
+        disabled={!src}
+        $paddingButton={paddingButton}
       >
         {isPause ? (
           <img src="/images/play.svg" alt="Играть" />
@@ -99,13 +105,15 @@ export function Audio(props: AudioProps) {
           <img src="/images/pause.svg" alt="Пауза" />
         )}
       </PlayButton>
+      {isOpen && createPortal(<Player />, document.body)}
     </>
   );
 }
 
-const PlayButton = styled.button`
+const PlayButton = styled.button<{ $paddingButton?: string }>`
   ${ResetButton}
-  padding: 40px;
+  padding: ${({ $paddingButton }) =>
+    $paddingButton ? $paddingButton : "40px"};
   aspect-ratio: 1 / 1;
   height: 100%;
   border-radius: 100px;

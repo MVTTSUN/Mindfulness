@@ -29,7 +29,7 @@ const root = ReactDOM.createRoot(
 );
 
 root.render(
-  <React.StrictMode>
+  <>
     <GlobalStyle />
     <Provider store={store}>
       <HistoryRouter history={browserHistory}>
@@ -47,5 +47,5 @@ root.render(
         <App />
       </HistoryRouter>
     </Provider>
-  </React.StrictMode>
+  </>
 );

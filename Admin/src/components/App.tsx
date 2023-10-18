@@ -9,12 +9,8 @@ import { TasksPage } from "../pages/TasksPage";
 import { MeditationsPage } from "../pages/MeditationsPage";
 import { EmotionsPage } from "../pages/EmotionsPage";
 import { InformationPage } from "../pages/InformationPage";
-import { Player } from "./Player";
-import { useAppSelector } from "../hooks/useAppSelector";
-import { getAudioSrc, getIsPause } from "../store/currentAudioSelectors";
-import { useEffect, useState } from "react";
 import { HelmetProvider } from "react-helmet-async";
-import { Statistics } from "../pages/Statistics";
+import { StatisticsPage } from "../pages/StatisticsPage";
 import { Auth } from "../pages/Auth";
 import { TaskPage } from "../pages/TaskPage";
 import { DisplayResultTips } from "./DisplayResultTips";
@@ -22,27 +18,12 @@ import { FormTextLottieImage } from "./FormTextLottieImage";
 import { DisplayResultInfo } from "./DisplayResultInfo";
 import { FormInformation } from "./FormInformation";
 import { DisplayResultTask } from "./DisplayResultTask";
-import { getIsLoadingServer } from "../store/isLoadingServer";
-import { useSelector } from "react-redux";
 import { Preloader } from "./Preloader";
-import { useDeferredRender } from "../hooks/useDeferredRender";
 import { DisplayResultMeditation } from "./DisplayResultMeditation";
 import { MeditationPage } from "../pages/MeditationPage";
 import { FormMeditation } from "./FormMeditation";
 
 export function App() {
-  const isLoadingServer = useSelector(getIsLoadingServer);
-  const isPause = useAppSelector(getIsPause);
-  const srcAudio = useAppSelector(getAudioSrc);
-  const [isFirstPlayAudio, setIsFirstPlayAudio] = useState(false);
-  const isActivePreloader = useDeferredRender(isLoadingServer, 1000);
-
-  useEffect(() => {
-    if (!isPause) {
-      setIsFirstPlayAudio(true);
-    }
-  }, [isPause]);
-
   return (
     <HelmetProvider>
       <Header />
@@ -92,7 +73,10 @@ export function App() {
                   element={<FormInformation />}
                 />
               </Route>
-              <Route path={BrowserRoute.Statistic} element={<Statistics />} />
+              <Route
+                path={BrowserRoute.Statistic}
+                element={<StatisticsPage />}
+              />
               <Route path={BrowserRoute.Login} element={<Auth />} />
               <Route path={BrowserRoute.Register} element={<Auth />} />
             </Route>
@@ -103,8 +87,7 @@ export function App() {
           </Routes>
         </CenterContainer>
       </Main>
-      {isFirstPlayAudio && srcAudio !== "" && <Player />}
-      {isActivePreloader && <Preloader />}
+      <Preloader />
     </HelmetProvider>
   );
 }

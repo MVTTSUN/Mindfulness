@@ -35,15 +35,15 @@ type FormInformation = {
 };
 
 type TextLine = {
-  timeAt: number | null;
-  timeTo: number | null;
+  timeAt: number | null | string;
+  timeTo: number | null | string;
   text: string;
 };
 
 type FormMeditation = {
   title: string;
-  image: File;
-  audio: File;
+  image: File | string;
+  audio: File | string;
   textLines: TextLine[];
   kind: string;
 };

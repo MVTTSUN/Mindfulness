@@ -13,9 +13,10 @@ const {
   deleteTask,
   patchTask,
 } = require('../controllers/tasks');
+const statisticsMiddleware = require('../middlewares/statistics');
 
 router.get('/tasks', getTasks);
-router.get('/tasks/:id', getTask);
+router.get('/tasks/:id', statisticsMiddleware, getTask);
 router.get('/tasks/filename/:filename', getTaskFile);
 router.post('/tasks', postTaskCelebrate, uploadTasks.array('file'), postTask);
 router.delete('/tasks/:id', deleteTaskCelebrate, deleteTask);

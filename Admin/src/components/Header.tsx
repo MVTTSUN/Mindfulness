@@ -61,6 +61,7 @@ export function Header() {
 }
 
 const HeaderStyled = styled.header`
+  z-index: 10;
   position: fixed;
   width: 100%;
   box-sizing: border-box;

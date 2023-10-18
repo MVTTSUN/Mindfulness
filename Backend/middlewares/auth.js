@@ -5,7 +5,7 @@ const { DEV_JWT_SECRET } = require('../config');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
 
-module.exports = (req, res, next) => {
+module.exports = (req, _, next) => {
   const token = req.cookies.jwt;
   let payload;
 

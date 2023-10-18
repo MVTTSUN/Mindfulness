@@ -15,13 +15,10 @@ export function TaskPage() {
   const { pathname } = useLocation();
   const dataTest = [data];
 
-  const navigateEditAndBack = () => {
-    if (pathname === `${BrowserRoute.Task}/${id}`) {
-      navigate(`${BrowserRoute.Task}/${id}` + BrowserRoute.Edit);
-    } else {
-      navigate(-1);
-    }
-  };
+  const navigateBack = () => navigate(-1);
+
+  const navigateEdit = () =>
+    navigate(`${BrowserRoute.Task}/${id}` + BrowserRoute.Edit);
 
   return (
     <>
@@ -32,9 +29,14 @@ export function TaskPage() {
       <ContainerOneSide>
         {!errorError && (
           <>
-            <Button type="button" onClick={navigateEditAndBack} isPrimary>
-              {pathname === `${BrowserRoute.Task}/${id}` ? textEdit : "Назад"}
+            <Button type="button" onClick={navigateBack} isPrimary>
+              Назад
             </Button>
+            {pathname === `${BrowserRoute.Task}/${id}` && (
+              <Button type="button" onClick={navigateEdit} isPrimary>
+                {textEdit}
+              </Button>
+            )}
             <Outlet context={dataTest} />
           </>
         )}

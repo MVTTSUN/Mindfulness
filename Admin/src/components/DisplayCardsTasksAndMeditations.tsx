@@ -55,6 +55,7 @@ const Container = styled.ul`
   flex-wrap: wrap;
   gap: 10px;
   width: 320px;
+  align-content: baseline;
 `;
 
 const LinkStyled = styled(Link)`

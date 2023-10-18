@@ -5,6 +5,9 @@
     "comma-dangle": "off",
     "object-curly-newline": "off",
     "consistent-return": "off",
-    "implicit-arrow-linebreak": "off"
+    "implicit-arrow-linebreak": "off",
+    "operator-linebreak": "off",
+    "no-useless-constructor": "off",
+    "indent": "off"
   }
 }

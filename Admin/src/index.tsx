@@ -12,6 +12,11 @@ import { HistoryRouter } from "./components/HistoryRouter.tsx";
 import { browserHistory } from "./utils/browserHistory.ts";
 
 const GlobalStyle = createGlobalStyle`
+  html {
+    width:100vw;
+    overflow-x:hidden;
+  }
+
   body {
     background-color: ${Color.BackgroundMain};
     color: ${Color.TextStandard};

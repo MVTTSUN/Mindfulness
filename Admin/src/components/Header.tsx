@@ -63,7 +63,7 @@ export function Header() {
 const HeaderStyled = styled.header`
   z-index: 10;
   position: fixed;
-  width: 100%;
+  width: 100vw;
   box-sizing: border-box;
   background-color: ${Color.Pastel};
   padding: 20px 0;

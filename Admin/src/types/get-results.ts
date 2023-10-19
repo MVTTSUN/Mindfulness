@@ -48,12 +48,29 @@ type DataMeditation = {
   _id: string;
 };
 
-type DataStatistics = {
+type MonthStatistics = {
+  month: number;
+  count: number;
+  android: number;
+  ios: number;
+};
+
+type YearStatistics = {
+  year: number;
+  months: MonthStatistics[];
+  count: number;
+};
+
+type TaskAndMeditationStatistics = {
   title: string;
-  kind: string;
-  created: string;
-  device: string;
-  _id: string;
+  count: number;
+  years: YearStatistics[];
+};
+
+type DataStatistics = {
+  meditations: TaskAndMeditationStatistics[];
+  tasks: TaskAndMeditationStatistics[];
+  count: number;
 };
 
 export type {

@@ -126,7 +126,7 @@ const PlayerStyled = styled.div`
   position: fixed;
   bottom: 0;
   height: 100px;
-  width: 100%;
+  width: 100vw;
   background-color: ${Color.Pastel};
 `;
 

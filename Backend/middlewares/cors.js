@@ -1,4 +1,8 @@
-const allowedCors = ['https://localhost:5173', 'http://localhost:5173', 'http://localhost:3005'];
+const allowedCors = [
+  'https://localhost:5173',
+  'http://localhost:5173',
+  'http://192.168.1.111:5173',
+];
 
 module.exports = (req, res, next) => {
   const { origin } = req.headers;

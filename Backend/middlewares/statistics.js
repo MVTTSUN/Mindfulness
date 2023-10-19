@@ -5,7 +5,7 @@ const { Socket } = require('../utils/socket');
 
 module.exports = async (req, _, next) => {
   try {
-    const { url, headers } = req;
+    const { url, headers, originalUrl } = req;
     const { id } = req.params;
     const statistics = await Statistic.find({});
     const device = headers['user-agent']
@@ -26,7 +26,7 @@ module.exports = async (req, _, next) => {
       let meditation;
       let task;
 
-      if (url.includes('meditations')) {
+      if (url.includes('meditations') || originalUrl.includes('meditations')) {
         const { title } = await Meditation.findOne({ _id: id });
 
         if (statistic.meditations.length !== 0) {
@@ -40,22 +40,18 @@ module.exports = async (req, _, next) => {
                     const yearCount = statistic.meditations[i].years[j].count + 1;
                     const currentYear = statistic.meditations[i].years[j].year;
 
-                    if (statistic.meditations[i].years[j].months !== 0) {
-                      for (
-                        let k = 0;
-                        k < statistic.meditations[i].years[j].months.length - 1;
-                        k += 1
-                      ) {
+                    if (statistic.meditations[i].years[j].months.length !== 0) {
+                      for (let k = 0; k < statistic.meditations[i].years[j].months.length; k += 1) {
                         if (
                           statistic.meditations[i].years[j].months[k].month ===
                           new Date().getMonth()
                         ) {
                           const monthCount = statistic.meditations[i].years[j].months[k].count + 1;
                           const currentMonth = statistic.meditations[i].years[j].months[k].month;
-                          let androidCount;
-                          let IOSCount;
+                          let androidCount = statistic.meditations[i].years[j].months[k].android;
+                          let IOSCount = statistic.meditations[i].years[j].months[k].ios;
 
-                          if (device === 'android') {
+                          if (device === 'windows') {
                             androidCount = statistic.meditations[i].years[j].months[k].android + 1;
                           } else {
                             IOSCount = statistic.meditations[i].years[j].months[k].ios + 1;
@@ -75,7 +71,7 @@ module.exports = async (req, _, next) => {
                           let countAndroidScope = 0;
                           let countIOSScope = 0;
 
-                          if (device === 'android') {
+                          if (device === 'windows') {
                             countAndroidScope = 1;
                           } else {
                             countIOSScope = 1;
@@ -93,7 +89,7 @@ module.exports = async (req, _, next) => {
                       let countAndroidScope = 0;
                       let countIOSScope = 0;
 
-                      if (device === 'android') {
+                      if (device === 'windows') {
                         countAndroidScope = 1;
                       } else {
                         countIOSScope = 1;
@@ -120,7 +116,7 @@ module.exports = async (req, _, next) => {
                     let countAndroidScope = 0;
                     let countIOSScope = 0;
 
-                    if (device === 'android') {
+                    if (device === 'windows') {
                       countAndroidScope = 1;
                     } else {
                       countIOSScope = 1;
@@ -144,7 +140,7 @@ module.exports = async (req, _, next) => {
                 let countAndroidScope = 0;
                 let countIOSScope = 0;
 
-                if (device === 'android') {
+                if (device === 'windows') {
                   countAndroidScope = 1;
                 } else {
                   countIOSScope = 1;
@@ -177,7 +173,7 @@ module.exports = async (req, _, next) => {
               let countAndroidScope = 0;
               let countIOSScope = 0;
 
-              if (device === 'android') {
+              if (device === 'windows') {
                 countAndroidScope = 1;
               } else {
                 countIOSScope = 1;
@@ -207,7 +203,7 @@ module.exports = async (req, _, next) => {
           let countAndroidScope = 0;
           let countIOSScope = 0;
 
-          if (device === 'android') {
+          if (device === 'windows') {
             countAndroidScope = 1;
           } else {
             countIOSScope = 1;
@@ -234,7 +230,7 @@ module.exports = async (req, _, next) => {
         }
       }
 
-      if (url.includes('tasks')) {
+      if (url.includes('tasks') || originalUrl.includes('tasks')) {
         const { title } = await Task.findOne({ _id: id });
 
         if (statistic.tasks.length !== 0) {
@@ -248,15 +244,15 @@ module.exports = async (req, _, next) => {
                     const yearCount = statistic.tasks[i].years[j].count + 1;
                     const currentYear = statistic.tasks[i].years[j].year;
 
-                    if (statistic.tasks[i].years[j].months !== 0) {
-                      for (let k = 0; k < statistic.tasks[i].years[j].months.length - 1; k += 1) {
+                    if (statistic.tasks[i].years[j].months.length !== 0) {
+                      for (let k = 0; k < statistic.tasks[i].years[j].months.length; k += 1) {
                         if (statistic.tasks[i].years[j].months[k].month === new Date().getMonth()) {
                           const monthCount = statistic.tasks[i].years[j].months[k].count + 1;
                           const currentMonth = statistic.tasks[i].years[j].months[k].month;
-                          let androidCount;
-                          let IOSCount;
+                          let androidCount = statistic.tasks[i].years[j].months[k].android;
+                          let IOSCount = statistic.tasks[i].years[j].months[k].ios;
 
-                          if (device === 'android') {
+                          if (device === 'windows') {
                             androidCount = statistic.tasks[i].years[j].months[k].android + 1;
                           } else {
                             IOSCount = statistic.tasks[i].years[j].months[k].ios + 1;
@@ -276,7 +272,7 @@ module.exports = async (req, _, next) => {
                           let countAndroidScope = 0;
                           let countIOSScope = 0;
 
-                          if (device === 'android') {
+                          if (device === 'windows') {
                             countAndroidScope = 1;
                           } else {
                             countIOSScope = 1;
@@ -294,7 +290,7 @@ module.exports = async (req, _, next) => {
                       let countAndroidScope = 0;
                       let countIOSScope = 0;
 
-                      if (device === 'android') {
+                      if (device === 'windows') {
                         countAndroidScope = 1;
                       } else {
                         countIOSScope = 1;
@@ -321,7 +317,7 @@ module.exports = async (req, _, next) => {
                     let countAndroidScope = 0;
                     let countIOSScope = 0;
 
-                    if (device === 'android') {
+                    if (device === 'windows') {
                       countAndroidScope = 1;
                     } else {
                       countIOSScope = 1;
@@ -345,7 +341,7 @@ module.exports = async (req, _, next) => {
                 let countAndroidScope = 0;
                 let countIOSScope = 0;
 
-                if (device === 'android') {
+                if (device === 'windows') {
                   countAndroidScope = 1;
                 } else {
                   countIOSScope = 1;
@@ -378,7 +374,7 @@ module.exports = async (req, _, next) => {
               let countAndroidScope = 0;
               let countIOSScope = 0;
 
-              if (device === 'android') {
+              if (device === 'windows') {
                 countAndroidScope = 1;
               } else {
                 countIOSScope = 1;
@@ -408,7 +404,7 @@ module.exports = async (req, _, next) => {
           let countAndroidScope = 0;
           let countIOSScope = 0;
 
-          if (device === 'android') {
+          if (device === 'windows') {
             countAndroidScope = 1;
           } else {
             countIOSScope = 1;
@@ -445,12 +441,12 @@ module.exports = async (req, _, next) => {
         { new: true, runValidators: true }
       );
     } else {
-      if (url.includes('meditations')) {
+      if (url.includes('meditations') || originalUrl.includes('meditations')) {
         const { title } = await Meditation.findOne({ _id: id });
         let androidCount = 0;
         let IOSCount = 0;
 
-        if (device === 'android') {
+        if (device === 'windows') {
           androidCount = 1;
         } else {
           IOSCount = 1;
@@ -482,12 +478,12 @@ module.exports = async (req, _, next) => {
         });
       }
 
-      if (url.includes('tasks')) {
+      if (url.includes('tasks') || originalUrl.includes('tasks')) {
         const { title } = await Task.findOne({ _id: id });
         let androidCount = 0;
         let IOSCount = 0;
 
-        if (device === 'android') {
+        if (device === 'windows') {
           androidCount = 1;
         } else {
           IOSCount = 1;
@@ -521,24 +517,6 @@ module.exports = async (req, _, next) => {
     }
 
     Socket.emit('statistics', updateStatistics);
-
-    // if (url.includes('tasks')) {
-    //   const { title } = await Task.findOne({ _id: id });
-
-    //   await Statistic.create({
-    //     title,
-    //     kind: 'task',
-    //     created: new Date(),
-    //     device: headers['user-agent'].match(/(?<=\().*?(?=;)/)[0].split(' ')[0],
-    //   });
-
-    //   Socket.emit('statistics', {
-    //     title,
-    //     kind: 'task',
-    //     created: new Date(),
-    //     device: headers['user-agent'].match(/(?<=\().*?(?=;)/)[0].split(' ')[0],
-    //   });
-    // }
   } catch (err) {
     console.log(err);
   }

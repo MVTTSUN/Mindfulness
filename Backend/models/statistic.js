@@ -1,14 +1,14 @@
 const mongoose = require('mongoose');
 
 const monthSchema = new mongoose.Schema({
-  month: String,
+  month: Number,
   count: { type: Number, default: 0 },
   android: Number,
   ios: Number,
 });
 
 const yearSchema = new mongoose.Schema({
-  year: String,
+  year: Number,
   months: [monthSchema],
   count: { type: Number, default: 0 },
 });

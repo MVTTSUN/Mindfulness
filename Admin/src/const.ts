@@ -1,3 +1,5 @@
+import { getYears } from "./utils/utils";
+
 enum BrowserRoute {
   Main = "/",
   Login = "/signin",
@@ -34,14 +36,36 @@ enum ErrorText {
 
 enum Slice {
   CurrentAudio = "currentAudio",
+  Statistics = "statistics",
 }
 
-const BASE_URL = "http://localhost:3000";
+const BASE_URL = "http://192.168.1.111:3000";
 
 const MAX_SIZE_IMAGE = 200;
 
 const OPTIONS_KIND_MEDITATIONS = ["Легкая", "Средняя", "Сложная"];
 const OPTIONS_KIND_TASKS = ["Легкое", "Среднее", "Сложное"];
+
+const FILTER_YEARS = getYears();
+const FILTER_TYPE = [
+  { name: "Все", value: "all" },
+  { name: "Медитации", value: "meditations" },
+  { name: "Задания", value: "tasks" },
+];
+const FILTER_MONTHS = [
+  "Янв",
+  "Фев",
+  "Мар",
+  "Апр",
+  "Май",
+  "Июн",
+  "Июл",
+  "Авг",
+  "Сен",
+  "Окт",
+  "Ноя",
+  "Дек",
+];
 
 export {
   BrowserRoute,
@@ -52,4 +76,7 @@ export {
   MAX_SIZE_IMAGE,
   OPTIONS_KIND_MEDITATIONS,
   OPTIONS_KIND_TASKS,
+  FILTER_YEARS,
+  FILTER_TYPE,
+  FILTER_MONTHS,
 };

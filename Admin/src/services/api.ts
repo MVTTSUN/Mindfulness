@@ -240,7 +240,7 @@ export const mindfulnessApi = createApi({
         }
       },
     }),
-    getStatistics: builder.query<DataStatistics[], void>({
+    getStatistics: builder.query<DataStatistics, void>({
       query: () => "statistics",
       async onCacheEntryAdded(
         _,
@@ -249,11 +249,7 @@ export const mindfulnessApi = createApi({
         const socket = io(BASE_URL);
         await cacheDataLoaded;
 
-        socket.on("statistics", (data) =>
-          updateCachedData((draft) => {
-            draft.push(data);
-          })
-        );
+        socket.on("statistics", (data) => updateCachedData(() => data));
 
         await cacheEntryRemoved;
         socket.close();

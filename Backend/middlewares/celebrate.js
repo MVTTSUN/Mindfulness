@@ -1,4 +1,22 @@
 const { celebrate, Joi } = require('celebrate');
+const Emotion = require('../models/emotion');
+const { errorMessages } = require('../const');
+
+const uniqueEmotions = async (emotions, { message }) => {
+  const dbEmotions = [];
+  const promise = emotions.map(async (emotion) => {
+    const dbEmotion = await Emotion.findOne({ value: emotion });
+
+    if (dbEmotion) {
+      dbEmotions.push(dbEmotion);
+    }
+  });
+  await Promise.all(promise);
+
+  if (dbEmotions.length !== 0) {
+    return message({ external: errorMessages.CONFLICT });
+  }
+};
 
 const signinCelebrate = celebrate({
   body: Joi.object().keys({
@@ -34,7 +52,7 @@ const postTipCelebrate = celebrate({
 
 const postEmotionCelebrate = celebrate({
   body: Joi.object().keys({
-    data: Joi.array().items(Joi.string()).required(),
+    data: Joi.array().items(Joi.string()).required().external(uniqueEmotions),
   }),
 });
 
@@ -63,13 +81,12 @@ const postInfoCelebrate = celebrate({
 
 const postTaskCelebrate = celebrate({
   body: Joi.object().keys({
-    title: Joi.string(),
-    kind: Joi.string(),
-    type: Joi.alternatives().try(
-      Joi.string().required(),
-      Joi.array().items(Joi.string()).required()
-    ),
-    text: Joi.alternatives().try(Joi.string(), Joi.array().items(Joi.string())),
+    title: Joi.string().required(),
+    kind: Joi.string().required(),
+    type: Joi.alternatives()
+      .try(Joi.string().required(), Joi.array().items(Joi.string()).required())
+      .required(),
+    text: Joi.alternatives().try(Joi.string(), Joi.array().items(Joi.string())).required(),
   }),
 });
 
@@ -80,26 +97,24 @@ const deleteTaskCelebrate = celebrate({
 });
 
 const patchTaskCelebrate = celebrate({
+  params: Joi.object().keys({
+    id: Joi.string().required(),
+  }),
   body: Joi.object().keys({
-    title: Joi.string(),
-    kind: Joi.string(),
-    type: Joi.alternatives().try(
-      Joi.string().required(),
-      Joi.array().items(Joi.string()).required()
-    ),
-    text: Joi.alternatives().try(Joi.string(), Joi.array().items(Joi.string())),
+    title: Joi.string().required(),
+    kind: Joi.string().required(),
+    type: Joi.alternatives()
+      .try(Joi.string().required(), Joi.array().items(Joi.string()).required())
+      .required(),
+    text: Joi.alternatives().try(Joi.string(), Joi.array().items(Joi.string())).required(),
   }),
 });
 
 const postMeditationCelebrate = celebrate({
   body: Joi.object().keys({
-    title: Joi.string(),
-    kind: Joi.string(),
-    textLines: Joi.array().items({
-      text: Joi.string(),
-      timeAt: Joi.string(),
-      timeTo: Joi.string(),
-    }),
+    title: Joi.string().required(),
+    kind: Joi.string().required(),
+    textLines: Joi.string(),
   }),
 });
 
@@ -110,14 +125,13 @@ const deleteMeditationCelebrate = celebrate({
 });
 
 const patchMeditationCelebrate = celebrate({
+  params: Joi.object().keys({
+    id: Joi.string().required(),
+  }),
   body: Joi.object().keys({
-    title: Joi.string(),
-    kind: Joi.string(),
-    textLines: Joi.array().items({
-      text: Joi.string(),
-      timeAt: Joi.string(),
-      timeTo: Joi.string(),
-    }),
+    title: Joi.string().required(),
+    kind: Joi.string().required(),
+    textLines: Joi.string(),
   }),
 });
 

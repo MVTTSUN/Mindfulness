@@ -34,8 +34,8 @@ export const DropFileInput = forwardRef(
     const [imagePreview, setImagePreview] = useState(src ? src : imageDefault);
     const [audioPreview, setAudioPreview] = useState("");
     const [lottiePreview, setLottiePreview] = useState(EmptyLottie);
-    const lottieRef = useRef(null);
     const [isChangeFile, setIsChangeFile] = useState(false);
+    const lottieRef = useRef(null);
 
     const convertToLocalFile = (file: File) => {
       onChange(file);
@@ -49,6 +49,7 @@ export const DropFileInput = forwardRef(
         reader.onload = (event: ProgressEvent<FileReader>) => {
           const str = event.target?.result as string;
           const json = JSON.parse(str);
+
           setLottiePreview(json);
         };
         reader.readAsText(file);
@@ -87,7 +88,6 @@ export const DropFileInput = forwardRef(
 
     const onDropHandler = (e: DragEvent) => {
       e.preventDefault();
-
       convertToLocalFileAfterDrop(e.dataTransfer);
     };
 
@@ -100,6 +100,7 @@ export const DropFileInput = forwardRef(
       if (src && typeof src === "string") {
         let extension = src.split(".").pop();
         const extensionName = extension;
+
         if (extension === "jpg") {
           extension = "jpeg";
         }
@@ -110,11 +111,11 @@ export const DropFileInput = forwardRef(
           const file = new File([data], `image.${extensionName}`, {
             type: `image/${extension}`,
           });
+
           onChange(file);
         } else if (type === "lottie") {
           const response = await fetch(src);
           const dataJson = await response.json();
-          setLottiePreview(dataJson);
           const str = JSON.stringify(dataJson);
           const bytes = new TextEncoder().encode(str);
           const blob = new Blob([bytes], {
@@ -123,6 +124,8 @@ export const DropFileInput = forwardRef(
           const file = new File([blob], `lottie.json`, {
             type: "application/json",
           });
+
+          setLottiePreview(dataJson);
           onChange(file);
         } else {
           const response = await fetch(src);
@@ -130,6 +133,7 @@ export const DropFileInput = forwardRef(
           const file = new File([data], `audio.${extensionName}`, {
             type: `audio/${extension}`,
           });
+
           onChange(file);
         }
       }
@@ -152,6 +156,7 @@ export const DropFileInput = forwardRef(
       } else if (src && !isChangeFile) {
         convertToLocalFile(src as File);
       }
+
       if (!src) {
         setImagePreview(imageDefault);
         setAudioPreview("");

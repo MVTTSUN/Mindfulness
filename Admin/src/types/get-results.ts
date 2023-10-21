@@ -73,6 +73,12 @@ type DataStatistics = {
   count: number;
 };
 
+type DataValidate = {
+  data: {
+    message: string;
+  };
+};
+
 export type {
   ElementTextLottieImage,
   DataTextLottieImage,
@@ -80,4 +86,6 @@ export type {
   DataInformation,
   DataMeditation,
   DataStatistics,
+  TaskAndMeditationStatistics,
+  DataValidate,
 };

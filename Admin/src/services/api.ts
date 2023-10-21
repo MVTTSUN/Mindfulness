@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { BASE_URL } from "../const";
+import { ApiRoute, BASE_URL } from "../const";
 import {
   FormEmotion,
   FormInformation,
@@ -12,6 +12,7 @@ import {
   DataMeditation,
   DataStatistics,
   DataTextLottieImage,
+  DataValidate,
 } from "../types/get-results";
 import {
   addEmotionsAdapter,
@@ -39,14 +40,14 @@ export const mindfulnessApi = createApi({
   endpoints: (builder) => ({
     getTips: builder.query<DataTextLottieImage[], void>({
       query: () => {
-        return "tips";
+        return ApiRoute.Tips;
       },
       providesTags: (result) => providesTags(result, "Tips"),
     }),
     addTips: builder.mutation<void, FormTextLottieImage>({
       query: (data) => {
         return {
-          url: "tips",
+          url: ApiRoute.Tips,
           method: "POST",
           body: addTipsAdapter(data),
         };
@@ -55,6 +56,7 @@ export const mindfulnessApi = createApi({
       async onQueryStarted(_, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
+
           dispatch(
             mindfulnessApi.util.upsertQueryData(
               "getTips",
@@ -69,14 +71,14 @@ export const mindfulnessApi = createApi({
     }),
     getEmotions: builder.query<DataEmotion[], void>({
       query: () => {
-        return "emotions";
+        return ApiRoute.Emotions;
       },
       providesTags: (result) => providesTags(result, "Emotions"),
     }),
     addEmotions: builder.mutation<void, FormEmotion>({
       query: (data) => {
         return {
-          url: "emotions",
+          url: ApiRoute.Emotions,
           method: "POST",
           body: addEmotionsAdapter(data),
         };
@@ -86,7 +88,7 @@ export const mindfulnessApi = createApi({
     deleteEmotion: builder.mutation<DataEmotion, string>({
       query: (id) => {
         return {
-          url: `emotions/${id}`,
+          url: `${ApiRoute.Emotions}/${id}`,
           method: "DELETE",
         };
       },
@@ -94,14 +96,14 @@ export const mindfulnessApi = createApi({
     }),
     getInfo: builder.query<DataInformation[], void>({
       query: () => {
-        return "info";
+        return ApiRoute.Info;
       },
       providesTags: (result) => providesTags(result, "Info"),
     }),
     addInfo: builder.mutation<void, FormInformation>({
       query: (data) => {
         return {
-          url: "info",
+          url: ApiRoute.Info,
           method: "POST",
           body: addInfoAdapter(data),
         };
@@ -110,6 +112,7 @@ export const mindfulnessApi = createApi({
       async onQueryStarted(_, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
+
           dispatch(
             mindfulnessApi.util.upsertQueryData(
               "getInfo",
@@ -124,30 +127,39 @@ export const mindfulnessApi = createApi({
     }),
     getTasks: builder.query<DataTextLottieImage[], void>({
       query: () => {
-        return "tasks";
+        return ApiRoute.Tasks;
       },
       providesTags: (result) => providesTags(result, "Tasks"),
     }),
     getTask: builder.query<DataTextLottieImage, string>({
       query: (id) => {
-        return `tasks/${id}`;
+        return `${ApiRoute.Tasks}/${id}`;
       },
       providesTags: (result) => providesTags(result, "Tasks"),
     }),
     addTask: builder.mutation<void, FormTextLottieImage>({
       query: (data) => {
         return {
-          url: "tasks",
+          url: ApiRoute.Tasks,
           method: "POST",
           body: addTaskAdapter(data),
         };
       },
       invalidatesTags: [{ type: "Tasks", id: "LIST" }],
     }),
+    validateAddTask: builder.mutation<DataValidate, FormTextLottieImage>({
+      query: (data) => {
+        return {
+          url: ApiRoute.Tasks + ApiRoute.Validate,
+          method: "POST",
+          body: addTaskAdapter(data),
+        };
+      },
+    }),
     deleteTask: builder.mutation<DataTextLottieImage, string>({
       query: (id) => {
         return {
-          url: `tasks/${id}`,
+          url: `${ApiRoute.Tasks}/${id}`,
           method: "DELETE",
         };
       },
@@ -159,7 +171,7 @@ export const mindfulnessApi = createApi({
     >({
       query: ({ id, data }) => {
         return {
-          url: `tasks/${id}`,
+          url: `${ApiRoute.Tasks}/${id}`,
           method: "PATCH",
           body: addTaskAdapter(data),
         };
@@ -181,32 +193,53 @@ export const mindfulnessApi = createApi({
         }
       },
     }),
+    validateUpdateTask: builder.mutation<
+      DataValidate,
+      { id: string; data: FormTextLottieImage }
+    >({
+      query: ({ id, data }) => {
+        return {
+          url: ApiRoute.Tasks + ApiRoute.Validate + `/${id}`,
+          method: "PATCH",
+          body: addTaskAdapter(data),
+        };
+      },
+    }),
     getMeditations: builder.query<DataMeditation[], void>({
       query: () => {
-        return "meditations";
+        return ApiRoute.Meditations;
       },
       providesTags: (result) => providesTags(result, "Meditations"),
     }),
     getMeditation: builder.query<DataMeditation, string>({
       query: (id) => {
-        return `meditations/${id}`;
+        return `${ApiRoute.Meditations}/${id}`;
       },
       providesTags: (result) => providesTags(result, "Meditations"),
     }),
     addMeditation: builder.mutation<void, FormMeditation>({
       query: (data) => {
         return {
-          url: "meditations",
+          url: ApiRoute.Meditations,
           method: "POST",
           body: addMeditationAdapter(data),
         };
       },
       invalidatesTags: [{ type: "Meditations", id: "LIST" }],
     }),
+    validateAddMeditation: builder.mutation<DataValidate, FormMeditation>({
+      query: (data) => {
+        return {
+          url: ApiRoute.Meditations + ApiRoute.Validate,
+          method: "POST",
+          body: addMeditationAdapter(data),
+        };
+      },
+    }),
     deleteMeditation: builder.mutation<DataMeditation, string>({
       query: (id) => {
         return {
-          url: `meditations/${id}`,
+          url: `${ApiRoute.Meditations}/${id}`,
           method: "DELETE",
         };
       },
@@ -218,7 +251,7 @@ export const mindfulnessApi = createApi({
     >({
       query: ({ id, data }) => {
         return {
-          url: `meditations/${id}`,
+          url: `${ApiRoute.Meditations}/${id}`,
           method: "PATCH",
           body: addMeditationAdapter(data),
         };
@@ -240,17 +273,28 @@ export const mindfulnessApi = createApi({
         }
       },
     }),
+    validateUpdateMeditation: builder.mutation<
+      DataValidate,
+      { id: string; data: FormMeditation }
+    >({
+      query: ({ id, data }) => {
+        return {
+          url: ApiRoute.Meditations + ApiRoute.Validate + `/${id}`,
+          method: "PATCH",
+          body: addMeditationAdapter(data),
+        };
+      },
+    }),
     getStatistics: builder.query<DataStatistics, void>({
-      query: () => "statistics",
+      query: () => ApiRoute.Statistics,
       async onCacheEntryAdded(
         _,
         { cacheEntryRemoved, updateCachedData, cacheDataLoaded }
       ) {
         const socket = io(BASE_URL);
+
         await cacheDataLoaded;
-
         socket.on("statistics", (data) => updateCachedData(() => data));
-
         await cacheEntryRemoved;
         socket.close();
       },
@@ -269,12 +313,16 @@ export const {
   useGetTasksQuery,
   useGetTaskQuery,
   useAddTaskMutation,
+  useValidateAddTaskMutation,
   useDeleteTaskMutation,
   useUpdateTaskMutation,
+  useValidateUpdateTaskMutation,
   useGetMeditationsQuery,
   useGetMeditationQuery,
   useAddMeditationMutation,
+  useValidateAddMeditationMutation,
   useDeleteMeditationMutation,
   useUpdateMeditationMutation,
+  useValidateUpdateMeditationMutation,
   useGetStatisticsQuery,
 } = mindfulnessApi;

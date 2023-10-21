@@ -1,16 +1,11 @@
 import styled from "styled-components";
-import { BASE_URL, Color } from "../const";
+import { ApiRoute, BASE_URL, Color } from "../const";
 import { useGetTipsQuery } from "../services/api";
 import Lottie from "react-lottie-player";
 import { FontSizeStandard } from "../mixins";
-import { useEffect } from "react";
 
 export function DisplayResultTips() {
-  const { data, refetch } = useGetTipsQuery();
-
-  useEffect(() => {
-    refetch();
-  }, []);
+  const { data } = useGetTipsQuery();
 
   return (
     <Container>
@@ -22,7 +17,9 @@ export function DisplayResultTips() {
             return (
               <Image
                 key={index}
-                src={`${BASE_URL}/tips/filename/${item.payload}`}
+                src={`${BASE_URL}${ApiRoute.Tips + ApiRoute.Filename}/${
+                  item.payload
+                }`}
               />
             );
           } else {
@@ -30,7 +27,9 @@ export function DisplayResultTips() {
               <WrapperLottie key={index}>
                 <Lottie
                   loop
-                  path={`${BASE_URL}/tips/filename/${item.payload}`}
+                  path={`${BASE_URL}${ApiRoute.Tips + ApiRoute.Filename}/${
+                    item.payload
+                  }`}
                   play
                 />
               </WrapperLottie>

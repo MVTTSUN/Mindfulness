@@ -14,6 +14,7 @@ const addTipsAdapter = (data: FormTextLottieImage) => {
       formData.append("type", field.type);
     } else {
       const text = field.payload as string;
+
       formData.append("text", text.trim());
       formData.append("type", field.type);
     }

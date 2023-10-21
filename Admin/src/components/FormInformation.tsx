@@ -9,7 +9,7 @@ import { ErrorField } from "./ErrorField";
 import { Textarea } from "./Textarea";
 import { DropFileInput } from "./DropFileInput";
 import styled from "styled-components";
-import { BASE_URL, Color } from "../const";
+import { ApiRoute, BASE_URL, Color } from "../const";
 import { useAddInfoMutation } from "../services/api";
 import { DataInformation } from "../types/get-results";
 import { FontSizeHeading } from "../mixins";
@@ -17,7 +17,9 @@ import { useNavigate, useOutletContext } from "react-router-dom";
 import { useEffect } from "react";
 
 export function FormInformation() {
+  const navigate = useNavigate();
   const data = useOutletContext<DataInformation>();
+  const [addInfo, { isLoading }] = useAddInfoMutation();
   const {
     handleSubmit,
     register,
@@ -35,7 +37,9 @@ export function FormInformation() {
       surnamePsycho: data ? data.surnamePsycho : "",
       info: data ? data.info : "",
       avatarPsycho: data
-        ? `${BASE_URL}/info/filename/${data?.avatarPsycho}`
+        ? `${BASE_URL}${ApiRoute.Info + ApiRoute.Filename}/${
+            data?.avatarPsycho
+          }`
         : "",
       nicknameInstagram: data ? data.nicknameInstagram : "",
       nicknameTelegram: data ? data.nicknameTelegram : "",
@@ -45,13 +49,13 @@ export function FormInformation() {
       firstNameDevelop: data ? data.firstNameDevelop : "",
       surnameDevelop: data ? data.surnameDevelop : "",
       avatarDevelop: data
-        ? `${BASE_URL}/info/filename/${data?.avatarDevelop}`
+        ? `${BASE_URL}${ApiRoute.Info + ApiRoute.Filename}/${
+            data?.avatarDevelop
+          }`
         : "",
       emailDevelop: data ? data.emailDevelop : "",
     },
   });
-  const [addInfo, { isLoading }] = useAddInfoMutation();
-  const navigate = useNavigate();
 
   const onSubmit = handleSubmit(async (data) => {
     await addInfo(data);
@@ -66,7 +70,7 @@ export function FormInformation() {
       setValue("info", data.info);
       setValue(
         "avatarPsycho",
-        `${BASE_URL}/info/filename/${data.avatarPsycho}`
+        `${BASE_URL}${ApiRoute.Info + ApiRoute.Filename}/${data.avatarPsycho}`
       );
       setValue("nicknameInstagram", data.nicknameInstagram);
       setValue("nicknameTelegram", data.nicknameTelegram);
@@ -77,7 +81,7 @@ export function FormInformation() {
       setValue("surnameDevelop", data.surnameDevelop);
       setValue(
         "avatarDevelop",
-        `${BASE_URL}/info/filename/${data.avatarDevelop}`
+        `${BASE_URL}${ApiRoute.Info + ApiRoute.Filename}/${data.avatarDevelop}`
       );
       setValue("emailDevelop", data.emailDevelop);
     }
@@ -208,7 +212,7 @@ export function FormInformation() {
         isNotArray
       />
       <ErrorField>{errors.emailDevelop?.message}</ErrorField>
-      <Button isDisabled={isLoading} isPrimary isLoading={isLoading}>
+      <Button disabled={isLoading} isPrimary isLoading={isLoading}>
         {isLoading ? "Сохранение" : "Загрузить"}
       </Button>
     </Form>

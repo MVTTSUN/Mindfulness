@@ -42,5 +42,3 @@ app.use(errorLogger);
 
 app.use(errors());
 app.use(errorsMiddleware);
-
-// app.listen(PORT);

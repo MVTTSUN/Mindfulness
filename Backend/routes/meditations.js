@@ -7,11 +7,13 @@ const {
 } = require('../middlewares/celebrate');
 const {
   postMeditation,
+  postMeditationUnique,
   getMeditation,
   getMeditations,
   getMeditationFile,
   deleteMeditation,
   patchMeditation,
+  patchMeditationUnique,
 } = require('../controllers/meditations');
 const statisticsMiddleware = require('../middlewares/statistics');
 
@@ -19,17 +21,19 @@ router.get('/meditations', getMeditations);
 router.get('/meditations/:id', statisticsMiddleware, getMeditation);
 router.get('/meditations/filename/:filename', getMeditationFile);
 router.post(
-  '/meditations',
+  '/meditations/validate',
+  uploadMeditations.any(),
   postMeditationCelebrate,
-  uploadMeditations.array('file'),
-  postMeditation
+  postMeditationUnique
 );
+router.post('/meditations', uploadMeditations.array('file'), postMeditation);
 router.delete('/meditations/:id', deleteMeditationCelebrate, deleteMeditation);
 router.patch(
-  '/meditations/:id',
+  '/meditations/validate/:id',
+  uploadMeditations.any(),
   patchMeditationCelebrate,
-  uploadMeditations.array('file'),
-  patchMeditation
+  patchMeditationUnique
 );
+router.patch('/meditations/:id', uploadMeditations.array('file'), patchMeditation);
 
 module.exports = router;

@@ -1,19 +1,16 @@
 import styled from "styled-components";
 import { ResetButton } from "../mixins";
-import { PropsWithChildren, useEffect, useRef, useState } from "react";
+import { ButtonHTMLAttributes, useEffect, useRef, useState } from "react";
 import { Color } from "../const";
 import { useFrameInterval } from "../hooks/useFrameInterval";
 
-type ButtonProps = PropsWithChildren<{
-  onClick?: () => void;
+type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   isPrimary?: boolean;
-  type?: "button" | "submit" | "reset";
-  isDisabled?: boolean;
   isLoading?: boolean;
-}>;
+};
 
 export function Button(props: ButtonProps) {
-  const { children, isPrimary, onClick, type, isDisabled, isLoading } = props;
+  const { children, isPrimary, isLoading, ...rest } = props;
   const [text, setText] = useState<string>(children as string);
   const cntRef = useRef(0);
   const { startAnimating, stopAnimating } = useFrameInterval(500, () => {
@@ -42,12 +39,7 @@ export function Button(props: ButtonProps) {
   }, [children]);
 
   return (
-    <ButtonStyled
-      type={type}
-      onClick={onClick}
-      $isPrimary={isPrimary}
-      disabled={isDisabled}
-    >
+    <ButtonStyled {...rest} $isPrimary={isPrimary}>
       {text}
     </ButtonStyled>
   );

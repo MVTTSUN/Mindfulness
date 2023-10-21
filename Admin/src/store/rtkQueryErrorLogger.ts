@@ -4,10 +4,14 @@ import { toast } from "react-toastify";
 
 export const rtkQueryErrorLogger: Middleware = () => (next) => (action) => {
   if (isRejectedWithValue(action)) {
-    if (action.payload.error) {
+    if (action?.payload?.error) {
       toast.error("Не удалось связаться с сервером", { autoClose: 3000 });
+    } else if (action?.payload?.data?.validation?.body?.message) {
+      toast.error(action?.payload?.data?.validation?.body?.message, {
+        autoClose: 3000,
+      });
     } else {
-      toast.error(action.payload.data.message, { autoClose: 3000 });
+      toast.error(action?.payload?.data?.message, { autoClose: 3000 });
     }
   } else if (isFulfilled(action)) {
     if (

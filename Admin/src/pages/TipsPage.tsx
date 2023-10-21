@@ -7,11 +7,11 @@ import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { BrowserRoute } from "../const";
 
 export function TipsPage() {
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
   const { data, error } = useGetTipsQuery();
   const textEdit = data && data[0]?.data.length ? "Редактировать" : "Добавить";
   const errorError = error && "error" in error ? error.error : "";
-  const navigate = useNavigate();
-  const { pathname } = useLocation();
 
   const navigateEditAndBack = () => {
     if (pathname === BrowserRoute.Tip) {

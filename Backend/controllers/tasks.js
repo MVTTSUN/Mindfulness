@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const Task = require('../models/task');
 const IncorrectError = require('../errors/incorrectError');
 const NotFoundDataError = require('../errors/notFoundDataError');
+const ConflictError = require('../errors/conflictError');
 const { errorMessages } = require('../const');
 const { DEV_DATABASE_URL } = require('../config');
 require('dotenv').config();
@@ -100,6 +101,25 @@ const postTask = async (req, res, next) => {
   }
 };
 
+const postTaskUnique = async (req, res, next) => {
+  try {
+    const { title } = req.body;
+    const dbTask = await Task.findOne({ title });
+
+    if (dbTask) {
+      throw new ConflictError(errorMessages.CONFLICT);
+    }
+
+    res.send({ message: 'ok' });
+  } catch (err) {
+    if (err instanceof mongoose.Error.ValidationError) {
+      next(new IncorrectError(errorMessages.INCORRECT_DATA));
+    } else {
+      next(err);
+    }
+  }
+};
+
 const deleteTask = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -184,11 +204,35 @@ const patchTask = async (req, res, next) => {
   }
 };
 
+const patchTaskUnique = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { title } = req.body;
+
+    const taskById = await Task.findOne({ _id: id });
+    const taskByTitle = await Task.findOne({ title });
+
+    if (taskById.title !== title && taskByTitle) {
+      throw new ConflictError(errorMessages.CONFLICT);
+    }
+
+    res.send({ message: 'ok' });
+  } catch (err) {
+    if (err instanceof mongoose.Error.ValidationError) {
+      next(new IncorrectError(errorMessages.INCORRECT_DATA));
+    } else {
+      next(err);
+    }
+  }
+};
+
 module.exports = {
   postTask,
+  postTaskUnique,
   getTask,
   getTasks,
   getTaskFile,
   deleteTask,
   patchTask,
+  patchTaskUnique,
 };

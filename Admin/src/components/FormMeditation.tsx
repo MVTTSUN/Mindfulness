@@ -17,6 +17,7 @@ import { Textarea } from "./Textarea";
 import styled from "styled-components";
 import { FontSizeStandard, ResetButton } from "../mixins";
 import {
+  ApiRoute,
   BASE_URL,
   BrowserRoute,
   Color,
@@ -29,9 +30,11 @@ import { InputSelect } from "./InputSelect";
 import {
   useAddMeditationMutation,
   useUpdateMeditationMutation,
+  useValidateAddMeditationMutation,
+  useValidateUpdateMeditationMutation,
 } from "../services/api";
 import { useLocation, useNavigate, useOutletContext } from "react-router-dom";
-import { DataMeditation } from "../types/get-results";
+import { DataMeditation, DataValidate } from "../types/get-results";
 import {
   DragDropContext,
   Draggable,
@@ -40,10 +43,20 @@ import {
 } from "@hello-pangea/dnd";
 
 export function FormMeditation() {
-  const data = useOutletContext<DataMeditation>();
   const [textLines, setTextLines] = useState<TextLine[]>([]);
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
   const isPause = useAppSelector(getIsPause);
   const currentTime = useAppSelector(getCurrentTime);
+  const data = useOutletContext<DataMeditation>();
+  const [addMeditation, { isLoading: isLoadingAdd }] =
+    useAddMeditationMutation();
+  const [patchMeditation, { isLoading: isLoadingPatch }] =
+    useUpdateMeditationMutation();
+  const [validateAddMeditation, { isLoading: isLoadingAddValidate }] =
+    useValidateAddMeditationMutation();
+  const [validateUpdateMeditation, { isLoading: isLoadingUpdateValidate }] =
+    useValidateUpdateMeditationMutation();
   const methods = useForm<FormMeditation>({
     mode: "onChange",
     resolver: yupResolver(
@@ -52,8 +65,16 @@ export function FormMeditation() {
     defaultValues: {
       title: data ? data.title : "",
       kind: data ? data.kind : "",
-      image: data ? `${BASE_URL}/meditations/filename/${data?.image}` : "",
-      audio: data ? `${BASE_URL}/meditations/filename/${data?.audio}` : "",
+      image: data
+        ? `${BASE_URL}${ApiRoute.Meditations + ApiRoute.Filename}/${
+            data?.image
+          }`
+        : "",
+      audio: data
+        ? `${BASE_URL}${ApiRoute.Meditations + ApiRoute.Filename}/${
+            data?.audio
+          }`
+        : "",
       textLines: data ? data.textLines : [],
     },
   });
@@ -70,22 +91,31 @@ export function FormMeditation() {
     control,
     name: "textLines",
   } as { name: string });
-  const navigate = useNavigate();
-  const { pathname } = useLocation();
-  const [addMeditation, { isLoading: isLoadingAdd }] =
-    useAddMeditationMutation();
-  const [patchMeditation, { isLoading: isLoadingPatch }] =
-    useUpdateMeditationMutation();
-  const isLoading = isLoadingAdd || isLoadingPatch;
+  const isLoading =
+    isLoadingAdd ||
+    isLoadingPatch ||
+    isLoadingAddValidate ||
+    isLoadingUpdateValidate;
 
   const onSubmit = handleSubmit(async (dataForm) => {
     if (pathname === BrowserRoute.Meditation) {
-      await addMeditation(dataForm);
-      reset();
-      replace([]);
+      const validateResult = (await validateAddMeditation(
+        dataForm
+      )) as unknown as DataValidate;
+      if (validateResult?.data?.message) {
+        await addMeditation(dataForm);
+        reset();
+        replace([]);
+      }
     } else if (pathname.includes(BrowserRoute.Meditation)) {
-      await patchMeditation({ id: data._id, data: dataForm });
-      navigate(-1);
+      const validateResult = (await validateUpdateMeditation({
+        id: data._id,
+        data: dataForm,
+      })) as unknown as DataValidate;
+      if (validateResult?.data?.message) {
+        await patchMeditation({ id: data._id, data: dataForm });
+        navigate(-1);
+      }
     }
   });
 
@@ -115,8 +145,14 @@ export function FormMeditation() {
     if (data) {
       setValue("title", data?.title);
       setValue("kind", data?.kind);
-      setValue("image", `${BASE_URL}/meditations/filename/${data?.image}`);
-      setValue("audio", `${BASE_URL}/meditations/filename/${data?.audio}`);
+      setValue(
+        "image",
+        `${BASE_URL}${ApiRoute.Meditations + ApiRoute.Filename}/${data?.image}`
+      );
+      setValue(
+        "audio",
+        `${BASE_URL}${ApiRoute.Meditations + ApiRoute.Filename}/${data?.audio}`
+      );
       replace(data.textLines);
     }
   }, [data]);
@@ -264,7 +300,7 @@ export function FormMeditation() {
         >
           + Строчка аудиозаписи
         </Button>
-        <Button isDisabled={isLoading} isPrimary isLoading={isLoading}>
+        <Button disabled={isLoading} isPrimary isLoading={isLoading}>
           {isLoading ? "Сохранение" : "Загрузить"}
         </Button>
       </Form>

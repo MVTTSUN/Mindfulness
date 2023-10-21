@@ -2,19 +2,19 @@ import { useOutletContext } from "react-router-dom";
 import { DataMeditation } from "../types/get-results";
 import styled from "styled-components";
 import { FontSizeStandard } from "../mixins";
-import { BASE_URL, Color } from "../const";
+import { ApiRoute, BASE_URL, Color, MEDITATION_AUDIO_ID } from "../const";
 import { Audio } from "./Audio";
 import { useAppSelector } from "../hooks/useAppSelector";
-import { getCurrentTime } from "../store/currentAudioSelectors";
 import { useAppDispatch } from "../hooks/useAppDispatch";
 import { changeCurrentTime } from "../store/currentAudioSlice";
 import { useGetAudio } from "../hooks/useGetAudio";
+import { getCurrentTime } from "../store/currentAudioSelectors";
 
 export function DisplayResultMeditation() {
-  const audio = useGetAudio("meditation-audio");
   const data = useOutletContext<DataMeditation>();
   const currentTime = useAppSelector(getCurrentTime);
   const dispatch = useAppDispatch();
+  const { audio, changeCurrentTimeAudio } = useGetAudio(MEDITATION_AUDIO_ID);
 
   const getIsActiveInput = (index: number) => {
     const timeAt = data.textLines && Number(data.textLines[index]?.timeAt);
@@ -32,7 +32,7 @@ export function DisplayResultMeditation() {
 
       setTimeout(() => {
         dispatch(changeCurrentTime(value));
-        audio.currentTime = value;
+        changeCurrentTimeAudio(value);
       }, 80);
     }
   };
@@ -41,10 +41,22 @@ export function DisplayResultMeditation() {
     <Container>
       <Text>Вид: {data && data.kind}</Text>
       <Image
-        src={data ? `${BASE_URL}/meditations/filename/${data.image}` : ""}
+        src={
+          data
+            ? `${BASE_URL}${ApiRoute.Meditations + ApiRoute.Filename}/${
+                data.image
+              }`
+            : ""
+        }
       />
       <Audio
-        src={data ? `${BASE_URL}/meditations/filename/${data.audio}` : ""}
+        src={
+          data
+            ? `${BASE_URL}${ApiRoute.Meditations + ApiRoute.Filename}/${
+                data.audio
+              }`
+            : ""
+        }
         paddingButton="20px"
       />
       {data?.textLines &&

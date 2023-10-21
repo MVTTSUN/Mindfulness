@@ -11,6 +11,7 @@ import { ErrorField } from "./ErrorField";
 import { useAddEmotionsMutation } from "../services/api";
 
 export function FormEmotion() {
+  const [addEmotions, { isLoading }] = useAddEmotionsMutation();
   const {
     handleSubmit,
     control,
@@ -25,7 +26,6 @@ export function FormEmotion() {
     control,
     name: "fields",
   } as { name: string });
-  const [addEmotions, { isLoading }] = useAddEmotionsMutation();
 
   const onSubmit = handleSubmit((data) => {
     addEmotions(data);
@@ -50,7 +50,7 @@ export function FormEmotion() {
       <Button type="button" onClick={() => append({ value: "" })}>
         + Эмоция
       </Button>
-      <Button isDisabled={isLoading} isPrimary isLoading={isLoading}>
+      <Button disabled={isLoading} isPrimary isLoading={isLoading}>
         {isLoading ? "Сохранение" : "Загрузить"}
       </Button>
     </Form>

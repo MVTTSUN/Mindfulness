@@ -4,8 +4,8 @@ export const useDeferredRender = (
   isSomethingBoolean: boolean,
   time: number
 ) => {
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [isActive, setIsActive] = useState(false);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (isSomethingBoolean) {

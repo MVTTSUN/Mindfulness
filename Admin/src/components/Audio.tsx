@@ -1,19 +1,15 @@
 import styled from "styled-components";
 import { ResetButton } from "../mixins";
-import { Color } from "../const";
-import { useEffect, useRef, useState } from "react";
-import { useAppSelector } from "../hooks/useAppSelector";
-import { getIsPause } from "../store/currentAudioSelectors";
+import { Color, Image, MEDITATION_AUDIO_ID } from "../const";
+import { useEffect, useState } from "react";
 import { useAppDispatch } from "../hooks/useAppDispatch";
-import {
-  changeCurrentTime,
-  changeIsPause,
-  setAudioSrc,
-  setDuration,
-} from "../store/currentAudioSlice";
+import { changeCurrentTime, changeIsPause } from "../store/currentAudioSlice";
 import { useFrameInterval } from "../hooks/useFrameInterval";
 import { Player } from "./Player";
 import { createPortal } from "react-dom";
+import { useGetAudio } from "../hooks/useGetAudio";
+import { getIsPause } from "../store/currentAudioSelectors";
+import { useAppSelector } from "../hooks/useAppSelector";
 
 type AudioProps = {
   src: string;
@@ -21,51 +17,37 @@ type AudioProps = {
 };
 
 export function Audio(props: AudioProps) {
-  const [isOpen, setIsOpen] = useState(false);
   const { src, paddingButton } = props;
-  const dispatch = useAppDispatch();
-  const isPause = useAppSelector(getIsPause);
-  const refAudio = useRef<HTMLAudioElement | null>(null);
+  const [isOpen, setIsOpen] = useState(false);
   const [isFirstPlay, setIsFirstPlay] = useState(true);
-  const { startAnimating, stopAnimating } = useFrameInterval(100, () => {
-    if (refAudio.current) {
-      dispatch(changeCurrentTime(refAudio.current.currentTime));
-    }
-  });
+  const isPause = useAppSelector(getIsPause);
+  const dispatch = useAppDispatch();
+  const { loadAudio, playAudio, pauseAudio, getCurrentTime } =
+    useGetAudio(MEDITATION_AUDIO_ID);
+  const { startAnimating, stopAnimating } = useFrameInterval(100, () =>
+    dispatch(changeCurrentTime(getCurrentTime()))
+  );
 
   const togglePlayAndPause = () => {
     setIsOpen(true);
-    if (refAudio?.current?.paused && src) {
-      isFirstPlay && refAudio.current?.load();
+    if (isPause && src) {
+      isFirstPlay && loadAudio();
       setIsFirstPlay(false);
       dispatch(changeIsPause(false));
-      refAudio.current.play();
+      playAudio();
       startAnimating();
     } else {
       dispatch(changeIsPause(true));
-      refAudio?.current?.pause();
+      pauseAudio();
       stopAnimating();
     }
   };
 
-  const handleLoadedMetadata = () => {
-    dispatch(setDuration(Number(refAudio.current?.duration)));
-  };
-
   const handleOnEnded = () => {
-    stopAnimating();
     dispatch(changeIsPause(true));
     dispatch(changeCurrentTime(0));
+    stopAnimating();
   };
-
-  useEffect(() => {
-    return () => {
-      stopAnimating();
-      dispatch(changeIsPause(true));
-      dispatch(changeCurrentTime(0));
-      dispatch(setAudioSrc(""));
-    };
-  }, []);
 
   useEffect(() => {
     if (isPause) {
@@ -76,21 +58,25 @@ export function Audio(props: AudioProps) {
   useEffect(() => {
     if (src) {
       setIsFirstPlay(true);
-      dispatch(setAudioSrc(src));
-      refAudio?.current?.pause();
+      pauseAudio();
       dispatch(changeIsPause(true));
       dispatch(changeCurrentTime(0));
+      changeCurrentTime(0);
     }
   }, [src]);
 
+  useEffect(() => {
+    return () => {
+      stopAnimating();
+      dispatch(changeIsPause(true));
+      dispatch(changeCurrentTime(0));
+      changeCurrentTime(0);
+    };
+  }, []);
+
   return (
     <>
-      <audio
-        ref={refAudio}
-        onLoadedMetadata={handleLoadedMetadata}
-        onEnded={handleOnEnded}
-        id="meditation-audio"
-      >
+      <audio onEnded={handleOnEnded} id={MEDITATION_AUDIO_ID}>
         <source src={src} type="audio/mp3" />
       </audio>
       <PlayButton
@@ -100,9 +86,9 @@ export function Audio(props: AudioProps) {
         $paddingButton={paddingButton}
       >
         {isPause ? (
-          <img src="/images/play.svg" alt="Играть" />
+          <img src={Image.Play} alt="Играть" />
         ) : (
-          <img src="/images/pause.svg" alt="Пауза" />
+          <img src={Image.Pause} alt="Пауза" />
         )}
       </PlayButton>
       {isOpen && createPortal(<Player />, document.body)}

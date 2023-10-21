@@ -14,6 +14,17 @@ enum BrowserRoute {
   Edit = "/edit",
 }
 
+enum ApiRoute {
+  Meditations = "/meditations",
+  Tasks = "/tasks",
+  Tips = "/tips",
+  Emotions = "/emotions",
+  Info = "/info",
+  Filename = "/filename",
+  Statistics = "/statistics",
+  Validate = "/validate",
+}
+
 enum Color {
   Primary = "#b5f2ea",
   Pastel = "#d4f4ef",
@@ -38,6 +49,15 @@ enum Slice {
   CurrentAudio = "currentAudio",
   Statistics = "statistics",
 }
+
+enum Image {
+  Backward = "/images/backward.svg",
+  Forward = "/images/forward.svg",
+  Pause = "/images/pause.svg",
+  Play = "/images/play.svg",
+}
+
+const MEDITATION_AUDIO_ID = "meditation-audio";
 
 const BASE_URL = "http://192.168.1.111:3000";
 
@@ -69,9 +89,11 @@ const FILTER_MONTHS = [
 
 export {
   BrowserRoute,
+  ApiRoute,
   Color,
   ErrorText,
   Slice,
+  Image,
   BASE_URL,
   MAX_SIZE_IMAGE,
   OPTIONS_KIND_MEDITATIONS,
@@ -79,4 +101,5 @@ export {
   FILTER_YEARS,
   FILTER_TYPE,
   FILTER_MONTHS,
+  MEDITATION_AUDIO_ID,
 };

@@ -24,8 +24,10 @@ import {
   useAddTaskMutation,
   useAddTipsMutation,
   useUpdateTaskMutation,
+  useValidateAddTaskMutation,
+  useValidateUpdateTaskMutation,
 } from "../services/api";
-import { BASE_URL, BrowserRoute, OPTIONS_KIND_TASKS } from "../const";
+import { ApiRoute, BASE_URL, BrowserRoute, OPTIONS_KIND_TASKS } from "../const";
 import {
   DragDropContext,
   Droppable,
@@ -35,23 +37,38 @@ import {
 import { useEffect, useRef } from "react";
 import { Input } from "./Input";
 import { useLocation, useNavigate, useOutletContext } from "react-router-dom";
-import { DataTextLottieImage } from "../types/get-results";
+import { DataTextLottieImage, DataValidate } from "../types/get-results";
 import { InputSelect } from "./InputSelect";
 
 export function FormTextLottieImage() {
   const data = useOutletContext<DataTextLottieImage[]>();
+  const dataRef = useRef(data && data[0]?.data);
+  const sourceFileIndexRef = useRef<number | null>(null);
+  const destinationFileIndexRef = useRef<number | null>(null);
+  const navigate = useNavigate();
   const { pathname } = useLocation();
+  const [addTips, { isLoading: isLoadingTips }] = useAddTipsMutation();
+  const [addTask, { isLoading: isLoadingTaskAdd }] = useAddTaskMutation();
+  const [patchTask, { isLoading: isLoadingTaskPatch }] =
+    useUpdateTaskMutation();
+  const [validateAddTask, { isLoading: isLoadingTaskAddValidate }] =
+    useValidateAddTaskMutation();
+  const [validateUpdateTask, { isLoading: isLoadingTaskUpdateValidate }] =
+    useValidateUpdateTaskMutation();
   const routeName =
-    pathname === BrowserRoute.Tip + BrowserRoute.Edit ? "tips" : "tasks";
+    pathname === BrowserRoute.Tip + BrowserRoute.Edit
+      ? ApiRoute.Tips
+      : ApiRoute.Tasks;
   const dataFieldsAdapted =
     data &&
     data[0]?.data.map((item) => ({
       type: item.type,
       payload: (item.type === "text"
         ? item.payload
-        : `${BASE_URL}/${routeName}/filename/${item.payload}`) as string,
+        : `${BASE_URL}${routeName + ApiRoute.Filename}/${
+            item.payload
+          }`) as string,
     }));
-
   const methods = useForm<FormTextLottieImage>({
     mode: "onChange",
     resolver: yupResolver(
@@ -81,24 +98,32 @@ export function FormTextLottieImage() {
     move: UseFieldArrayMove;
     replace: UseFieldArrayReplace<FieldValues, string>;
   };
-  const [addTips, { isLoading: isLoadingTips }] = useAddTipsMutation();
-  const [addTask, { isLoading: isLoadingTaskAdd }] = useAddTaskMutation();
-  const [patchTask, { isLoading: isLoadingTaskPatch }] =
-    useUpdateTaskMutation();
-  const isLoading = isLoadingTaskAdd || isLoadingTips || isLoadingTaskPatch;
-  const dataRef = useRef(data && data[0]?.data);
-  const sourceFileIndexRef = useRef<number | null>(null);
-  const destinationFileIndexRef = useRef<number | null>(null);
-  const navigate = useNavigate();
+  const isLoading =
+    isLoadingTaskAdd ||
+    isLoadingTips ||
+    isLoadingTaskPatch ||
+    isLoadingTaskAddValidate ||
+    isLoadingTaskUpdateValidate;
 
   const onSubmit = handleSubmit(async (dataForm) => {
     if (pathname === BrowserRoute.Task) {
-      await addTask(dataForm);
-      reset();
-      replace([]);
+      const validateResult = (await validateAddTask(
+        dataForm
+      )) as unknown as DataValidate;
+      if (validateResult?.data?.message) {
+        await addTask(dataForm);
+        reset();
+        replace([]);
+      }
     } else if (pathname.includes(BrowserRoute.Task)) {
-      await patchTask({ id: data[0]._id, data: dataForm });
-      navigate(-1);
+      const validateResult = (await validateUpdateTask({
+        id: data[0]._id,
+        data: dataForm,
+      })) as unknown as DataValidate;
+      if (validateResult?.data?.message) {
+        await patchTask({ id: data[0]._id, data: dataForm });
+        navigate(-1);
+      }
     } else if (pathname === BrowserRoute.Tip + BrowserRoute.Edit) {
       await addTips(dataForm);
       navigate(-1);
@@ -191,7 +216,11 @@ export function FormTextLottieImage() {
                                           dataRef.current[index] &&
                                           field.payload !== "" &&
                                           typeof field.payload === "string"
-                                            ? `${BASE_URL}/${routeName}/filename/${dataRef.current[index]?.payload}`
+                                            ? `${BASE_URL}${
+                                                routeName + ApiRoute.Filename
+                                              }/${
+                                                dataRef.current[index]?.payload
+                                              }`
                                             : field.payload
                                         }
                                       />
@@ -222,7 +251,11 @@ export function FormTextLottieImage() {
                                           dataRef.current[index] &&
                                           field.payload !== "" &&
                                           typeof field.payload === "string"
-                                            ? `${BASE_URL}/${routeName}/filename/${dataRef.current[index]?.payload}`
+                                            ? `${BASE_URL}${
+                                                routeName + ApiRoute.Filename
+                                              }/${
+                                                dataRef.current[index]?.payload
+                                              }`
                                             : field.payload
                                         }
                                       />
@@ -271,7 +304,7 @@ export function FormTextLottieImage() {
             + JSON
           </Button>
         </ContainerButtonsAdd>
-        <Button isDisabled={isLoading} isPrimary isLoading={isLoading}>
+        <Button disabled={isLoading} isPrimary isLoading={isLoading}>
           {isLoading ? "Сохранение" : "Загрузить"}
         </Button>
       </Form>

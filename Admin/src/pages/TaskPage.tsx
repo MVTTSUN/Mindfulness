@@ -8,12 +8,12 @@ import { BrowserRoute } from "../const";
 
 export function TaskPage() {
   const { id } = useParams() as { id: string };
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
   const { data, error } = useGetTaskQuery(id);
   const textEdit = data && data?.data.length ? "Редактировать" : "Добавить";
   const errorError = error && "error" in error ? error.error : "";
-  const navigate = useNavigate();
-  const { pathname } = useLocation();
-  const dataTest = [data];
+  const dataConvertToArray = [data];
 
   const navigateBack = () => navigate(-1);
 
@@ -37,7 +37,7 @@ export function TaskPage() {
                 {textEdit}
               </Button>
             )}
-            <Outlet context={dataTest} />
+            <Outlet context={dataConvertToArray} />
           </>
         )}
       </ContainerOneSide>

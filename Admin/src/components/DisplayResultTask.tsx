@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { BASE_URL, Color } from "../const";
+import { ApiRoute, BASE_URL, Color } from "../const";
 import Lottie from "react-lottie-player";
 import { FontSizeStandard } from "../mixins";
 import { DataTextLottieImage } from "../types/get-results";
@@ -19,7 +19,9 @@ export function DisplayResultTask() {
             return (
               <Image
                 key={index}
-                src={`${BASE_URL}/tasks/filename/${item.payload}`}
+                src={`${BASE_URL}${ApiRoute.Tasks + ApiRoute.Filename}/${
+                  item.payload
+                }`}
               />
             );
           } else {
@@ -27,7 +29,9 @@ export function DisplayResultTask() {
               <WrapperLottie key={index}>
                 <Lottie
                   loop
-                  path={`${BASE_URL}/tasks/filename/${item.payload}`}
+                  path={`${BASE_URL}${ApiRoute.Tasks + ApiRoute.Filename}/${
+                    item.payload
+                  }`}
                   play
                 />
               </WrapperLottie>

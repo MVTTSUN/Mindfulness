@@ -13,116 +13,91 @@ module.exports = async (req, _, next) => {
       .split(' ')[0]
       .toLowerCase();
     let updateStatistics;
+    let updatedDataStatisticsMeditation;
+    let updatedDataStatisticsTask;
 
     if (statistics.length !== 0) {
       const statistic = statistics[0];
       const allCount = statistic.count ? statistic.count + 1 : 1;
-      let years;
-      let meditations;
-      let tasks;
-      let months;
-      let month;
-      let year;
-      let meditation;
-      let task;
+      updatedDataStatisticsMeditation = statistic.meditations;
+      updatedDataStatisticsTask = statistic.tasks;
 
-      if (url.includes('meditations') || originalUrl.includes('meditations')) {
-        const { title } = await Meditation.findOne({ _id: id });
+      const updateDataStatistics = (title, statisticItem) => {
+        const statisticItemCopy = JSON.parse(JSON.stringify(statisticItem));
 
-        if (statistic.meditations.length !== 0) {
-          for (let i = 0; i < statistic.meditations.length; i += 1) {
-            if (statistic.meditations[i].title === title) {
-              const meditationsCount = statistic.meditations[i].count + 1;
-
-              if (statistic.meditations[i].years.length !== 0) {
-                for (let j = 0; j < statistic.meditations[i].years.length; j += 1) {
-                  if (statistic.meditations[i].years[j].year === new Date().getFullYear()) {
-                    const yearCount = statistic.meditations[i].years[j].count + 1;
-                    const currentYear = statistic.meditations[i].years[j].year;
-
-                    if (statistic.meditations[i].years[j].months.length !== 0) {
-                      for (let k = 0; k < statistic.meditations[i].years[j].months.length; k += 1) {
+        if (statisticItemCopy.length !== 0) {
+          for (let i = 0; i < statisticItemCopy.length; i += 1) {
+            if (statisticItemCopy[i].title === title) {
+              if (statisticItemCopy[i].years.length !== 0) {
+                for (let j = 0; j < statisticItemCopy[i].years.length; j += 1) {
+                  if (statisticItemCopy[i].years[j].year === new Date().getFullYear()) {
+                    if (statisticItemCopy[i].years[j].months.length !== 0) {
+                      for (let k = 0; k < statisticItemCopy[i].years[j].months.length; k += 1) {
                         if (
-                          statistic.meditations[i].years[j].months[k].month ===
-                          new Date().getMonth()
+                          statisticItemCopy[i].years[j].months[k].month === new Date().getMonth()
                         ) {
-                          const monthCount = statistic.meditations[i].years[j].months[k].count + 1;
-                          const currentMonth = statistic.meditations[i].years[j].months[k].month;
-                          let androidCount = statistic.meditations[i].years[j].months[k].android;
-                          let IOSCount = statistic.meditations[i].years[j].months[k].ios;
-
-                          if (device === 'windows') {
-                            androidCount = statistic.meditations[i].years[j].months[k].android + 1;
+                          statisticItemCopy[i].years[j].months[k].count += 1;
+                          if (device === 'ios') {
+                            statisticItemCopy[i].years[j].months[k].android += 1;
                           } else {
-                            IOSCount = statistic.meditations[i].years[j].months[k].ios + 1;
+                            statisticItemCopy[i].years[j].months[k].ios += 1;
                           }
-
-                          months = [...statistic.meditations[i].years[j].months];
-                          months.splice(j, 1, {
-                            month: currentMonth,
-                            count: monthCount,
-                            android: androidCount,
-                            ios: IOSCount,
-                          });
 
                           break;
                         }
-                        if (k === statistic.meditations[i].years[j].months.length - 1) {
+                        if (k === statisticItemCopy[i].years[j].months.length - 1) {
                           let countAndroidScope = 0;
                           let countIOSScope = 0;
 
-                          if (device === 'windows') {
+                          if (device === 'ios') {
                             countAndroidScope = 1;
                           } else {
                             countIOSScope = 1;
                           }
 
-                          month = {
+                          statisticItemCopy[i].years[j].months.push({
                             month: new Date().getMonth(),
                             count: 1,
                             android: countAndroidScope,
                             ios: countIOSScope,
-                          };
+                          });
+
+                          break;
                         }
                       }
                     } else {
                       let countAndroidScope = 0;
                       let countIOSScope = 0;
 
-                      if (device === 'windows') {
+                      if (device === 'ios') {
                         countAndroidScope = 1;
                       } else {
                         countIOSScope = 1;
                       }
 
-                      month = {
+                      statisticItemCopy[i].years[j].months.push({
                         month: new Date().getMonth(),
                         count: 1,
                         android: countAndroidScope,
                         ios: countIOSScope,
-                      };
+                      });
                     }
 
-                    years = [...statistic.meditations[i].years];
-                    years.splice(j, 1, {
-                      year: currentYear,
-                      count: yearCount,
-                      months: month ? [...statistic.meditations[i].years[j].months, month] : months,
-                    });
+                    statisticItemCopy[i].years[j].count += 1;
 
                     break;
                   }
-                  if (j === statistic.meditations[i].years.length - 1) {
+                  if (j === statisticItemCopy[i].years.length - 1) {
                     let countAndroidScope = 0;
                     let countIOSScope = 0;
 
-                    if (device === 'windows') {
+                    if (device === 'ios') {
                       countAndroidScope = 1;
                     } else {
                       countIOSScope = 1;
                     }
 
-                    year = {
+                    statisticItemCopy[i].years.push({
                       year: new Date().getFullYear(),
                       count: 1,
                       months: [
@@ -133,20 +108,22 @@ module.exports = async (req, _, next) => {
                           ios: countIOSScope,
                         },
                       ],
-                    };
+                    });
+
+                    break;
                   }
                 }
               } else {
                 let countAndroidScope = 0;
                 let countIOSScope = 0;
 
-                if (device === 'windows') {
+                if (device === 'ios') {
                   countAndroidScope = 1;
                 } else {
                   countIOSScope = 1;
                 }
 
-                year = {
+                statisticItemCopy[i].years.push({
                   year: new Date().getFullYear(),
                   count: 1,
                   months: [
@@ -157,29 +134,24 @@ module.exports = async (req, _, next) => {
                       ios: countIOSScope,
                     },
                   ],
-                };
+                });
               }
 
-              meditations = [...statistic.meditations];
-              meditations.splice(i, 1, {
-                title,
-                count: meditationsCount,
-                years: year ? [...statistic.meditations[i].years, year] : years,
-              });
+              statisticItemCopy[i].count += 1;
 
               break;
             }
-            if (i === statistic.meditations.length - 1) {
+            if (i === statisticItemCopy.length - 1) {
               let countAndroidScope = 0;
               let countIOSScope = 0;
 
-              if (device === 'windows') {
+              if (device === 'ios') {
                 countAndroidScope = 1;
               } else {
                 countIOSScope = 1;
               }
 
-              meditation = {
+              statisticItemCopy.push({
                 title,
                 count: 1,
                 years: [
@@ -196,20 +168,22 @@ module.exports = async (req, _, next) => {
                     ],
                   },
                 ],
-              };
+              });
+
+              break;
             }
           }
         } else {
           let countAndroidScope = 0;
           let countIOSScope = 0;
 
-          if (device === 'windows') {
+          if (device === 'ios') {
             countAndroidScope = 1;
           } else {
             countIOSScope = 1;
           }
 
-          meditation = {
+          statisticItemCopy.push({
             title,
             count: 1,
             years: [
@@ -226,216 +200,29 @@ module.exports = async (req, _, next) => {
                 ],
               },
             ],
-          };
+          });
         }
+
+        return statisticItemCopy;
+      };
+
+      if (url.includes('meditations') || originalUrl.includes('meditations')) {
+        const { title } = await Meditation.findOne({ _id: id });
+
+        updatedDataStatisticsMeditation = updateDataStatistics(title, statistic.meditations);
       }
 
       if (url.includes('tasks') || originalUrl.includes('tasks')) {
         const { title } = await Task.findOne({ _id: id });
 
-        if (statistic.tasks.length !== 0) {
-          for (let i = 0; i < statistic.tasks.length; i += 1) {
-            if (statistic.tasks[i].title === title) {
-              const tasksCount = statistic.tasks[i].count + 1;
-
-              if (statistic.tasks[i].years.length !== 0) {
-                for (let j = 0; j < statistic.tasks[i].years.length; j += 1) {
-                  if (statistic.tasks[i].years[j].year === new Date().getFullYear()) {
-                    const yearCount = statistic.tasks[i].years[j].count + 1;
-                    const currentYear = statistic.tasks[i].years[j].year;
-
-                    if (statistic.tasks[i].years[j].months.length !== 0) {
-                      for (let k = 0; k < statistic.tasks[i].years[j].months.length; k += 1) {
-                        if (statistic.tasks[i].years[j].months[k].month === new Date().getMonth()) {
-                          const monthCount = statistic.tasks[i].years[j].months[k].count + 1;
-                          const currentMonth = statistic.tasks[i].years[j].months[k].month;
-                          let androidCount = statistic.tasks[i].years[j].months[k].android;
-                          let IOSCount = statistic.tasks[i].years[j].months[k].ios;
-
-                          if (device === 'windows') {
-                            androidCount = statistic.tasks[i].years[j].months[k].android + 1;
-                          } else {
-                            IOSCount = statistic.tasks[i].years[j].months[k].ios + 1;
-                          }
-
-                          months = [...statistic.tasks[i].years[j].months];
-                          months.splice(j, 1, {
-                            month: currentMonth,
-                            count: monthCount,
-                            android: androidCount,
-                            ios: IOSCount,
-                          });
-
-                          break;
-                        }
-                        if (k === statistic.tasks[i].years[j].months.length - 1) {
-                          let countAndroidScope = 0;
-                          let countIOSScope = 0;
-
-                          if (device === 'windows') {
-                            countAndroidScope = 1;
-                          } else {
-                            countIOSScope = 1;
-                          }
-
-                          month = {
-                            month: new Date().getMonth(),
-                            count: 1,
-                            android: countAndroidScope,
-                            ios: countIOSScope,
-                          };
-                        }
-                      }
-                    } else {
-                      let countAndroidScope = 0;
-                      let countIOSScope = 0;
-
-                      if (device === 'windows') {
-                        countAndroidScope = 1;
-                      } else {
-                        countIOSScope = 1;
-                      }
-
-                      month = {
-                        month: new Date().getMonth(),
-                        count: 1,
-                        android: countAndroidScope,
-                        ios: countIOSScope,
-                      };
-                    }
-
-                    years = [...statistic.tasks[i].years];
-                    years.splice(j, 1, {
-                      year: currentYear,
-                      count: yearCount,
-                      months: month ? [...statistic.tasks[i].years[j].months, month] : months,
-                    });
-
-                    break;
-                  }
-                  if (j === statistic.tasks[i].years.length - 1) {
-                    let countAndroidScope = 0;
-                    let countIOSScope = 0;
-
-                    if (device === 'windows') {
-                      countAndroidScope = 1;
-                    } else {
-                      countIOSScope = 1;
-                    }
-
-                    year = {
-                      year: new Date().getFullYear(),
-                      count: 1,
-                      months: [
-                        {
-                          month: new Date().getMonth(),
-                          count: 1,
-                          android: countAndroidScope,
-                          ios: countIOSScope,
-                        },
-                      ],
-                    };
-                  }
-                }
-              } else {
-                let countAndroidScope = 0;
-                let countIOSScope = 0;
-
-                if (device === 'windows') {
-                  countAndroidScope = 1;
-                } else {
-                  countIOSScope = 1;
-                }
-
-                year = {
-                  year: new Date().getFullYear(),
-                  count: 1,
-                  months: [
-                    {
-                      month: new Date().getMonth(),
-                      count: 1,
-                      android: countAndroidScope,
-                      ios: countIOSScope,
-                    },
-                  ],
-                };
-              }
-
-              tasks = [...statistic.tasks];
-              tasks.splice(i, 1, {
-                title,
-                count: tasksCount,
-                years: year ? [...statistic.tasks[i].years, year] : years,
-              });
-
-              break;
-            }
-            if (i === statistic.tasks.length - 1) {
-              let countAndroidScope = 0;
-              let countIOSScope = 0;
-
-              if (device === 'windows') {
-                countAndroidScope = 1;
-              } else {
-                countIOSScope = 1;
-              }
-
-              task = {
-                title,
-                count: 1,
-                years: [
-                  {
-                    year: new Date().getFullYear(),
-                    count: 1,
-                    months: [
-                      {
-                        month: new Date().getMonth(),
-                        count: 1,
-                        android: countAndroidScope,
-                        ios: countIOSScope,
-                      },
-                    ],
-                  },
-                ],
-              };
-            }
-          }
-        } else {
-          let countAndroidScope = 0;
-          let countIOSScope = 0;
-
-          if (device === 'windows') {
-            countAndroidScope = 1;
-          } else {
-            countIOSScope = 1;
-          }
-
-          task = {
-            title,
-            count: 1,
-            years: [
-              {
-                year: new Date().getFullYear(),
-                count: 1,
-                months: [
-                  {
-                    month: new Date().getMonth(),
-                    count: 1,
-                    android: countAndroidScope,
-                    ios: countIOSScope,
-                  },
-                ],
-              },
-            ],
-          };
-        }
+        updatedDataStatisticsTask = updateDataStatistics(title, statistic.tasks);
       }
 
       updateStatistics = await Statistic.findByIdAndUpdate(
         statistic._id,
         {
-          meditations: meditation ? [...statistic.meditations, meditation] : meditations,
-          tasks: task ? [...statistic.tasks, task] : tasks,
+          meditations: updatedDataStatisticsMeditation,
+          tasks: updatedDataStatisticsTask,
           count: allCount,
         },
         { new: true, runValidators: true }
@@ -446,7 +233,7 @@ module.exports = async (req, _, next) => {
         let androidCount = 0;
         let IOSCount = 0;
 
-        if (device === 'windows') {
+        if (device === 'ios') {
           androidCount = 1;
         } else {
           IOSCount = 1;
@@ -483,7 +270,7 @@ module.exports = async (req, _, next) => {
         let androidCount = 0;
         let IOSCount = 0;
 
-        if (device === 'windows') {
+        if (device === 'ios') {
           androidCount = 1;
         } else {
           IOSCount = 1;

@@ -1,9 +1,7 @@
-import { PropsWithChildren } from "react";
+import { FormHTMLAttributes } from "react";
 import styled from "styled-components";
 
-type FormProps = PropsWithChildren<{
-  onSubmit: () => void;
-}>;
+type FormProps = FormHTMLAttributes<HTMLFormElement>;
 
 export function Form(props: FormProps) {
   const { children, onSubmit } = props;

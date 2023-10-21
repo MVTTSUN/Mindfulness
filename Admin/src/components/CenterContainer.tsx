@@ -5,6 +5,7 @@ type CenterContainerProps = PropsWithChildren;
 
 export function CenterContainer(props: CenterContainerProps) {
   const { children } = props;
+
   return <CenterContainerStyled>{children}</CenterContainerStyled>;
 }
 

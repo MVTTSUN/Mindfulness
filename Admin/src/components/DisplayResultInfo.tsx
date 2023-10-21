@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { BASE_URL, Color } from "../const";
+import { ApiRoute, BASE_URL, Color } from "../const";
 import { FontSizeHeading, FontSizeStandard } from "../mixins";
 import Lottie from "react-lottie-player";
 import LottieCircle from "/public/lottie/animaRound.json";
@@ -26,7 +26,13 @@ export function DisplayResultInfo() {
       </Text>
       <WrapperImageAndLottie>
         <Image
-          src={data ? `${BASE_URL}/info/filename/${data?.avatarPsycho}` : ""}
+          src={
+            data
+              ? `${BASE_URL}${ApiRoute.Info + ApiRoute.Filename}/${
+                  data?.avatarPsycho
+                }`
+              : ""
+          }
         />
         <LottieStyled loop animationData={LottieCircle} play />
       </WrapperImageAndLottie>
@@ -54,7 +60,13 @@ export function DisplayResultInfo() {
       </Text>
       <WrapperImageAndLottie>
         <Image
-          src={data ? `${BASE_URL}/info/filename/${data?.avatarDevelop}` : ""}
+          src={
+            data
+              ? `${BASE_URL}${ApiRoute.Info + ApiRoute.Filename}/${
+                  data?.avatarDevelop
+                }`
+              : ""
+          }
         />
         <LottieStyled loop animationData={LottieCircle} play />
       </WrapperImageAndLottie>

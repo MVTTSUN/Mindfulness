@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const Meditation = require('../models/meditation');
 const IncorrectError = require('../errors/incorrectError');
 const NotFoundDataError = require('../errors/notFoundDataError');
+const ConflictError = require('../errors/conflictError');
 const { errorMessages } = require('../const');
 const { DEV_DATABASE_URL } = require('../config');
 require('dotenv').config();
@@ -70,17 +71,15 @@ const getMeditationFile = async (req, res, next) => {
       const end = partialEnd ? parseInt(partialEnd, 10) : fileLength - 1;
       const chunkSize = end - start + 1;
 
-      if (req.headers.range) {
-        res.writeHead(206, {
-          'Content-Range': `bytes ${start}-${end}/${fileLength}`,
-          'Accept-Ranges': 'bytes',
-          'Content-Length': chunkSize,
-          'Content-Type': file[0].contentType,
-        });
-      }
+      res.writeHead(206, {
+        'Content-Range': `bytes ${start}-${end}/${fileLength}`,
+        'Accept-Ranges': 'bytes',
+        'Content-Length': chunkSize,
+        'Content-Type': file[0].contentType,
+      });
 
       return new Promise((resolve, reject) => {
-        const downloadStream = gfs.openDownloadStreamByName(filename, { start, end });
+        const downloadStream = gfs.openDownloadStreamByName(filename, { start, end: end + 1 });
         downloadStream.on('error', (err) => {
           res.end();
           reject(err);
@@ -114,6 +113,27 @@ const postMeditation = async (req, res, next) => {
     });
 
     res.send(meditation);
+  } catch (err) {
+    if (err instanceof mongoose.Error.ValidationError) {
+      next(new IncorrectError(errorMessages.INCORRECT_DATA));
+    } else if (err.code === 11000) {
+      next(new ConflictError(errorMessages.CONFLICT));
+    } else {
+      next(err);
+    }
+  }
+};
+
+const postMeditationUnique = async (req, res, next) => {
+  try {
+    const { title } = req.body;
+    const dbMeditation = await Meditation.findOne({ title });
+
+    if (dbMeditation) {
+      throw new ConflictError(errorMessages.CONFLICT);
+    }
+
+    res.send({ message: 'ok' });
   } catch (err) {
     if (err instanceof mongoose.Error.ValidationError) {
       next(new IncorrectError(errorMessages.INCORRECT_DATA));
@@ -183,6 +203,30 @@ const patchMeditation = async (req, res, next) => {
       next(new IncorrectError(errorMessages.INCORRECT_DATA));
     } else if (err instanceof mongoose.Error.DocumentNotFoundError) {
       next(new NotFoundDataError(errorMessages.NOT_FOUND_DATA));
+    } else if (err.code === 11000) {
+      next(new ConflictError(errorMessages.CONFLICT));
+    } else {
+      next(err);
+    }
+  }
+};
+
+const patchMeditationUnique = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { title } = req.body;
+
+    const meditationById = await Meditation.findOne({ _id: id });
+    const meditationByTitle = await Meditation.findOne({ title });
+
+    if (meditationById.title !== title && meditationByTitle) {
+      throw new ConflictError(errorMessages.CONFLICT);
+    }
+
+    res.send({ message: 'ok' });
+  } catch (err) {
+    if (err instanceof mongoose.Error.ValidationError) {
+      next(new IncorrectError(errorMessages.INCORRECT_DATA));
     } else {
       next(err);
     }
@@ -191,9 +235,11 @@ const patchMeditation = async (req, res, next) => {
 
 module.exports = {
   postMeditation,
+  postMeditationUnique,
   getMeditation,
   getMeditations,
   getMeditationFile,
   deleteMeditation,
   patchMeditation,
+  patchMeditationUnique,
 };

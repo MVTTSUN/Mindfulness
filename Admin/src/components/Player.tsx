@@ -1,79 +1,65 @@
 import styled from "styled-components";
 import { useGetAudio } from "../hooks/useGetAudio";
-import { Color } from "../const";
+import { Color, Image, MEDITATION_AUDIO_ID } from "../const";
 import { ResetButton } from "../mixins";
 import { ChangeEvent, useEffect } from "react";
+import { useFrameInterval } from "../hooks/useFrameInterval";
 import { useAppSelector } from "../hooks/useAppSelector";
-import {
-  getCurrentTime,
-  getDuration,
-  getIsPause,
-} from "../store/currentAudioSelectors";
+import { getIsPause } from "../store/currentAudioSelectors";
 import { useAppDispatch } from "../hooks/useAppDispatch";
 import { changeCurrentTime, changeIsPause } from "../store/currentAudioSlice";
-import { useFrameInterval } from "../hooks/useFrameInterval";
 
 export function Player() {
   const isPause = useAppSelector(getIsPause);
   const dispatch = useAppDispatch();
-  const currentTime = useAppSelector(getCurrentTime);
-  const duration = useAppSelector(getDuration);
-  const audio = useGetAudio("meditation-audio");
-  const { startAnimating, stopAnimating } = useFrameInterval(100, () => {
-    if (audio) {
-      dispatch(changeCurrentTime(audio.currentTime));
-    }
-  });
+  const {
+    getCurrentTime,
+    getDuration,
+    changeCurrentTimeAudio,
+    playAudio,
+    pauseAudio,
+  } = useGetAudio(MEDITATION_AUDIO_ID);
+  const { startAnimating, stopAnimating } = useFrameInterval(100, () =>
+    dispatch(changeCurrentTime(getCurrentTime()))
+  );
 
   const togglePlayAndPause = () => {
-    if (audio?.paused) {
+    if (isPause) {
       dispatch(changeIsPause(false));
-      audio.play();
+      playAudio();
       startAnimating();
     } else {
       dispatch(changeIsPause(true));
-      audio?.pause();
+      pauseAudio();
       stopAnimating();
     }
   };
 
   const changeTimeAudio = (evt: ChangeEvent<HTMLInputElement>) => {
-    if (audio) {
-      const value = Number(evt.target.value);
+    const value = Number(evt.target.value);
 
-      setTimeout(() => {
-        dispatch(changeCurrentTime(value));
-        audio.currentTime = value;
-      }, 80);
-    }
+    setTimeout(() => {
+      dispatch(changeCurrentTime(value));
+      changeCurrentTimeAudio(value);
+    }, 80);
   };
 
   const changeBackward = () => {
-    if (audio) {
-      const value = audio.currentTime - 5 <= 0 ? 0 : audio.currentTime - 5;
+    const currentTime = getCurrentTime();
+    const value = currentTime - 5 <= 0 ? 0 : currentTime - 5;
 
-      dispatch(changeCurrentTime(value));
-      audio.currentTime = value;
-    }
+    dispatch(changeCurrentTime(value));
+    changeCurrentTimeAudio(value);
   };
 
   const changeForward = () => {
-    if (audio) {
-      const value =
-        audio.currentTime + 5 >= audio.duration
-          ? audio.duration
-          : audio.currentTime + 5;
+    const currentTime = getCurrentTime();
+    const duration = getDuration();
+    const value = currentTime + 5 >= duration ? duration : currentTime + 5;
 
-      dispatch(changeCurrentTime(value));
-      audio.currentTime = value;
-    }
+    dispatch(changeCurrentTime(value));
+    changeCurrentTimeAudio(value);
   };
-
-  useEffect(() => {
-    return () => {
-      stopAnimating();
-    };
-  }, []);
 
   useEffect(() => {
     if (isPause) {
@@ -81,35 +67,41 @@ export function Player() {
     }
   }, [isPause]);
 
+  useEffect(() => {
+    return () => {
+      stopAnimating();
+    };
+  }, []);
+
   return (
     <PlayerStyled>
       <Container>
         <ControlContainer>
           <BackwardAndForwardButton onClick={changeBackward}>
-            <img src="/images/backward.svg" alt="Назад" />
+            <img src={Image.Backward} alt="Назад" />
           </BackwardAndForwardButton>
           <PlayButton type="button" onClick={togglePlayAndPause}>
             {isPause ? (
-              <img src="/images/play.svg" alt="Играть" />
+              <img src={Image.Play} alt="Играть" />
             ) : (
-              <img src="/images/pause.svg" alt="Пауза" />
+              <img src={Image.Pause} alt="Пауза" />
             )}
           </PlayButton>
           <BackwardAndForwardButton onClick={changeForward}>
-            <img src="/images/forward.svg" alt="Назад" />
+            <img src={Image.Forward} alt="Назад" />
           </BackwardAndForwardButton>
         </ControlContainer>
         <LineContainer>
-          <Time>{currentTime.toFixed(1)}</Time>
+          <Time>{getCurrentTime().toFixed(1)}</Time>
           <LineBar
-            value={currentTime}
+            value={getCurrentTime()}
             onChange={changeTimeAudio}
             step={1}
             min={0}
-            max={Math.floor(duration)}
+            max={Math.floor(getDuration())}
             type="range"
           />
-          <Time>{duration.toFixed(1)}</Time>
+          <Time>{getDuration().toFixed(1)}</Time>
         </LineContainer>
       </Container>
     </PlayerStyled>

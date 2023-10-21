@@ -17,6 +17,7 @@ import {
 } from "../store/statisticsSlice";
 import { useState } from "react";
 import { ContainerTwoSides } from "../components/ContainerTwoSides";
+import { getOptionDonut, getOptionLine } from "../utils/utils";
 
 export function StatisticsPage() {
   const [filterYearActive, setFilterYearActive] = useState<number>(
@@ -25,135 +26,9 @@ export function StatisticsPage() {
   const [filterMonthActive, setFilterMonthActive] = useState<string>("Все");
   const [filterTypeActive, setFilterTypeActive] = useState<number>(0);
   const [filterIsTitleActive, setIsFilterTitleActive] = useState(false);
-  const { data } = useGetStatisticsQuery();
   const filteredData = useAppSelector(getFilteredStatistics);
   const dispatch = useAppDispatch();
-
-  console.log(data);
-
-  const optionLine = {
-    tooltip: {
-      trigger: "axis",
-    },
-    legend: {
-      data: ["Все платформы", "Android", "IOS"],
-    },
-    grid: {
-      left: "3%",
-      right: "4%",
-      bottom: "3%",
-      containLabel: true,
-    },
-    toolbox: {
-      feature: {
-        saveAsImage: {},
-      },
-    },
-    xAxis: {
-      type: "category",
-      boundaryGap: false,
-      data: [
-        "Янв",
-        "Фев",
-        "Мар",
-        "Апр",
-        "Май",
-        "Июн",
-        "Июл",
-        "Авг",
-        "Сен",
-        "Окт",
-        "Ноя",
-        "Дек",
-      ],
-    },
-    yAxis: {
-      type: "value",
-    },
-    color: [Color.Errors, Color.Meditation, Color.Task],
-    series: [
-      {
-        name: "Все платформы",
-        type: "line",
-        data: filteredData?.months,
-        lineStyle: {
-          width: 3,
-        },
-        symbolSize: 10,
-      },
-      {
-        name: "Android",
-        type: "line",
-        data: filteredData?.monthsAndroid,
-        lineStyle: {
-          width: 3,
-        },
-        symbolSize: 10,
-      },
-      {
-        name: "IOS",
-        type: "line",
-        data: filteredData?.monthsIOS,
-        lineStyle: {
-          width: 3,
-        },
-        symbolSize: 10,
-      },
-    ],
-  };
-
-  const optionDonut = {
-    tooltip: {
-      trigger: "item",
-    },
-    legend: {
-      top: "0%",
-      left: "0%",
-      width: 30,
-    },
-    color: [Color.Meditation, Color.Task],
-    series: [
-      {
-        type: "pie",
-        radius: ["40%", "90%"],
-        avoidLabelOverlap: false,
-        itemStyle: {
-          borderRadius: 10,
-          borderWidth: 2,
-        },
-        label: {
-          show: false,
-          position: "center",
-        },
-        emphasis: {
-          label: {
-            show: true,
-            fontSize: 16,
-            fontWeight: "bold",
-          },
-        },
-        labelLine: {
-          show: false,
-        },
-        data: [
-          {
-            value: filteredData?.monthsAndroid?.reduce(
-              (acc, item) => acc + item,
-              0
-            ),
-            name: "Android",
-          },
-          {
-            value: filteredData?.monthsIOS?.reduce(
-              (acc, item) => acc + item,
-              0
-            ),
-            name: "IOS",
-          },
-        ],
-      },
-    ],
-  };
+  useGetStatisticsQuery();
 
   const setYearHandle = (index: number, year: number) => {
     dispatch(setYear(year));
@@ -239,38 +114,45 @@ export function StatisticsPage() {
           <Text>
             Всего посещений: {filteredData && filteredData.statisticsCopy.count}
           </Text>
-          <ReactEChartsStyled option={optionLine} />
-          <ReactEChartsStyled option={optionDonut} />
+          <ReactEChartsStyled
+            option={getOptionLine(
+              filteredData?.months,
+              filteredData?.monthsAndroid,
+              filteredData?.monthsIOS
+            )}
+          />
+          <ReactEChartsStyled
+            option={getOptionDonut(
+              filteredData?.monthsAndroid,
+              filteredData?.monthsIOS
+            )}
+          />
         </Container>
         <Container>
           {filteredData?.statisticsCopy.meditations?.map(
-            (meditation, index) =>
-              !!meditation.count && (
-                <li key={index}>
-                  <Card
-                    $isMeditation
-                    onClick={() => setTitleHandle(meditation.title)}
-                  >
-                    <CardCount $isMeditation>{meditation.count}</CardCount>
-                    <TitleCard $isMeditation>{meditation.title}</TitleCard>
-                  </Card>
-                </li>
-              )
+            (meditation, index) => (
+              <li key={index}>
+                <Card
+                  $isMeditation
+                  onClick={() => setTitleHandle(meditation.title)}
+                >
+                  <CardCount $isMeditation>{meditation.count}</CardCount>
+                  <TitleCard $isMeditation>{meditation.title}</TitleCard>
+                </Card>
+              </li>
+            )
           )}
-          {filteredData?.statisticsCopy.tasks?.map(
-            (task, index) =>
-              !!task.count && (
-                <li key={index}>
-                  <Card
-                    $isMeditation={false}
-                    onClick={() => setTitleHandle(task.title)}
-                  >
-                    <CardCount $isMeditation={false}>{task.count}</CardCount>
-                    <TitleCard $isMeditation={false}>{task.title}</TitleCard>
-                  </Card>
-                </li>
-              )
-          )}
+          {filteredData?.statisticsCopy.tasks?.map((task, index) => (
+            <li key={index}>
+              <Card
+                $isMeditation={false}
+                onClick={() => setTitleHandle(task.title)}
+              >
+                <CardCount $isMeditation={false}>{task.count}</CardCount>
+                <TitleCard $isMeditation={false}>{task.title}</TitleCard>
+              </Card>
+            </li>
+          ))}
         </Container>
       </ContainerTwoSides>
     </>

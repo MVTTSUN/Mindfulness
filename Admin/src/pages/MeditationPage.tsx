@@ -9,12 +9,11 @@ import { memo } from "react";
 
 export const MeditationPage = memo(() => {
   const { id } = useParams() as { id: string };
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
   const { data, error } = useGetMeditationQuery(id);
   const textEdit = data ? "Редактировать" : "Добавить";
   const errorError = error && "error" in error ? error.error : "";
-  const navigate = useNavigate();
-  const { pathname } = useLocation();
-  console.log(1);
 
   const navigateBack = () => navigate(-1);
 

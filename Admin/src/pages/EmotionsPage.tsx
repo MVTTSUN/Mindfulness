@@ -6,12 +6,14 @@ import { ContainerOneSide } from "../components/ContainerOneSide";
 import styled from "styled-components";
 import { FontSizeStandard, ResetButton, ResetList } from "../mixins";
 import { Color } from "../const";
+import { DataEmotion } from "../types/get-results";
 
 export function EmotionsPage() {
   const { data, error } = useGetEmotionsQuery();
   const [deleteEmotion] = useDeleteEmotionMutation();
   const errorError = error && "error" in error ? error.error : "";
-  const dataCopy = data && [...data];
+  const dataCopy =
+    data && (JSON.parse(JSON.stringify(data)) as DataEmotion[] | undefined);
   const dataSorted =
     dataCopy && dataCopy.sort((a, b) => a.value.localeCompare(b.value));
 

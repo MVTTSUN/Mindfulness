@@ -7,11 +7,11 @@ import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { BrowserRoute } from "../const";
 
 export function InformationPage() {
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
   const { data, error } = useGetInfoQuery();
   const textEdit = data ? "Редактировать" : "Добавить";
   const errorError = error && "error" in error ? error.error : "";
-  const navigate = useNavigate();
-  const { pathname } = useLocation();
 
   const navigateEditAndBack = () => {
     if (pathname === BrowserRoute.Information) {

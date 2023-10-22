@@ -91,6 +91,10 @@ const Strong = styled.p`
   padding: 5px 0;
   font-size: 20px;
   color: ${Color.TextStandard};
+
+  @media (max-width: 550px) {
+    font-size: 16px;
+  }
 `;
 
 const Text = styled.p`
@@ -106,6 +110,10 @@ const TextStrong = styled.span`
   width: 100%;
   color: ${Color.TextStandard};
   text-align: justify;
+
+  @media (max-width: 550px) {
+    font-size: 14px;
+  }
 `;
 
 const WrapperImageAndLottie = styled.div`

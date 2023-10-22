@@ -58,6 +58,7 @@ const Text = styled.p`
 `;
 
 const Image = styled.img`
+  box-sizing: border-box;
   aspect-ratio: 8 / 5;
   width: 100%;
   object-fit: cover;
@@ -67,6 +68,7 @@ const Image = styled.img`
 `;
 
 const WrapperLottie = styled.div`
+  box-sizing: border-box;
   display: flex;
   justify-content: center;
   align-items: center;

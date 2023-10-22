@@ -16,4 +16,8 @@ const SubtitleStyled = styled.h2`
   color: ${Color.TextStandard};
   text-align: center;
   margin-bottom: 40px;
+
+  @media (max-width: 550px) {
+    margin-bottom: 20px;
+  }
 `;

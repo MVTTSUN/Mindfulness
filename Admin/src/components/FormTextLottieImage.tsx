@@ -27,7 +27,7 @@ import {
   useValidateAddTaskMutation,
   useValidateUpdateTaskMutation,
 } from "../services/api";
-import { ApiRoute, BASE_URL, BrowserRoute, OPTIONS_KIND_TASKS } from "../const";
+import { ApiRoute, BASE_URL, BrowserRoute, Image, OPTIONS_KIND_TASKS } from "../const";
 import {
   DragDropContext,
   Droppable,
@@ -329,14 +329,14 @@ const ButtonDelete = styled.button`
   ${ResetButton}
   width: 30px;
   height: 30px;
-  background: url(/images/close.svg) no-repeat center;
+  background: url(${Image.Close}) no-repeat center;
 `;
 
 const ButtonMove = styled.div`
   ${ResetButton}
   width: 30px;
   height: 30px;
-  background: url(/images/move.svg) no-repeat center;
+  background: url(${Image.Move}) no-repeat center;
 `;
 
 const ContainerButtonsAdd = styled.div`

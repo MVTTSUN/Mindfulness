@@ -57,4 +57,8 @@ const ButtonStyled = styled.button<{ $isPrimary?: boolean }>`
     cursor: not-allowed;
     opacity: 0.4;
   }
+
+  @media (max-width: 550px) {
+    font-size: 14px;
+  }
 `;

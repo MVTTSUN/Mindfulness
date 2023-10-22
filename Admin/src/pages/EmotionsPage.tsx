@@ -5,7 +5,7 @@ import { useDeleteEmotionMutation, useGetEmotionsQuery } from "../services/api";
 import { ContainerOneSide } from "../components/ContainerOneSide";
 import styled from "styled-components";
 import { FontSizeStandard, ResetButton, ResetList } from "../mixins";
-import { Color } from "../const";
+import { Color, Image } from "../const";
 import { DataEmotion } from "../types/get-results";
 
 export function EmotionsPage() {
@@ -75,5 +75,5 @@ const ButtonDelete = styled.button`
   ${ResetButton}
   width: 25px;
   height: 25px;
-  background: url(/images/close.svg) no-repeat center;
+  background: url(${Image.Close}) no-repeat center;
 `;

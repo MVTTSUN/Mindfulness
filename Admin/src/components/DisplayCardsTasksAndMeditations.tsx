@@ -6,7 +6,7 @@ import {
   useDeleteTaskMutation,
 } from "../services/api";
 import { Link, useLocation } from "react-router-dom";
-import { BrowserRoute, Color } from "../const";
+import { BrowserRoute, Color, Image } from "../const";
 
 type DisplayCardsTasksAndMeditationsProps = {
   data?: DataTextLottieImage[] | DataMeditation[];
@@ -56,6 +56,10 @@ const Container = styled.ul`
   gap: 10px;
   width: 320px;
   align-content: baseline;
+
+  @media (max-width: 550px) {
+    justify-content: center;
+  }
 `;
 
 const LinkStyled = styled(Link)`
@@ -78,6 +82,11 @@ const Card = styled.article<{ $isMeditation: boolean }>`
   &:hover {
     opacity: 0.7;
   }
+
+  @media (max-width: 420px) {
+    width: 85px;
+    height: 85px;
+  }
 `;
 
 const TitleCard = styled.h3<{ $isMeditation: boolean }>`
@@ -86,6 +95,10 @@ const TitleCard = styled.h3<{ $isMeditation: boolean }>`
   color: ${({ $isMeditation }) =>
     $isMeditation ? Color.TextWhite : Color.TextStandard};
   text-align: center;
+
+  @media (max-width: 550px) {
+    font-size: 12px;
+  }
 `;
 
 const ButtonDelete = styled.button`
@@ -94,5 +107,5 @@ const ButtonDelete = styled.button`
   margin-left: auto;
   width: 25px;
   height: 25px;
-  background: url(/images/close.svg) no-repeat center;
+  background: url(${Image.Close}) no-repeat center;
 `;

@@ -12,6 +12,7 @@ enum BrowserRoute {
   Emotion = "/emotion",
   Information = "/information",
   Edit = "/edit",
+  Setting = "/setting",
 }
 
 enum ApiRoute {
@@ -55,6 +56,11 @@ enum Image {
   Forward = "/images/forward.svg",
   Pause = "/images/pause.svg",
   Play = "/images/play.svg",
+  Burger = "/images/burger.svg",
+  Close = "/images/close.svg",
+  CloudLoad = "/images/cloud-load.svg",
+  Image = "/images/image.svg",
+  Move = "/images/move.svg",
 }
 
 const MEDITATION_AUDIO_ID = "meditation-audio";

@@ -21,6 +21,7 @@ import {
   BASE_URL,
   BrowserRoute,
   Color,
+  Image,
   OPTIONS_KIND_MEDITATIONS,
 } from "../const";
 import { useEffect, useState } from "react";
@@ -343,14 +344,14 @@ const ButtonMove = styled.div`
   ${ResetButton}
   width: 30px;
   height: 30px;
-  background: url(/images/move.svg) no-repeat center;
+  background: url(${Image.Move}) no-repeat center;
 `;
 
 const ButtonClose = styled.button`
   ${ResetButton}
   width: 30px;
   height: 30px;
-  background: url(/images/close.svg) no-repeat center;
+  background: url(${Image.Close}) no-repeat center;
 `;
 
 const FieldsContainer = styled.div`

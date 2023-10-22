@@ -9,6 +9,7 @@ import styled from "styled-components";
 import { ResetButton } from "../mixins";
 import { ErrorField } from "./ErrorField";
 import { useAddEmotionsMutation } from "../services/api";
+import { Image } from "../const";
 
 export function FormEmotion() {
   const [addEmotions, { isLoading }] = useAddEmotionsMutation();
@@ -74,5 +75,5 @@ const ButtonClose = styled.button`
   ${ResetButton}
   width: 30px;
   height: 30px;
-  background: url(/images/close.svg) no-repeat center;
+  background: url(${Image.Close}) no-repeat center;
 `;

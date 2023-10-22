@@ -79,6 +79,7 @@ export function App() {
               />
               <Route path={BrowserRoute.Login} element={<Auth />} />
               <Route path={BrowserRoute.Register} element={<Auth />} />
+              <Route path={BrowserRoute.Setting} element={<Auth />} />
             </Route>
             <Route
               path={BrowserRoute.NotFoundPage}

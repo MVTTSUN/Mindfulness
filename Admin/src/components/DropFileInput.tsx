@@ -9,7 +9,7 @@ import {
 } from "react";
 import styled from "styled-components";
 import { FontSizeStandard } from "../mixins";
-import { Color, MAX_SIZE_IMAGE } from "../const";
+import { Color, Image, MAX_SIZE_IMAGE } from "../const";
 import imageDefault from "/images/image.svg";
 import Lottie from "react-lottie-player";
 import EmptyLottie from "/public/lottie/empty.json";
@@ -219,6 +219,10 @@ const Container = styled.div<{ $isNotArray?: boolean }>`
   align-items: stretch;
   height: 150px;
   gap: 5px;
+
+  @media (max-width: 420px) {
+    height: 120px;
+  }
 `;
 
 const Label = styled.label<{ $isDrag: boolean }>`
@@ -239,9 +243,22 @@ const Label = styled.label<{ $isDrag: boolean }>`
   transition: background-color 0.6s ease, border 0.6s ease;
 
   &::before {
-    content: url(/images/cloud-load.svg);
+    content: url(${Image.CloudLoad});
     width: 60px;
     height: 60px;
+  }
+
+  @media (max-width: 550px) {
+    font-size: 12px;
+  }
+
+  @media (max-width: 420px) {
+    font-size: 10px;
+
+    &::before {
+      width: 30px;
+      height: 30px;
+    }
   }
 `;
 

@@ -225,4 +225,8 @@ const Strong = styled.p`
   padding: 5px 0;
   font-size: 20px;
   color: ${Color.TextStandard};
+
+  @media (max-width: 550px) {
+    font-size: 16px;
+  }
 `;

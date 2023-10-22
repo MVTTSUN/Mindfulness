@@ -94,6 +94,7 @@ const Text = styled.p`
 `;
 
 const Image = styled.img`
+  box-sizing: border-box;
   aspect-ratio: 1 / 1;
   width: 100%;
   object-fit: cover;
@@ -114,6 +115,10 @@ const TextLine = styled.p<{ $isActive?: boolean }>`
   width: 100%;
   color: ${Color.TextStandard};
   opacity: ${({ $isActive }) => ($isActive ? 1 : 0.6)};
+
+  @media (max-width: 550px) {
+    font-size: 20px;
+  }
 `;
 
 const TimeContainer = styled.div`

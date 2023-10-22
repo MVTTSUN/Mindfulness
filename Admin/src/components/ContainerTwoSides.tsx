@@ -18,10 +18,19 @@ export function ContainerTwoSides(props: ContainerTwoSidesProps) {
 const Container = styled.div`
   display: flex;
   gap: 20px;
+  align-items: center;
+
+  @media (max-width: 1100px) {
+    flex-direction: column;
+  }
 `;
 
 const Side = styled.div`
   width: 50%;
   display: flex;
   justify-content: center;
+
+  @media (max-width: 1100px) {
+    width: 100%;
+  }
 `;

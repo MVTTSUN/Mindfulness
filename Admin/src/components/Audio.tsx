@@ -86,9 +86,17 @@ export function Audio(props: AudioProps) {
         $paddingButton={paddingButton}
       >
         {isPause ? (
-          <img src={Image.Play} alt="Играть" />
+          <ImageStyled
+            $paddingButton={paddingButton}
+            src={Image.Play}
+            alt="Играть"
+          />
         ) : (
-          <img src={Image.Pause} alt="Пауза" />
+          <ImageStyled
+            $paddingButton={paddingButton}
+            src={Image.Pause}
+            alt="Пауза"
+          />
         )}
       </PlayButton>
       {isOpen && createPortal(<Player />, document.body)}
@@ -98,6 +106,9 @@ export function Audio(props: AudioProps) {
 
 const PlayButton = styled.button<{ $paddingButton?: string }>`
   ${ResetButton}
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: ${({ $paddingButton }) =>
     $paddingButton ? $paddingButton : "40px"};
   aspect-ratio: 1 / 1;
@@ -109,4 +120,8 @@ const PlayButton = styled.button<{ $paddingButton?: string }>`
     opacity: 0.5;
     cursor: not-allowed;
   }
+`;
+
+const ImageStyled = styled.img<{ $paddingButton?: string }>`
+  width: ${({ $paddingButton }) => ($paddingButton ? 18 : 70)}px;
 `;

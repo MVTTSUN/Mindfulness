@@ -6,6 +6,10 @@ const FontSizeStandard = css`
   font-weight: 400;
   font-size: 16px;
   line-height: 1.2;
+
+  @media (max-width: 550px) {
+    font-size: 14px;
+  }
 `;
 
 const FontSizeSubtitle = css`
@@ -13,6 +17,10 @@ const FontSizeSubtitle = css`
   font-weight: 500;
   font-size: 24px;
   line-height: 1.2;
+
+  @media (max-width: 550px) {
+    font-size: 18px;
+  }
 `;
 
 const FontSizeHeading = css`
@@ -20,6 +28,10 @@ const FontSizeHeading = css`
   font-weight: 600;
   font-size: 32px;
   line-height: 1.2;
+
+  @media (max-width: 550px) {
+    font-size: 24px;
+  }
 `;
 
 const ResetButton = css`

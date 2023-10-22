@@ -162,7 +162,7 @@ export function StatisticsPage() {
 const ReactEChartsStyled = styled(ReactECharts)`
   box-sizing: border-box;
   padding: 20px;
-  width: 500px;
+  width: 100%;
   border: 5px dashed ${Color.Primary};
   border-radius: 25px;
 `;
@@ -179,6 +179,10 @@ const FilterContainer = styled.ul`
   max-width: 480px;
   justify-content: center;
   margin: 10px 0;
+
+  @media (max-width: 550px) {
+    margin: 0;
+  }
 `;
 
 const ButtonSpace = styled.li`
@@ -191,6 +195,16 @@ const ButtonSpace = styled.li`
   &:last-child {
     border-right: 2px solid ${Color.TextStandard};
   }
+
+  @media (max-width: 420px) {
+    &:nth-child(7n) {
+      border-right: none;
+    }
+
+    &:nth-child(5n) {
+      border-right: 2px solid ${Color.TextStandard};
+    }
+  }
 `;
 
 const ButtonYear = styled.button<{ $isActive: boolean }>`
@@ -202,6 +216,12 @@ const ButtonYear = styled.button<{ $isActive: boolean }>`
   border-bottom: 5px solid
     ${({ $isActive }) => ($isActive ? Color.Primary : "transparent")};
   transition: border-bottom 0.3s ease;
+
+  @media (max-width: 550px) {
+    font-size: 14px;
+    width: 35px;
+    margin: 2px 5px;
+  }
 `;
 
 const ButtonType = styled.button<{ $isActive: boolean }>`
@@ -213,6 +233,12 @@ const ButtonType = styled.button<{ $isActive: boolean }>`
   border-bottom: 5px solid
     ${({ $isActive }) => ($isActive ? Color.Primary : "transparent")};
   transition: border-bottom 0.3s ease;
+
+  @media (max-width: 550px) {
+    font-size: 14px;
+    width: 80px;
+    margin: 2px 5px;
+  }
 `;
 
 const Container = styled.ul`
@@ -223,6 +249,14 @@ const Container = styled.ul`
   width: 500px;
   align-content: baseline;
   justify-content: center;
+
+  @media (max-width: 550px) {
+    max-width: 370px;
+  }
+
+  @media (max-width: 420px) {
+    max-width: 280px;
+  }
 `;
 
 const Card = styled.article<{ $isMeditation: boolean }>`
@@ -244,6 +278,11 @@ const Card = styled.article<{ $isMeditation: boolean }>`
   &:hover {
     opacity: 0.7;
   }
+
+  @media (max-width: 550px) {
+    width: 85px;
+    height: 85px;
+  }
 `;
 
 const TitleCard = styled.h3<{ $isMeditation: boolean }>`
@@ -252,6 +291,10 @@ const TitleCard = styled.h3<{ $isMeditation: boolean }>`
   color: ${({ $isMeditation }) =>
     $isMeditation ? Color.TextWhite : Color.TextStandard};
   text-align: center;
+
+  @media (max-width: 550px) {
+    font-size: 10px;
+  }
 `;
 
 const CardCount = styled.p<{ $isMeditation: boolean }>`
@@ -260,4 +303,8 @@ const CardCount = styled.p<{ $isMeditation: boolean }>`
   color: ${({ $isMeditation }) =>
     $isMeditation ? Color.TextWhite : Color.TextStandard};
   text-align: center;
+
+  @media (max-width: 550px) {
+    font-size: 14px;
+  }
 `;

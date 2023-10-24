@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { FontSizeSubtitle, ResetButton, ResetList } from "../mixins";
-import { DataMeditation, DataTextLottieImage } from "../types/get-results";
+import { DataMeditation, DataTextLottieImage } from "../types/server";
 import {
   useDeleteMeditationMutation,
   useDeleteTaskMutation,
@@ -55,11 +55,8 @@ const Container = styled.ul`
   flex-wrap: wrap;
   gap: 10px;
   width: 320px;
+  justify-content: center;
   align-content: baseline;
-
-  @media (max-width: 550px) {
-    justify-content: center;
-  }
 `;
 
 const LinkStyled = styled(Link)`

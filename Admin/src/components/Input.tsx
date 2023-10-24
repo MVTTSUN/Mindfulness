@@ -1,36 +1,31 @@
-import { ForwardedRef, forwardRef } from "react";
+import { ForwardedRef, InputHTMLAttributes, forwardRef } from "react";
 import styled from "styled-components";
 import { FontSizeStandard } from "../mixins";
 import { Color } from "../const";
-import { ChangeHandler } from "react-hook-form";
 
-type InputProps = {
-  onChange: ChangeHandler;
-  name: string;
+type InputProps = InputHTMLAttributes<HTMLInputElement> & {
   withLabel?: boolean;
   labelText?: string;
   isNotArray?: boolean;
   isActive?: boolean;
-  type?: string;
+  isPassword?: boolean;
 };
 
 export const Input = forwardRef(
   (props: InputProps, ref: ForwardedRef<HTMLInputElement>) => {
-    const { onChange, name, withLabel, labelText, isNotArray, isActive, type } =
-      props;
+    const { name, withLabel, labelText, isNotArray, isActive, ...rest } = props;
 
     return (
       <>
         {withLabel && <Label htmlFor={name}>{labelText}</Label>}
         <InputStyled
+          {...rest}
           $isActive={isActive}
           $isNotArray={isNotArray}
           ref={ref}
           name={name}
-          onChange={onChange}
           id={name}
           placeholder="Введите текст"
-          type={type || "text"}
           step={0.1}
         />
       </>

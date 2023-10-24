@@ -4,7 +4,7 @@ import { FontSizeHeading, FontSizeStandard } from "../mixins";
 import Lottie from "react-lottie-player";
 import LottieCircle from "/public/lottie/animaRound.json";
 import { useOutletContext } from "react-router-dom";
-import { DataInformation } from "../types/get-results";
+import { DataInformation } from "../types/server";
 
 export function DisplayResultInfo() {
   const data = useOutletContext<DataInformation>();

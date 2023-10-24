@@ -11,9 +11,10 @@ import { HistoryRouter } from "./components/HistoryRouter.tsx";
 import { browserHistory } from "./utils/browserHistory.ts";
 
 const GlobalStyle = createGlobalStyle`
-  html {
-    width:100vw;
-    overflow-x:hidden;
+  #root {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
   }
 
   body {

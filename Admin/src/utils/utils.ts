@@ -21,6 +21,9 @@ const getOptionLine = (
     },
     legend: {
       data: ["Все платформы", "Android", "IOS"],
+      top: "0%",
+      left: "0%",
+      width: 150,
     },
     grid: {
       left: "3%",
@@ -30,6 +33,13 @@ const getOptionLine = (
     },
     toolbox: {
       feature: {
+        magicType: {
+          type: ["line", "bar"],
+          title: {
+            line: "",
+            bar: "",
+          },
+        },
         saveAsImage: {},
       },
     },
@@ -84,6 +94,11 @@ const getOptionDonut = (monthsAndroid?: number[], monthsIOS?: number[]) => {
       left: "0%",
       width: 30,
     },
+    toolbox: {
+      feature: {
+        saveAsImage: {},
+      },
+    },
     color: [Color.Task, Color.Meditation],
     series: [
       {
@@ -92,6 +107,7 @@ const getOptionDonut = (monthsAndroid?: number[], monthsIOS?: number[]) => {
         avoidLabelOverlap: false,
         itemStyle: {
           borderRadius: 10,
+          borderColor: Color.BackgroundMain,
           borderWidth: 2,
         },
         label: {
@@ -110,17 +126,11 @@ const getOptionDonut = (monthsAndroid?: number[], monthsIOS?: number[]) => {
         },
         data: [
           {
-            value: monthsAndroid?.reduce(
-              (acc, item) => acc + item,
-              0
-            ),
+            value: monthsAndroid?.reduce((acc, item) => acc + item, 0),
             name: "Android",
           },
           {
-            value: monthsIOS?.reduce(
-              (acc, item) => acc + item,
-              0
-            ),
+            value: monthsIOS?.reduce((acc, item) => acc + item, 0),
             name: "IOS",
           },
         ],

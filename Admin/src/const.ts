@@ -2,8 +2,8 @@ import { getYears } from "./utils/utils";
 
 enum BrowserRoute {
   Main = "/",
-  Login = "/signin",
-  Register = "/signup",
+  Login = "/login",
+  Register = "/registration",
   Statistic = "/statistic",
   NotFoundPage = "*",
   Tip = "/tip",
@@ -12,7 +12,7 @@ enum BrowserRoute {
   Emotion = "/emotion",
   Information = "/information",
   Edit = "/edit",
-  Setting = "/setting",
+  Profile = "/profile",
 }
 
 enum ApiRoute {
@@ -24,6 +24,7 @@ enum ApiRoute {
   Filename = "/filename",
   Statistics = "/statistics",
   Validate = "/validate",
+  Auth = "/auth",
 }
 
 enum Color {
@@ -44,11 +45,14 @@ enum ErrorText {
   SizeFile = "Максимальный размер",
   OnlyCyrillic = "Только кириллические буквы",
   Email = "Неверный формат почты",
+  PasswordCompare = "Пароли не совпадают",
+  Password = "Пароль должен быть не менее 8 символов, включать в себя строчные и прописные буквы на латинице, хотя бы одну цифру и хотя бы один спецсимвол",
 }
 
 enum Slice {
   CurrentAudio = "currentAudio",
   Statistics = "statistics",
+  Auth = "auth",
 }
 
 enum Image {
@@ -61,6 +65,8 @@ enum Image {
   CloudLoad = "/images/cloud-load.svg",
   Image = "/images/image.svg",
   Move = "/images/move.svg",
+  VisiblePassword = "/images/visible-password.svg",
+  Profile = "/images/profile.svg",
 }
 
 const MEDITATION_AUDIO_ID = "meditation-audio";
@@ -93,6 +99,8 @@ const FILTER_MONTHS = [
   "Дек",
 ];
 
+const AUTH_TOKEN_NAME = "token";
+
 export {
   BrowserRoute,
   ApiRoute,
@@ -108,4 +116,5 @@ export {
   FILTER_TYPE,
   FILTER_MONTHS,
   MEDITATION_AUDIO_ID,
+  AUTH_TOKEN_NAME,
 };

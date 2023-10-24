@@ -62,7 +62,7 @@ export function StatisticsPage() {
       </Helmet>
       <Subtitle>Статистика</Subtitle>
       <ContainerTwoSides>
-        <Container>
+        <ContainerStatistics>
           <FilterContainer>
             {FILTER_YEARS.map((year, index) => (
               <ButtonSpace key={index}>
@@ -127,8 +127,8 @@ export function StatisticsPage() {
               filteredData?.monthsIOS
             )}
           />
-        </Container>
-        <Container>
+        </ContainerStatistics>
+        <ContainerCards>
           {filteredData?.statisticsCopy.meditations?.map(
             (meditation, index) => (
               <li key={index}>
@@ -153,7 +153,7 @@ export function StatisticsPage() {
               </Card>
             </li>
           ))}
-        </Container>
+        </ContainerCards>
       </ContainerTwoSides>
     </>
   );
@@ -169,6 +169,7 @@ const ReactEChartsStyled = styled(ReactECharts)`
 
 const Text = styled.p`
   ${FontSizeSubtitle}
+  color: ${Color.TextStandard};
 `;
 
 const FilterContainer = styled.ul`
@@ -182,6 +183,11 @@ const FilterContainer = styled.ul`
 
   @media (max-width: 550px) {
     margin: 0;
+    max-width: 370px;
+  }
+
+  @media (max-width: 420px) {
+    max-width: 280px;
   }
 `;
 
@@ -212,6 +218,7 @@ const ButtonYear = styled.button<{ $isActive: boolean }>`
   margin: 2px 10px;
   width: 45px;
   ${ResetButton}
+  color: ${Color.TextStandard};
   font-size: 18px;
   border-bottom: 5px solid
     ${({ $isActive }) => ($isActive ? Color.Primary : "transparent")};
@@ -229,6 +236,7 @@ const ButtonType = styled.button<{ $isActive: boolean }>`
   margin: 2px 10px;
   width: 100px;
   ${ResetButton}
+  color: ${Color.TextStandard};
   font-size: 18px;
   border-bottom: 5px solid
     ${({ $isActive }) => ($isActive ? Color.Primary : "transparent")};
@@ -241,21 +249,31 @@ const ButtonType = styled.button<{ $isActive: boolean }>`
   }
 `;
 
-const Container = styled.ul`
+const ContainerStatistics = styled.ul`
+  ${ResetList}
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  max-width: 500px;
+
+  @media (max-width: 550px) {
+    max-width: none;
+    width: 100%;
+  }
+`;
+
+const ContainerCards = styled.ul`
   ${ResetList}
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  width: 500px;
-  align-content: baseline;
+  max-width: 500px;
   justify-content: center;
 
   @media (max-width: 550px) {
-    max-width: 370px;
-  }
-
-  @media (max-width: 420px) {
-    max-width: 280px;
+    max-width: none;
+    width: 100%;
   }
 `;
 
@@ -274,6 +292,7 @@ const Card = styled.article<{ $isMeditation: boolean }>`
   background-color: ${({ $isMeditation }) =>
     $isMeditation ? Color.Meditation : Color.Task};
   transition: opacity 0.3s ease;
+  align-content: baseline;
 
   &:hover {
     opacity: 0.7;

@@ -48,6 +48,20 @@ type FormMeditation = {
   kind: string;
 };
 
+type FormAuth = {
+  nickname: string;
+  email: string;
+  password: string;
+};
+
+type FormProfile = {
+  nickname: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  newPassword: string;
+};
+
 export type {
   FormTextLottieImage,
   FormEmotion,
@@ -55,4 +69,6 @@ export type {
   FormMeditation,
   TextLine,
   FieldTextLottieImage,
+  FormAuth,
+  FormProfile,
 };

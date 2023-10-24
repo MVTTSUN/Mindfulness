@@ -2,7 +2,7 @@ import styled from "styled-components";
 import { ApiRoute, BASE_URL, Color } from "../const";
 import Lottie from "react-lottie-player";
 import { FontSizeStandard } from "../mixins";
-import { DataTextLottieImage } from "../types/get-results";
+import { DataTextLottieImage } from "../types/server";
 import { useOutletContext } from "react-router-dom";
 
 export function DisplayResultTask() {

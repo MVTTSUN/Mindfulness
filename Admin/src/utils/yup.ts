@@ -1,4 +1,4 @@
-import { array, mixed, object, string } from "yup";
+import { array, mixed, object, ref, string } from "yup";
 import { ErrorText, MAX_SIZE_IMAGE } from "../const";
 
 const schemaTextLottieImage = (isTask?: boolean) =>
@@ -143,19 +143,80 @@ const schemaMeditation = object({
     }),
   kind: string().required(ErrorText.Required),
   title: string().required(ErrorText.Required),
-  textLines: array()
-    .of(
-      object({
-        text: string().required(ErrorText.Required),
-        timeAt: string().required(ErrorText.Required),
-        timeTo: string().required(ErrorText.Required),
-      })
+  textLines: array().of(
+    object({
+      text: string().required(ErrorText.Required),
+      timeAt: string().required(ErrorText.Required),
+      timeTo: string().required(ErrorText.Required),
+    })
+  ),
+});
+
+const schemaRegister = object({
+  nickname: string().required(ErrorText.Required),
+  email: string()
+    .required(ErrorText.Required)
+    .matches(/^[\w-\\.]+@([\w-]+\.)+[\w-]{2,4}$/g, ErrorText.Email),
+  password: string()
+    .required(ErrorText.Required)
+    .matches(
+      /(?=.*[0-9])(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z!@#$%^&*]{8,}/g,
+      ErrorText.Password
     ),
 });
+
+const schemaLogin = object({
+  email: string()
+    .required(ErrorText.Required)
+    .matches(/^[\w-\\.]+@([\w-]+\.)+[\w-]{2,4}$/g, ErrorText.Email),
+  password: string().required(ErrorText.Required),
+});
+
+const schemaUpdateUser = (isChangePassword?: boolean) =>
+  object({
+    nickname: string().required(ErrorText.Required),
+    email: string()
+      .required(ErrorText.Required)
+      .matches(/^[\w-\\.]+@([\w-]+\.)+[\w-]{2,4}$/g, ErrorText.Email),
+    password: string()
+      .test((value, { createError }) => {
+        if (isChangePassword && !value) {
+          return createError({
+            message: ErrorText.Required,
+          });
+        }
+        return true;
+      })
+      .matches(
+        /(?=.*[0-9])(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z!@#$%^&*]{8,}/g,
+        ErrorText.Password
+      ),
+    newPassword: string().test((value, { createError }) => {
+      if (isChangePassword && !value) {
+        return createError({
+          message: ErrorText.Required,
+        });
+      }
+      return true;
+    }),
+    confirmPassword: string()
+      .oneOf([ref("newPassword")], ErrorText.PasswordCompare)
+      .test((value, { createError }) => {
+        if (isChangePassword && !value) {
+          return createError({
+            message: ErrorText.Required,
+          });
+        }
+        return true;
+      }),
+  });
 
 export {
   schemaTextLottieImage,
   schemaEmotion,
   schemaInformation,
   schemaMeditation,
+  schemaRegister,
+  schemaLogin,
+  schemaUpdateUser,
 };

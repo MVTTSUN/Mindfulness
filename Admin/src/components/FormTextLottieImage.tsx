@@ -27,7 +27,13 @@ import {
   useValidateAddTaskMutation,
   useValidateUpdateTaskMutation,
 } from "../services/api";
-import { ApiRoute, BASE_URL, BrowserRoute, Image, OPTIONS_KIND_TASKS } from "../const";
+import {
+  ApiRoute,
+  BASE_URL,
+  BrowserRoute,
+  Image,
+  OPTIONS_KIND_TASKS,
+} from "../const";
 import {
   DragDropContext,
   Droppable,
@@ -37,7 +43,7 @@ import {
 import { useEffect, useRef } from "react";
 import { Input } from "./Input";
 import { useLocation, useNavigate, useOutletContext } from "react-router-dom";
-import { DataTextLottieImage, DataValidate } from "../types/get-results";
+import { DataTextLottieImage, DataValidate } from "../types/server";
 import { InputSelect } from "./InputSelect";
 
 export function FormTextLottieImage() {

@@ -79,6 +79,36 @@ type DataValidate = {
   };
 };
 
+type DataUser = {
+  user: DataUserInfo;
+  accessToken: string;
+};
+
+type DataRegistration = {
+  name: string;
+  email: string;
+  password: string;
+};
+
+type DataUpdateUser = {
+  name: string;
+  email: string;
+  password: string;
+  oldPassword: string;
+};
+
+type DataLogin = {
+  email: string;
+  password: string;
+};
+
+type DataUserInfo = {
+  _id: string;
+  name: string;
+  email: string;
+  isActivated: boolean;
+};
+
 export type {
   ElementTextLottieImage,
   DataTextLottieImage,
@@ -88,4 +118,9 @@ export type {
   DataStatistics,
   TaskAndMeditationStatistics,
   DataValidate,
+  DataUser,
+  DataRegistration,
+  DataLogin,
+  DataUserInfo,
+  DataUpdateUser,
 };

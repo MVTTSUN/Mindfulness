@@ -11,7 +11,7 @@ import { DropFileInput } from "./DropFileInput";
 import styled from "styled-components";
 import { ApiRoute, BASE_URL, Color } from "../const";
 import { useAddInfoMutation } from "../services/api";
-import { DataInformation } from "../types/get-results";
+import { DataInformation } from "../types/server";
 import { FontSizeHeading } from "../mixins";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { useEffect } from "react";

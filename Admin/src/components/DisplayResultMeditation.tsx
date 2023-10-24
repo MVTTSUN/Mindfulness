@@ -1,5 +1,5 @@
 import { useOutletContext } from "react-router-dom";
-import { DataMeditation } from "../types/get-results";
+import { DataMeditation } from "../types/server";
 import styled from "styled-components";
 import { FontSizeStandard } from "../mixins";
 import { ApiRoute, BASE_URL, Color, MEDITATION_AUDIO_ID } from "../const";

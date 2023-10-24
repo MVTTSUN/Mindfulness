@@ -2,6 +2,8 @@ const Meditation = require('../models/meditation');
 const Task = require('../models/task');
 const Statistic = require('../models/statistic');
 const { Socket } = require('../utils/socket');
+const IncorrectError = require('../errors/incorrectError');
+const { errorMessages } = require('../const');
 
 module.exports = async (req, _, next) => {
   try {
@@ -37,7 +39,7 @@ module.exports = async (req, _, next) => {
                           statisticItemCopy[i].years[j].months[k].month === new Date().getMonth()
                         ) {
                           statisticItemCopy[i].years[j].months[k].count += 1;
-                          if (device === 'ios') {
+                          if (device === 'windows') {
                             statisticItemCopy[i].years[j].months[k].android += 1;
                           } else {
                             statisticItemCopy[i].years[j].months[k].ios += 1;
@@ -49,7 +51,7 @@ module.exports = async (req, _, next) => {
                           let countAndroidScope = 0;
                           let countIOSScope = 0;
 
-                          if (device === 'ios') {
+                          if (device === 'windows') {
                             countAndroidScope = 1;
                           } else {
                             countIOSScope = 1;
@@ -69,7 +71,7 @@ module.exports = async (req, _, next) => {
                       let countAndroidScope = 0;
                       let countIOSScope = 0;
 
-                      if (device === 'ios') {
+                      if (device === 'windows') {
                         countAndroidScope = 1;
                       } else {
                         countIOSScope = 1;
@@ -91,7 +93,7 @@ module.exports = async (req, _, next) => {
                     let countAndroidScope = 0;
                     let countIOSScope = 0;
 
-                    if (device === 'ios') {
+                    if (device === 'windows') {
                       countAndroidScope = 1;
                     } else {
                       countIOSScope = 1;
@@ -117,7 +119,7 @@ module.exports = async (req, _, next) => {
                 let countAndroidScope = 0;
                 let countIOSScope = 0;
 
-                if (device === 'ios') {
+                if (device === 'windows') {
                   countAndroidScope = 1;
                 } else {
                   countIOSScope = 1;
@@ -145,7 +147,7 @@ module.exports = async (req, _, next) => {
               let countAndroidScope = 0;
               let countIOSScope = 0;
 
-              if (device === 'ios') {
+              if (device === 'windows') {
                 countAndroidScope = 1;
               } else {
                 countIOSScope = 1;
@@ -177,7 +179,7 @@ module.exports = async (req, _, next) => {
           let countAndroidScope = 0;
           let countIOSScope = 0;
 
-          if (device === 'ios') {
+          if (device === 'windows') {
             countAndroidScope = 1;
           } else {
             countIOSScope = 1;
@@ -233,7 +235,7 @@ module.exports = async (req, _, next) => {
         let androidCount = 0;
         let IOSCount = 0;
 
-        if (device === 'ios') {
+        if (device === 'windows') {
           androidCount = 1;
         } else {
           IOSCount = 1;
@@ -270,7 +272,7 @@ module.exports = async (req, _, next) => {
         let androidCount = 0;
         let IOSCount = 0;
 
-        if (device === 'ios') {
+        if (device === 'windows') {
           androidCount = 1;
         } else {
           IOSCount = 1;
@@ -305,7 +307,7 @@ module.exports = async (req, _, next) => {
 
     Socket.emit('statistics', updateStatistics);
   } catch (err) {
-    console.log(err);
+    next(new IncorrectError(errorMessages.INCORRECT_DATA));
   }
 
   next();

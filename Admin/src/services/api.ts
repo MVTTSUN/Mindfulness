@@ -1,5 +1,11 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { ApiRoute, BASE_URL } from "../const";
+import {
+  BaseQueryFn,
+  FetchArgs,
+  FetchBaseQueryError,
+  createApi,
+  fetchBaseQuery,
+} from "@reduxjs/toolkit/query/react";
+import { ApiRoute, BASE_URL, BrowserRoute } from "../const";
 import {
   FormEmotion,
   FormInformation,
@@ -9,11 +15,16 @@ import {
 import {
   DataEmotion,
   DataInformation,
+  DataLogin,
   DataMeditation,
+  DataRegistration,
   DataStatistics,
   DataTextLottieImage,
+  DataUpdateUser,
+  DataUser,
+  DataUserInfo,
   DataValidate,
-} from "../types/get-results";
+} from "../types/server";
 import {
   addEmotionsAdapter,
   addInfoAdapter,
@@ -23,6 +34,8 @@ import {
 } from "../utils/adapters";
 import { toast } from "react-toastify";
 import { io } from "socket.io-client";
+import { getToken, removeToken, setToken } from "./token";
+import { browserHistory } from "../utils/browserHistory";
 
 const providesTags = <T>(
   result: T | undefined,
@@ -33,10 +46,43 @@ const providesTags = <T>(
     : [{ type, id: "LIST" }];
 };
 
+const baseQuery = fetchBaseQuery({
+  baseUrl: BASE_URL,
+  credentials: "include",
+  prepareHeaders: (headers) => {
+    headers.set("Authorization", `Bearer ${getToken()}`);
+
+    return headers;
+  },
+});
+
+const baseQueryWithReauth: BaseQueryFn<
+  string | FetchArgs,
+  unknown,
+  FetchBaseQueryError
+> = async (args, api, extraOptions) => {
+  let result = await baseQuery(args, api, extraOptions);
+  if (result.error && result.error.status === 401 && getToken()) {
+    const { data } = (await baseQuery(
+      ApiRoute.Auth + "/refresh",
+      api,
+      extraOptions
+    )) as unknown as { data: DataUser };
+    if (data && data.accessToken) {
+      setToken(data.accessToken);
+      result = await baseQuery(args, api, extraOptions);
+    } else {
+      removeToken();
+      browserHistory.push(BrowserRoute.Login);
+    }
+  }
+  return result;
+};
+
 export const mindfulnessApi = createApi({
   reducerPath: "mindfulnessApi",
   tagTypes: ["Tips", "Emotions", "Info", "Tasks", "Meditations"],
-  baseQuery: fetchBaseQuery({ baseUrl: BASE_URL, credentials: "include" }),
+  baseQuery: baseQueryWithReauth,
   endpoints: (builder) => ({
     getTips: builder.query<DataTextLottieImage[], void>({
       query: () => {
@@ -299,6 +345,47 @@ export const mindfulnessApi = createApi({
         socket.close();
       },
     }),
+    registration: builder.mutation<DataUser, DataRegistration>({
+      query: (data) => {
+        return {
+          url: ApiRoute.Auth + "/registration",
+          method: "POST",
+          body: data,
+        };
+      },
+    }),
+    login: builder.mutation<DataUser, DataLogin>({
+      query: (data) => {
+        return {
+          url: ApiRoute.Auth + "/login",
+          method: "POST",
+          body: data,
+        };
+      },
+    }),
+    logout: builder.mutation<void, void>({
+      query: () => {
+        return {
+          url: ApiRoute.Auth + "/logout",
+          method: "POST",
+        };
+      },
+    }),
+    refresh: builder.query<DataUser, void>({
+      query: () => ApiRoute.Auth + "/refresh",
+    }),
+    getUser: builder.query<DataUserInfo, void>({
+      query: () => ApiRoute.Auth + "/user",
+    }),
+    updateUser: builder.mutation<DataUserInfo, DataUpdateUser>({
+      query: (data) => {
+        return {
+          url: ApiRoute.Auth + "/user",
+          method: "PATCH",
+          body: data,
+        };
+      },
+    }),
   }),
 });
 
@@ -325,4 +412,10 @@ export const {
   useUpdateMeditationMutation,
   useValidateUpdateMeditationMutation,
   useGetStatisticsQuery,
+  useRegistrationMutation,
+  useLoginMutation,
+  useLogoutMutation,
+  useLazyRefreshQuery,
+  useGetUserQuery,
+  useUpdateUserMutation,
 } = mindfulnessApi;

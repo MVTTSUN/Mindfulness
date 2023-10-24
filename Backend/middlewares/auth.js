@@ -1,25 +1,31 @@
-const jwt = require('jsonwebtoken');
 const UnauthorizedError = require('../errors/unauthorizedError');
 const { errorMessages } = require('../const');
-const { DEV_JWT_SECRET } = require('../config');
-
-const { NODE_ENV, JWT_SECRET } = process.env;
+const { validateAccessToken } = require('../service/token');
+require('dotenv').config();
 
 module.exports = (req, _, next) => {
-  const token = req.cookies.jwt;
-  let payload;
-
-  if (!token) {
-    next(new UnauthorizedError(errorMessages.UNAUTHORIZED));
-  }
-
   try {
-    payload = jwt.verify(token, NODE_ENV === 'production' ? JWT_SECRET : DEV_JWT_SECRET);
+    const authorizationHeader = req.headers.authorization;
+
+    if (!authorizationHeader) {
+      next(new UnauthorizedError(errorMessages.UNAUTHORIZED));
+    }
+
+    const accessToken = authorizationHeader.replace('Bearer ', '');
+
+    if (!accessToken) {
+      next(new UnauthorizedError(errorMessages.UNAUTHORIZED));
+    }
+
+    const userData = validateAccessToken(accessToken);
+
+    if (!userData) {
+      next(new UnauthorizedError(errorMessages.UNAUTHORIZED));
+    }
+
+    req.user = userData;
+    next();
   } catch (err) {
-    next(new UnauthorizedError(errorMessages.UNAUTHORIZED));
+    next(err);
   }
-
-  req.user = payload;
-
-  next();
 };

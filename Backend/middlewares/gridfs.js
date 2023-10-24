@@ -4,6 +4,7 @@ const { v4: uuidv4 } = require('uuid');
 const multer = require('multer');
 const path = require('node:path');
 const { DEV_DATABASE_URL } = require('../config');
+require('dotenv').config();
 
 const { DATABASE_URL, NODE_ENV } = process.env;
 

@@ -6,7 +6,7 @@ import { ContainerOneSide } from "../components/ContainerOneSide";
 import styled from "styled-components";
 import { FontSizeStandard, ResetButton, ResetList } from "../mixins";
 import { Color, Image } from "../const";
-import { DataEmotion } from "../types/get-results";
+import { DataEmotion } from "../types/server";
 
 export function EmotionsPage() {
   const { data, error } = useGetEmotionsQuery();

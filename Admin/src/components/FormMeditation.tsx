@@ -35,7 +35,7 @@ import {
   useValidateUpdateMeditationMutation,
 } from "../services/api";
 import { useLocation, useNavigate, useOutletContext } from "react-router-dom";
-import { DataMeditation, DataValidate } from "../types/get-results";
+import { DataMeditation, DataValidate } from "../types/server";
 import {
   DragDropContext,
   Draggable,

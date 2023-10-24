@@ -1,8 +1,26 @@
-// const router = require('express').Router();
-// const { getUser, patchUser } = require('../controllers/users');
-// const { patchUserCelebrate } = require('../middlewares/celebrate');
+const router = require('express').Router();
+const {
+  getUser,
+  patchUser,
+  postUser,
+  login,
+  logout,
+  activate,
+  refresh,
+} = require('../controllers/users');
+const {
+  signinCelebrate,
+  signupCelebrate,
+  patchUserCelebrate,
+} = require('../middlewares/celebrate');
+const authMiddleware = require('../middlewares/auth');
 
-// router.get('/users/me', getUser);
-// router.patch('/users/me', patchUserCelebrate, patchUser);
+router.post('/registration', postUser);
+router.post('/login', login);
+router.get('/activate/:link', activate);
+router.get('/refresh', refresh);
+router.post('/logout', authMiddleware, logout);
+router.get('/user', authMiddleware, getUser);
+router.patch('/user', authMiddleware, patchUser);
 
-// module.exports = router;
+module.exports = router;

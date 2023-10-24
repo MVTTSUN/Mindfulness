@@ -2,10 +2,7 @@ import { createSelector } from "@reduxjs/toolkit";
 import { mindfulnessApi } from "../services/api";
 import { RootState } from "../hooks/useAppSelector";
 import { FILTER_MONTHS, Slice } from "../const";
-import {
-  DataStatistics,
-  TaskAndMeditationStatistics,
-} from "../types/get-results";
+import { DataStatistics, TaskAndMeditationStatistics } from "../types/server";
 
 const getStatistics = (state: RootState) =>
   mindfulnessApi.endpoints.getStatistics.select()(state).data;

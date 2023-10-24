@@ -84,10 +84,10 @@ export function Header() {
                 </li>
                 <li>
                   <LinkStyled
-                    to={BrowserRoute.Information}
+                    to={BrowserRoute.Profile}
                     onClick={() => setIsOpen(false)}
                   >
-                    Выход
+                    <ImageProfile src={Image.Profile} alt="Профиль" />
                   </LinkStyled>
                 </li>
               </ListNav>
@@ -110,15 +110,10 @@ export function Header() {
 const HeaderStyled = styled.header`
   z-index: 10;
   position: fixed;
-  height: 85px;
   width: 100vw;
   box-sizing: border-box;
   background-color: ${Color.Pastel};
   padding: 20px 0;
-
-  @media (max-width: 550px) {
-    height: 75px;
-  }
 `;
 
 const NavStyled = styled.nav`
@@ -131,15 +126,21 @@ const NavStyled = styled.nav`
 const LinkStyled = styled(Link)`
   ${ResetLink}
   ${FontSizeStandard}
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: ${Color.TextStandard};
 `;
 
 const Heading = styled.h1`
   ${FontSizeHeading}
+  color: ${Color.TextStandard};
 `;
 
 const NavLinkStyled = styled(NavLink)`
   ${ResetLink}
   ${FontSizeStandard}
+  color: ${Color.TextStandard};
 
   &.active {
     font-weight: 600;
@@ -182,7 +183,7 @@ const BurgerMenu = styled.div<{ $isOpen: boolean }>`
   @media (max-width: 900px) {
     padding: 20px 100px;
     position: fixed;
-    top: 85px;
+    top: 80px;
     right: 0;
     height: 100vh;
     transform: ${({ $isOpen }) =>
@@ -193,7 +194,7 @@ const BurgerMenu = styled.div<{ $isOpen: boolean }>`
 
   @media (max-width: 550px) {
     padding: 20px 50px;
-    top: 75px;
+    top: 70px;
   }
 `;
 
@@ -204,7 +205,7 @@ const Overlay = styled.div<{ $isOpen: boolean }>`
 
   @media (max-width: 900px) {
     position: fixed;
-    top: 85px;
+    top: 0;
     right: 0;
     height: 100vh;
     width: 100%;
@@ -212,8 +213,9 @@ const Overlay = styled.div<{ $isOpen: boolean }>`
     visibility: ${({ $isOpen }) => ($isOpen ? "visible" : "hidden")};
     transition: opacity 0.3s ease;
   }
+`;
 
-  @media (max-width: 550px) {
-    top: 75px;
-  }
+const ImageProfile = styled.img`
+  width: 25px;
+  height: 25px;
 `;

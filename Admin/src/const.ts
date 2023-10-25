@@ -52,7 +52,6 @@ enum ErrorText {
 enum Slice {
   CurrentAudio = "currentAudio",
   Statistics = "statistics",
-  Auth = "auth",
 }
 
 enum Image {

@@ -22,6 +22,7 @@ import { setToken } from "../services/token";
 import { DataUser } from "../types/server";
 import { Helmet } from "react-helmet-async";
 import { CenterContainer } from "../components/CenterContainer";
+import { setUserId } from "../services/storage";
 
 export function Auth() {
   const [isOpenActivate, setIsOpenActivate] = useState(false);
@@ -66,6 +67,7 @@ export function Auth() {
         };
         if (dataUser) {
           setToken(dataUser.accessToken);
+          setUserId(dataUser.user._id);
           navigate(BrowserRoute.Statistic);
         }
       }
@@ -77,105 +79,114 @@ export function Auth() {
   }, [pathname]);
 
   return (
-    <Container>
+    <Main>
       <CenterContainer>
-        {pathname === BrowserRoute.Login ? (
-          <Helmet>
-            <title>Вход - Mindfulness</title>
-          </Helmet>
-        ) : (
-          <Helmet>
-            <title>Регистрация - Mindfulness</title>
-          </Helmet>
-        )}
-        <Form onSubmit={onSubmit}>
-          <Title>
-            {pathname === BrowserRoute.Login ? "Вход" : "Регистрация"}
-          </Title>
-          {pathname === BrowserRoute.Register && (
-            <>
-              <Input
-                {...register("nickname")}
-                labelText="Никнейм"
-                withLabel
-                isNotArray
-                autoComplete="on"
-              />
-              <ErrorField>{errors.nickname?.message}</ErrorField>
-            </>
+        <Container>
+          {pathname === BrowserRoute.Login ? (
+            <Helmet>
+              <title>Вход - Mindfulness</title>
+            </Helmet>
+          ) : (
+            <Helmet>
+              <title>Регистрация - Mindfulness</title>
+            </Helmet>
           )}
-          <Input
-            {...register("email")}
-            labelText="Почта"
-            withLabel
-            isNotArray
-            type="email"
-            autoComplete="on"
-          />
-          <ErrorField>{errors.email?.message}</ErrorField>
-          <ContainerPassword>
-            <Label htmlFor="password">Пароль</Label>
+          <Form onSubmit={onSubmit}>
+            <Title>
+              {pathname === BrowserRoute.Login ? "Вход" : "Регистрация"}
+            </Title>
+            {pathname === BrowserRoute.Register && (
+              <>
+                <Input
+                  {...register("nickname")}
+                  labelText="Никнейм"
+                  withLabel
+                  isNotArray
+                  autoComplete="on"
+                />
+                <ErrorField>{errors.nickname?.message}</ErrorField>
+              </>
+            )}
             <Input
-              {...register("password")}
+              {...register("email")}
+              labelText="Почта"
+              withLabel
               isNotArray
-              type={isVisiblePassword ? "text" : "password"}
+              type="email"
               autoComplete="on"
             />
-            <ButtonVisiblePassword
-              type="button"
-              onClick={() => setIsVisiblePassword(!isVisiblePassword)}
-            >
-              <img src={Image.VisiblePassword} />
-            </ButtonVisiblePassword>
-          </ContainerPassword>
-          <ErrorField>{errors.password?.message}</ErrorField>
-          <Button disabled={isLoading} isPrimary isLoading={isLoading}>
-            {pathname === BrowserRoute.Login ? "Войти" : "Зарегистрироваться"}
-          </Button>
-        </Form>
-        <Text>
-          {pathname === BrowserRoute.Login
-            ? "Еще не зарегистрированы?"
-            : "Уже зарегистрированы?"}
-          <LinkStyled
-            to={
-              pathname === BrowserRoute.Login
-                ? BrowserRoute.Register
-                : BrowserRoute.Login
-            }
-          >
-            {pathname === BrowserRoute.Login ? "Зарегистрироваться" : "Войти"}
-          </LinkStyled>
-        </Text>
-        {isOpenActivate && (
-          <>
-            <TextActivate>
-              Вам отправлено письмо с активацией. Пожалуйста, активируйте
-              аккаунт
-            </TextActivate>
+            <ErrorField>{errors.email?.message}</ErrorField>
+            <ContainerPassword>
+              <Label htmlFor="password">Пароль</Label>
+              <Input
+                {...register("password")}
+                isNotArray
+                type={isVisiblePassword ? "text" : "password"}
+                autoComplete="on"
+              />
+              <ButtonVisiblePassword
+                type="button"
+                onClick={() => setIsVisiblePassword(!isVisiblePassword)}
+              >
+                <img src={Image.VisiblePassword} />
+              </ButtonVisiblePassword>
+            </ContainerPassword>
+            <ErrorField>{errors.password?.message}</ErrorField>
+            <Button disabled={isLoading} isPrimary isLoading={isLoading}>
+              {pathname === BrowserRoute.Login ? "Войти" : "Зарегистрироваться"}
+            </Button>
+          </Form>
+          <Text>
+            {pathname === BrowserRoute.Login
+              ? "Еще не зарегистрированы?"
+              : "Уже зарегистрированы?"}
             <LinkStyled
-              to="https://www.google.com/intl/ru/gmail/about/"
-              target="_blank"
+              to={
+                pathname === BrowserRoute.Login
+                  ? BrowserRoute.Register
+                  : BrowserRoute.Login
+              }
             >
-              Gmail
+              {pathname === BrowserRoute.Login ? "Зарегистрироваться" : "Войти"}
             </LinkStyled>
-            <LinkStyled to="https://360.yandex.ru/mail/" target="_blank">
-              Яндекс.Почта
-            </LinkStyled>
-          </>
-        )}
+          </Text>
+          {isOpenActivate && (
+            <>
+              <TextActivate>
+                Вам отправлено письмо с активацией. Пожалуйста, активируйте
+                аккаунт
+              </TextActivate>
+              <LinkStyled
+                to="https://www.google.com/intl/ru/gmail/about/"
+                target="_blank"
+              >
+                Gmail
+              </LinkStyled>
+              <LinkStyled to="https://360.yandex.ru/mail/" target="_blank">
+                Яндекс.Почта
+              </LinkStyled>
+            </>
+          )}
+        </Container>
       </CenterContainer>
-    </Container>
+    </Main>
   );
 }
 
-const Container = styled.main`
+const Main = styled.main`
   flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   gap: 20px;
+`;
+
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
 `;
 
 const Title = styled.h1`
@@ -233,10 +244,11 @@ const LinkStyled = styled(Link)`
 
 const TextActivate = styled.p`
   ${FontSizeSubtitle}
+  text-align: center;
   color: ${Color.TextStandard};
   font-size: 18px;
 
   @media (max-width: 550px) {
-    font-size: 12px;
+    font-size: 16px;
   }
 `;

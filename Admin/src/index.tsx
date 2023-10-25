@@ -9,6 +9,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.min.css";
 import { HistoryRouter } from "./components/HistoryRouter.tsx";
 import { browserHistory } from "./utils/browserHistory.ts";
+import React from "react";
 
 const GlobalStyle = createGlobalStyle`
   #root {
@@ -34,7 +35,7 @@ const root = ReactDOM.createRoot(
 );
 
 root.render(
-  <>
+  <React.StrictMode>
     <GlobalStyle />
     <Provider store={store}>
       <HistoryRouter history={browserHistory}>
@@ -52,5 +53,5 @@ root.render(
         <App />
       </HistoryRouter>
     </Provider>
-  </>
+  </React.StrictMode>
 );

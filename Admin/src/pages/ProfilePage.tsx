@@ -11,7 +11,7 @@ import { ErrorField } from "../components/ErrorField";
 import { BrowserRoute, Color, Image } from "../const";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
-import { FontSizeStandard, ResetButton } from "../mixins";
+import { FontSizeStandard, FontSizeSubtitle, ResetButton } from "../mixins";
 import { Button } from "../components/Button";
 import {
   useGetUserQuery,
@@ -21,6 +21,7 @@ import {
 import { removeToken } from "../services/token";
 import { DataUpdateUser } from "../types/server";
 import { useNavigate } from "react-router-dom";
+import { removeUserId } from "../services/storage";
 
 export function ProfilePage() {
   const [isChangePassword, setIsChangePassword] = useState(false);
@@ -32,7 +33,6 @@ export function ProfilePage() {
   const {
     handleSubmit,
     register,
-    // reset,
     setValue,
     formState: { errors },
   } = useForm<FormProfile>({
@@ -136,6 +136,10 @@ export function ProfilePage() {
               <ErrorField>{errors.confirmPassword?.message}</ErrorField>
             </>
           )}
+          <TextActivate>
+            При изменении пароля или почты будет отправлено письмо для
+            подтверждения действия
+          </TextActivate>
           <Button disabled={isLoading} isPrimary isLoading={isLoading}>
             Обновить
           </Button>
@@ -149,8 +153,9 @@ export function ProfilePage() {
         <Button
           type="button"
           onClick={async () => {
-            removeToken();
             await logout();
+            removeToken();
+            removeUserId();
             navigate(BrowserRoute.Login);
           }}
         >
@@ -180,4 +185,15 @@ const ButtonVisiblePassword = styled.button`
   position: absolute;
   top: 44px;
   right: 20px;
+`;
+
+const TextActivate = styled.p`
+  ${FontSizeSubtitle}
+  text-align: center;
+  color: ${Color.TextStandard};
+  font-size: 18px;
+
+  @media (max-width: 550px) {
+    font-size: 16px;
+  }
 `;

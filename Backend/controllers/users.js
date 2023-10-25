@@ -1,12 +1,13 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
 const User = require('../models/user');
+const ProofLink = require('../models/proofLink');
 const {
   registration,
   activateUser,
   loginUser,
   logoutUser,
   refreshUser,
+  createProofLink,
 } = require('../service/user');
 const IncorrectError = require('../errors/incorrectError');
 const NotFoundDataError = require('../errors/notFoundDataError');
@@ -39,27 +40,18 @@ const patchUser = async (req, res, next) => {
   try {
     const { name, email, password, oldPassword } = req.body;
     let user = await User.findById(req.user._id);
+    const emailLowerCase = email.toLowerCase();
 
-    if (password && oldPassword) {
-      const isPassEquals = await bcrypt.compare(oldPassword, user.password);
-
-      if (!isPassEquals) {
-        throw new IncorrectError(errorMessages.INCORRECT_DATA);
-      }
-
-      const hash = await bcrypt.hash(password, 10);
-
+    if (name && emailLowerCase === user.email && !password && !oldPassword) {
       user = await User.findByIdAndUpdate(
         req.user._id,
-        { name, email, password: hash },
+        { name },
         { new: true, runValidators: true }
       );
     } else {
-      user = await User.findByIdAndUpdate(
-        req.user._id,
-        { name, email },
-        { new: true, runValidators: true }
-      );
+      await createProofLink(req.user._id, name, emailLowerCase, password, oldPassword);
+
+      return res.send({ message: 'Подтвердите изменения по ссылке в письме' });
     }
 
     const { ...userWithoutPassword } = user.toObject();
@@ -85,13 +77,14 @@ const patchUser = async (req, res, next) => {
 const postUser = async (req, res, next) => {
   try {
     const { name, email, password } = req.body;
+    const emailLowerCase = email.toLowerCase();
     const users = await User.find({});
 
     if (users.length === 2) {
       throw new ConflictError('Превышен лимит аккаунтов');
     }
 
-    await registration(name, email, password);
+    await registration(name, emailLowerCase, password);
 
     return res.send({ message: 'ok' });
   } catch (err) {
@@ -108,13 +101,18 @@ const postUser = async (req, res, next) => {
 const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
+    const emailLowerCase = email.toLowerCase();
     const user = await User.findOne({ email });
+
+    if (!user) {
+      throw new NotFoundDataError(errorMessages.NOT_FOUND_DATA);
+    }
 
     if (!user.isActivated) {
       throw new IncorrectError('Активируйте аккаунт');
     }
 
-    const userData = await loginUser(email, password);
+    const userData = await loginUser(emailLowerCase, password);
 
     res.cookie('refreshToken', userData.refreshToken, {
       maxAge: 30 * 24 * 60 * 60 * 1000,
@@ -135,9 +133,9 @@ const login = async (req, res, next) => {
 const logout = async (req, res, next) => {
   try {
     const { refreshToken } = req.cookies;
-    await logoutUser(refreshToken);
-
+    await logoutUser(req.user._id, refreshToken);
     res.clearCookie('refreshToken');
+
     return res.send({ message: 'ok' });
   } catch (err) {
     next(err);
@@ -148,7 +146,7 @@ const refresh = async (req, res, next) => {
   try {
     const { refreshToken } = req.cookies;
 
-    const userData = await refreshUser(refreshToken);
+    const userData = await refreshUser(req.params.id, refreshToken);
 
     res.cookie('refreshToken', userData.refreshToken, {
       maxAge: 30 * 24 * 60 * 60 * 1000,
@@ -182,6 +180,46 @@ const activate = async (req, res, next) => {
   }
 };
 
+const updateEmailAfterProof = async (req, res, next) => {
+  try {
+    const proofLink = req.params.link;
+
+    const proofLinkData = await ProofLink.findOne({ proofLink });
+
+    if (!proofLinkData) {
+      throw new NotFoundDataError(errorMessages.NOT_FOUND_DATA);
+    }
+
+    if (proofLinkData.password && !proofLinkData.email) {
+      await User.findByIdAndUpdate(
+        proofLinkData.user,
+        { name: proofLinkData.name, password: proofLinkData.password },
+        { new: true, runValidators: true }
+      );
+    } else if (proofLinkData.email && !proofLinkData.password) {
+      await User.findByIdAndUpdate(
+        proofLinkData.user,
+        { name: proofLinkData.name, email: proofLinkData.email },
+        { new: true, runValidators: true }
+      );
+    } else if (proofLinkData.email && proofLinkData.password) {
+      await User.findByIdAndUpdate(
+        proofLinkData.user,
+        { name: proofLinkData.name, email: proofLinkData.email, password: proofLinkData.password },
+        { new: true, runValidators: true }
+      );
+    }
+
+    res.redirect(`${CLIENT_URL}/profile`);
+  } catch (err) {
+    if (err instanceof mongoose.Error.ValidationError) {
+      next(new IncorrectError(errorMessages.INCORRECT_DATA));
+    } else {
+      next(err);
+    }
+  }
+};
+
 module.exports = {
   getUser,
   patchUser,
@@ -190,4 +228,5 @@ module.exports = {
   logout,
   activate,
   refresh,
+  updateEmailAfterProof,
 };

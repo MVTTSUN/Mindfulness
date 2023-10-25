@@ -36,10 +36,11 @@ import { toast } from "react-toastify";
 import { io } from "socket.io-client";
 import { getToken, removeToken, setToken } from "./token";
 import { browserHistory } from "../utils/browserHistory";
+import { getUserId, removeUserId } from "./storage";
 
 const providesTags = <T>(
   result: T | undefined,
-  type: "Tips" | "Emotions" | "Info" | "Tasks" | "Meditations"
+  type: "Tips" | "Emotions" | "Info" | "Tasks" | "Meditations" | "User"
 ) => {
   return result && Array.isArray(result)
     ? [...result.map(({ _id }) => ({ type, id: _id })), { type, id: "LIST" }]
@@ -62,17 +63,20 @@ const baseQueryWithReauth: BaseQueryFn<
   FetchBaseQueryError
 > = async (args, api, extraOptions) => {
   let result = await baseQuery(args, api, extraOptions);
+
   if (result.error && result.error.status === 401 && getToken()) {
     const { data } = (await baseQuery(
-      ApiRoute.Auth + "/refresh",
+      ApiRoute.Auth + "/refresh/" + getUserId(),
       api,
       extraOptions
     )) as unknown as { data: DataUser };
+
     if (data && data.accessToken) {
       setToken(data.accessToken);
       result = await baseQuery(args, api, extraOptions);
     } else {
       removeToken();
+      removeUserId();
       browserHistory.push(BrowserRoute.Login);
     }
   }
@@ -81,7 +85,7 @@ const baseQueryWithReauth: BaseQueryFn<
 
 export const mindfulnessApi = createApi({
   reducerPath: "mindfulnessApi",
-  tagTypes: ["Tips", "Emotions", "Info", "Tasks", "Meditations"],
+  tagTypes: ["Tips", "Emotions", "Info", "Tasks", "Meditations", "User"],
   baseQuery: baseQueryWithReauth,
   endpoints: (builder) => ({
     getTips: builder.query<DataTextLottieImage[], void>({
@@ -372,10 +376,11 @@ export const mindfulnessApi = createApi({
       },
     }),
     refresh: builder.query<DataUser, void>({
-      query: () => ApiRoute.Auth + "/refresh",
+      query: (id) => ApiRoute.Auth + "/refresh" + `/${id}`,
     }),
     getUser: builder.query<DataUserInfo, void>({
       query: () => ApiRoute.Auth + "/user",
+      providesTags: (result) => providesTags(result, "User"),
     }),
     updateUser: builder.mutation<DataUserInfo, DataUpdateUser>({
       query: (data) => {
@@ -385,6 +390,7 @@ export const mindfulnessApi = createApi({
           body: data,
         };
       },
+      invalidatesTags: [{ type: "User", id: "LIST" }],
     }),
   }),
 });

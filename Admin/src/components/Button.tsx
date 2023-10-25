@@ -29,6 +29,7 @@ export function Button(props: ButtonProps) {
       startAnimating();
     } else {
       stopAnimating();
+      setText(children as string);
     }
   }, [isLoading]);
 
@@ -39,7 +40,10 @@ export function Button(props: ButtonProps) {
   }, [children]);
 
   return (
-    <ButtonStyled {...rest} $isPrimary={isPrimary}>
+    <ButtonStyled
+      {...rest}
+      $isPrimary={isPrimary}
+    >
       {text}
     </ButtonStyled>
   );

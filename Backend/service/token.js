@@ -9,7 +9,7 @@ const generateTokens = (payload) => {
   const accessToken = jwt.sign(
     payload,
     NODE_ENV === 'production' ? JWT_SECRET : DEV_JWT_ACCESS_SECRET,
-    { expiresIn: '15m' }
+    { expiresIn: '15s' }
   );
   const refreshToken = jwt.sign(
     payload,
@@ -20,28 +20,74 @@ const generateTokens = (payload) => {
   return { accessToken, refreshToken };
 };
 
-const saveToken = async (userId, refreshToken) => {
+const saveToken = async (userId, refreshToken, oldRefreshToken = null) => {
   const tokenData = await Token.findOne({ user: userId });
 
   if (tokenData) {
-    tokenData.refreshToken = refreshToken;
-    return tokenData.save();
+    if (oldRefreshToken) {
+      for (let i = 0; i < tokenData.refreshTokens.length; i += 1) {
+        if (tokenData.refreshTokens[i] === oldRefreshToken) {
+          tokenData.refreshTokens[i] = refreshToken;
+
+          return tokenData.save();
+        }
+      }
+    }
+    for (let i = 0; i < tokenData.refreshTokens.length; i += 1) {
+      if (tokenData.refreshTokens[i] === null) {
+        tokenData.refreshTokens[i] = refreshToken;
+
+        return tokenData.save();
+      }
+    }
+    for (let i = 0; i < tokenData.refreshTokens.length; i += 1) {
+      if (i === tokenData.iteration) {
+        tokenData.refreshTokens[i] = refreshToken;
+        tokenData.iteration += 1;
+
+        return tokenData.save();
+      }
+
+      if (i === tokenData.refreshTokens.length - 1) {
+        tokenData.refreshTokens[0] = refreshToken;
+        tokenData.iteration = 1;
+
+        return tokenData.save();
+      }
+    }
   }
-  const token = await Token.create({ user: userId, refreshToken });
+
+  const refreshTokens = [refreshToken, null, null, null, null];
+
+  const token = await Token.create({ user: userId, refreshTokens, iteration: 1 });
+
+  console.log(111);
 
   return token;
 };
 
-const removeToken = async (refreshToken) => {
-  const token = await Token.deleteOne({ refreshToken });
+const removeToken = async (userId, refreshToken) => {
+  const tokenData = await Token.findOne({ user: userId });
 
-  return token;
+  for (let i = 0; i < tokenData.refreshTokens.length; i += 1) {
+    if (tokenData.refreshTokens[i] === refreshToken) {
+      tokenData.refreshTokens[i] = null;
+      tokenData.save();
+
+      break;
+    }
+  }
+
+  return null;
 };
 
-const findToken = async (refreshToken) => {
-  const token = await Token.findOne({ refreshToken });
+const findToken = async (userId, refreshToken) => {
+  const tokenData = await Token.findOne({
+    user: userId,
+    refreshTokens: { $in: [refreshToken] },
+  });
 
-  return token;
+  return tokenData;
 };
 
 const validateAccessToken = (token) => {

@@ -1,7 +1,8 @@
 const bcrypt = require('bcryptjs');
 const { v4: uuidv4 } = require('uuid');
 const User = require('../models/user');
-const { sendActivationMail } = require('./mail');
+const ProofLink = require('../models/proofLink');
+const { sendActivationMail, sendProof } = require('./mail');
 const {
   generateTokens,
   saveToken,
@@ -27,7 +28,6 @@ const registration = async (name, email, password) => {
 
   await sendActivationMail(email, `${API_URL}/auth/activate/${activationLink}`);
   const tokens = generateTokens(userWithoutPassword);
-  await saveToken(userWithoutPassword._id, tokens.refreshToken);
 
   return { ...tokens, user: userWithoutPassword };
 };
@@ -41,6 +41,27 @@ const activateUser = async (activationLink) => {
 
   user.isActivated = true;
   await user.save();
+};
+
+const createProofLink = async (userId, name, email, password, oldPassword) => {
+  const proofLink = uuidv4();
+  const user = await User.findById(userId);
+
+  if (password && oldPassword) {
+    const isPassEquals = await bcrypt.compare(oldPassword, user.password);
+
+    if (!isPassEquals) {
+      throw new IncorrectError(errorMessages.INCORRECT_DATA);
+    }
+
+    const hash = await bcrypt.hash(password, 10);
+
+    await ProofLink.create({ user: userId, name, proofLink, password: hash, email });
+  } else if (email !== user.email) {
+    await ProofLink.create({ user: userId, name, proofLink, email });
+  }
+
+  await sendProof(user.email, `${API_URL}/auth/proof/${proofLink}`);
 };
 
 const loginUser = async (email, password) => {
@@ -65,19 +86,19 @@ const loginUser = async (email, password) => {
   return { ...tokens, user: userWithoutPassword };
 };
 
-const logoutUser = async (refreshToken) => {
-  const token = await removeToken(refreshToken);
+const logoutUser = async (userId, refreshToken) => {
+  const token = await removeToken(userId, refreshToken);
 
   return token;
 };
 
-const refreshUser = async (refreshToken) => {
+const refreshUser = async (userId, refreshToken) => {
   if (!refreshToken) {
     throw new UnauthorizedError(errorMessages.UNAUTHORIZED);
   }
 
   const userData = validateRefreshToken(refreshToken);
-  const tokenFromDB = await findToken(refreshToken);
+  const tokenFromDB = await findToken(userId, refreshToken);
 
   if (!userData || !tokenFromDB) {
     throw new UnauthorizedError(errorMessages.UNAUTHORIZED);
@@ -88,9 +109,16 @@ const refreshUser = async (refreshToken) => {
   delete userWithoutPassword.password;
   delete userWithoutPassword.activationLink;
   const tokens = generateTokens(userWithoutPassword);
-  await saveToken(userWithoutPassword._id, tokens.refreshToken);
+  await saveToken(userWithoutPassword._id, tokens.refreshToken, refreshToken);
 
   return { ...tokens, user: userWithoutPassword };
 };
 
-module.exports = { registration, activateUser, loginUser, logoutUser, refreshUser };
+module.exports = {
+  registration,
+  activateUser,
+  loginUser,
+  logoutUser,
+  refreshUser,
+  createProofLink,
+};

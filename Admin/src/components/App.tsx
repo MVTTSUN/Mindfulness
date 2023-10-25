@@ -20,20 +20,12 @@ import { DisplayResultMeditation } from "./DisplayResultMeditation";
 import { MeditationPage } from "../pages/MeditationPage";
 import { FormMeditation } from "./FormMeditation";
 import { HeaderWithFooterLayout } from "./HeaderWithMainLayout";
-import { useEffect } from "react";
-import { useLazyRefreshQuery } from "../services/api";
-import { getToken } from "../services/token";
 import { PrivateRoute } from "./PrivateRoute";
 import { ProfilePage } from "../pages/ProfilePage";
+import { useNavigateAllTabs } from "../hooks/useNavigateAllTabs";
 
 export function App() {
-  const [trigger] = useLazyRefreshQuery();
-
-  useEffect(() => {
-    if (getToken()) {
-      trigger();
-    }
-  }, []);
+  useNavigateAllTabs();
 
   return (
     <HelmetProvider>

@@ -178,23 +178,28 @@ const schemaUpdateUser = (isChangePassword?: boolean) =>
     email: string()
       .required(ErrorText.Required)
       .matches(/^[\w-\\.]+@([\w-]+\.)+[\w-]{2,4}$/g, ErrorText.Email),
-    password: string()
-      .test((value, { createError }) => {
-        if (isChangePassword && !value) {
-          return createError({
-            message: ErrorText.Required,
-          });
-        }
-        return true;
-      })
-      .matches(
-        /(?=.*[0-9])(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z!@#$%^&*]{8,}/g,
-        ErrorText.Password
-      ),
+    password: string().test((value, { createError }) => {
+      if (isChangePassword && !value) {
+        return createError({
+          message: ErrorText.Required,
+        });
+      }
+      return true;
+    }),
     newPassword: string().test((value, { createError }) => {
       if (isChangePassword && !value) {
         return createError({
           message: ErrorText.Required,
+        });
+      }
+      if (
+        isChangePassword &&
+        !value?.match(
+          /(?=.*[0-9])(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z!@#$%^&*]{8,}/g
+        )
+      ) {
+        return createError({
+          message: ErrorText.Password,
         });
       }
       return true;

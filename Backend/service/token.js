@@ -61,8 +61,6 @@ const saveToken = async (userId, refreshToken, oldRefreshToken = null) => {
 
   const token = await Token.create({ user: userId, refreshTokens, iteration: 1 });
 
-  console.log(111);
-
   return token;
 };
 

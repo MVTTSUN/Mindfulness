@@ -117,8 +117,8 @@ const login = async (req, res, next) => {
     res.cookie('refreshToken', userData.refreshToken, {
       maxAge: 30 * 24 * 60 * 60 * 1000,
       httpOnly: true,
-      // sameSite: true,
-      // secure: true,
+      sameSite: true,
+      secure: true,
     });
 
     const { ...userDataWithoutRefreshToken } = userData;
@@ -151,8 +151,8 @@ const refresh = async (req, res, next) => {
     res.cookie('refreshToken', userData.refreshToken, {
       maxAge: 30 * 24 * 60 * 60 * 1000,
       httpOnly: true,
-      // sameSite: true,
-      // secure: true,
+      sameSite: true,
+      secure: true,
     });
 
     const { ...userDataWithoutRefreshToken } = userData;

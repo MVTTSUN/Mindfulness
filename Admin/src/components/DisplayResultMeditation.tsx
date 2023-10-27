@@ -9,8 +9,11 @@ import { useAppDispatch } from "../hooks/useAppDispatch";
 import { changeCurrentTime } from "../store/currentAudioSlice";
 import { useGetAudio } from "../hooks/useGetAudio";
 import { getCurrentTime } from "../store/currentAudioSelectors";
+import { Image } from "../const";
+import { useState } from "react";
 
 export function DisplayResultMeditation() {
+  const [isLoadImage, setIsLoadImage] = useState(false);
   const data = useOutletContext<DataMeditation>();
   const currentTime = useAppSelector(getCurrentTime);
   const dispatch = useAppDispatch();
@@ -40,13 +43,14 @@ export function DisplayResultMeditation() {
   return (
     <Container>
       <Text>Вид: {data && data.kind}</Text>
-      <Image
+      <ImageStyled
+        onLoad={() => setIsLoadImage(true)}
         src={
-          data
+          data && isLoadImage
             ? `${BASE_URL}${ApiRoute.Meditations + ApiRoute.Filename}/${
                 data.image
               }`
-            : ""
+            : Image.EmptyImg
         }
       />
       <Audio
@@ -93,7 +97,7 @@ const Text = styled.p`
   color: ${Color.TextStandard};
 `;
 
-const Image = styled.img`
+const ImageStyled = styled.img`
   box-sizing: border-box;
   aspect-ratio: 1 / 1;
   width: 100%;

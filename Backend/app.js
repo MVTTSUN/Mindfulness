@@ -15,12 +15,12 @@ require('dotenv').config();
 const { PORT = 3000, DATABASE_URL, NODE_ENV } = process.env;
 
 const app = express();
-const server = http.createServer(app).listen(PORT, '192.168.1.111');
+const server = http.createServer(app).listen(PORT);
 const { io } = require('./utils/socket');
 
 io.attach(server, {
   cors: {
-    origin: ['https://localhost:5173', 'http://localhost:5173'],
+    origin: ['https://mindflns.ru', 'http://mindflns.ru'],
   },
 });
 

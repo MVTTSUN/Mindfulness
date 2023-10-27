@@ -9,7 +9,7 @@ const generateTokens = (payload) => {
   const accessToken = jwt.sign(
     payload,
     NODE_ENV === 'production' ? JWT_SECRET : DEV_JWT_ACCESS_SECRET,
-    { expiresIn: '15s' }
+    { expiresIn: '15m' }
   );
   const refreshToken = jwt.sign(
     payload,

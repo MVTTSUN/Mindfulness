@@ -66,11 +66,12 @@ enum Image {
   Move = "/images/move.svg",
   VisiblePassword = "/images/visible-password.svg",
   Profile = "/images/profile.svg",
+  EmptyImg = "/images/empty.jpg",
 }
 
 const MEDITATION_AUDIO_ID = "meditation-audio";
 
-const BASE_URL = "http://192.168.1.111:3000";
+const BASE_URL = "https://api.mindflns.ru";
 
 const MAX_SIZE_IMAGE = 200;
 

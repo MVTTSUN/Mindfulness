@@ -40,7 +40,9 @@ const getOptionLine = (
             bar: "",
           },
         },
-        saveAsImage: {},
+        saveAsImage: {
+          title: "",
+        },
       },
     },
     xAxis: {
@@ -96,7 +98,9 @@ const getOptionDonut = (monthsAndroid?: number[], monthsIOS?: number[]) => {
     },
     toolbox: {
       feature: {
-        saveAsImage: {},
+        saveAsImage: {
+          title: "",
+        },
       },
     },
     color: [Color.Task, Color.Meditation],

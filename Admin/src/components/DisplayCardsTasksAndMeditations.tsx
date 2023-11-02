@@ -19,6 +19,9 @@ export function DisplayCardsTasksAndMeditations(
   const { pathname } = useLocation();
   const [deleteTask] = useDeleteTaskMutation();
   const [deleteMeditation] = useDeleteMeditationMutation();
+  const { dataCopy } = JSON.parse(JSON.stringify({ dataCopy: data })) as {
+    dataCopy: DataTextLottieImage[] | DataMeditation[];
+  };
   const isMeditation = pathname === BrowserRoute.Meditation;
 
   const deleteCard = (id: string) => {
@@ -31,20 +34,24 @@ export function DisplayCardsTasksAndMeditations(
 
   return (
     <Container>
-      {data?.map((item) => (
-        <li key={item._id}>
-          <ButtonDelete type="button" onClick={() => deleteCard(item._id)} />
-          <LinkStyled
-            to={`${
-              isMeditation ? BrowserRoute.Meditation : BrowserRoute.Task
-            }/${item._id}`}
-          >
-            <Card $isMeditation={isMeditation}>
-              <TitleCard $isMeditation={isMeditation}>{item.title}</TitleCard>
-            </Card>
-          </LinkStyled>
-        </li>
-      ))}
+      {dataCopy
+        ?.sort((a, b) =>
+          a.title && b.title ? a.title.localeCompare(b.title) : -1
+        )
+        .map((item) => (
+          <li key={item._id}>
+            <ButtonDelete type="button" onClick={() => deleteCard(item._id)} />
+            <LinkStyled
+              to={`${
+                isMeditation ? BrowserRoute.Meditation : BrowserRoute.Task
+              }/${item._id}`}
+            >
+              <Card $isMeditation={isMeditation}>
+                <TitleCard $isMeditation={isMeditation}>{item.title}</TitleCard>
+              </Card>
+            </LinkStyled>
+          </li>
+        ))}
     </Container>
   );
 }

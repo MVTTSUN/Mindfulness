@@ -85,7 +85,7 @@ const postTaskCelebrate = celebrate({
     type: Joi.alternatives()
       .try(Joi.string().required(), Joi.array().items(Joi.string()).required())
       .required(),
-    text: Joi.alternatives().try(Joi.string(), Joi.array().items(Joi.string())).required(),
+    text: Joi.alternatives().try(Joi.string(), Joi.array().items(Joi.string())),
   }),
 });
 
@@ -105,7 +105,7 @@ const patchTaskCelebrate = celebrate({
     type: Joi.alternatives()
       .try(Joi.string().required(), Joi.array().items(Joi.string()).required())
       .required(),
-    text: Joi.alternatives().try(Joi.string(), Joi.array().items(Joi.string())).required(),
+    text: Joi.alternatives().try(Joi.string(), Joi.array().items(Joi.string())),
   }),
 });
 

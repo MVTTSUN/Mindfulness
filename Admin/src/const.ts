@@ -28,8 +28,8 @@ enum ApiRoute {
 }
 
 enum Color {
-  Primary = "#b5f2ea",
-  Pastel = "#d4f4ef",
+  Primary = "#aef0f6",
+  Pastel = "#d1f9fe",
   Dark = "#283957",
   Meditation = "#469ab2",
   Task = "#d2f2d0",

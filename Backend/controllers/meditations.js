@@ -58,11 +58,9 @@ const getMeditationFile = async (req, res, next) => {
   try {
     const { filename } = req.params;
     const file = await gfs.find({ filename }).toArray();
-
-    res.set('Content-Type', file[0].contentType);
+    const fileLength = file[0].length;
 
     if (file[0] && req.headers.range) {
-      const fileLength = file[0].length;
       const parts = req.headers.range.replace(/bytes=/, '').split('-');
       const partialStart = parts[0];
       const partialEnd = parts[1];
@@ -93,6 +91,9 @@ const getMeditationFile = async (req, res, next) => {
         downloadStream.pipe(res);
       });
     }
+
+    res.set('Content-Type', file[0].contentType);
+    res.set('Content-Length', fileLength);
 
     await gfs.openDownloadStreamByName(filename).pipe(res);
   } catch (err) {

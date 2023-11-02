@@ -270,6 +270,7 @@ const ContainerCards = styled.ul`
   gap: 10px;
   max-width: 500px;
   justify-content: center;
+  align-content: baseline;
 
   @media (max-width: 550px) {
     max-width: none;

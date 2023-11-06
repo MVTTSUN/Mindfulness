@@ -26,7 +26,7 @@ import {
 } from "../const";
 import { useEffect, useState } from "react";
 import { useAppSelector } from "../hooks/useAppSelector";
-import { getCurrentTime, getIsPause } from "../store/currentAudioSelectors";
+import { getCurrentTime } from "../store/currentAudioSelectors";
 import { InputSelect } from "./InputSelect";
 import {
   useAddMeditationMutation,
@@ -47,7 +47,6 @@ export function FormMeditation() {
   const [textLines, setTextLines] = useState<TextLine[]>([]);
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const isPause = useAppSelector(getIsPause);
   const currentTime = useAppSelector(getCurrentTime);
   const data = useOutletContext<DataMeditation>();
   const [addMeditation, { isLoading: isLoadingAdd }] =
@@ -137,10 +136,8 @@ export function FormMeditation() {
   };
 
   useEffect(() => {
-    if (!isPause) {
-      setTextLines(getValues("textLines"));
-    }
-  }, [isPause]);
+    setTextLines(getValues("textLines"));
+  }, [fields]);
 
   useEffect(() => {
     if (data) {

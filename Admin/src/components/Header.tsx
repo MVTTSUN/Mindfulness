@@ -1,15 +1,10 @@
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { CenterContainer } from "./CenterContainer";
 import styled from "styled-components";
-import {
-  FontSizeHeading,
-  FontSizeStandard,
-  ResetButton,
-  ResetLink,
-  ResetList,
-} from "../mixins";
+import { FontSizeStandard, ResetButton, ResetLink, ResetList } from "../mixins";
 import { BrowserRoute, Color, Image } from "../const";
 import { useState } from "react";
+import { Logo } from "./Logo";
 
 export function Header() {
   const [isOpen, setIsOpen] = useState(false);
@@ -21,13 +16,13 @@ export function Header() {
         <CenterContainer>
           <NavStyled>
             {pathname === BrowserRoute.Statistic ? (
-              <Heading>Mindfulness</Heading>
+              <Logo />
             ) : (
               <LinkStyled
                 to={BrowserRoute.Statistic}
                 onClick={() => setIsOpen(false)}
               >
-                <Heading>Mindfulness</Heading>
+                <Logo />
               </LinkStyled>
             )}
             <BurgerMenu $isOpen={isOpen}>
@@ -113,7 +108,7 @@ const HeaderStyled = styled.header`
   width: 100vw;
   box-sizing: border-box;
   background-color: ${Color.Pastel};
-  padding: 20px 0;
+  padding: 5px 0;
 `;
 
 const NavStyled = styled.nav`
@@ -129,11 +124,6 @@ const LinkStyled = styled(Link)`
   display: flex;
   align-items: center;
   justify-content: center;
-  color: ${Color.TextStandard};
-`;
-
-const Heading = styled.h1`
-  ${FontSizeHeading}
   color: ${Color.TextStandard};
 `;
 

@@ -23,6 +23,7 @@ import { DataUser } from "../types/server";
 import { Helmet } from "react-helmet-async";
 import { CenterContainer } from "../components/CenterContainer";
 import { setUserId } from "../services/storage";
+import { Logo } from "../components/Logo";
 
 export function Auth() {
   const [isOpenActivate, setIsOpenActivate] = useState(false);
@@ -82,6 +83,7 @@ export function Auth() {
     <Main>
       <CenterContainer>
         <Container>
+          <Logo isColumn />
           {pathname === BrowserRoute.Login ? (
             <Helmet>
               <title>Вход - Mindfulness</title>

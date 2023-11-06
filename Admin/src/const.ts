@@ -67,13 +67,14 @@ enum Image {
   VisiblePassword = "/images/visible-password.svg",
   Profile = "/images/profile.svg",
   EmptyImg = "/images/empty.jpg",
+  Logo = "/images/logo.svg"
 }
 
 const MEDITATION_AUDIO_ID = "meditation-audio";
 
 const BASE_URL = "https://api.mindflns.ru";
 
-const MAX_SIZE_IMAGE = 200;
+const MAX_SIZE_IMAGE = 500;
 
 const OPTIONS_KIND_MEDITATIONS = ["Легкая", "Средняя", "Сложная"];
 const OPTIONS_KIND_TASKS = ["Легкое", "Среднее", "Сложное"];

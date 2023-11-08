@@ -1,19 +1,19 @@
-import { GlobalScreen } from "../../components/GlobalScreen";
+import { GlobalScreen } from "../../components/GlobalScreenWrapper";
 import { CenterContainer } from "../../components/CenterContainer";
-import { TopWithBack } from "../../components/ui/TopWithBack";
+import { HeaderWithBack } from "../../components/ui/headers/HeaderWithBack";
 import { styled } from "styled-components/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import {
-  useFocusEffect,
-  useNavigation,
-  useRoute,
-} from "@react-navigation/native";
-import { NotesScreenProp, TaskType, TasksScreenProp } from "../../types";
+  DataTextLottieImage,
+  NotesScreenProp,
+  TasksScreenProp,
+} from "../../types";
 import { Pressable, ScrollView } from "react-native";
-import { AddIcon } from "../../components/icons/AddIcon";
+import { AddIcon } from "../../components/svg/icons/other-icons/AddIcon";
 import LottieView from "lottie-react-native";
-import { COLORS } from "../../const";
-import { useCallback, useEffect, useState } from "react";
-import { LikeIcon } from "../../components/icons/LikeIcon";
+import { ApiRoute, AppRoute, BASE_URL, Color, NameFolder, Theme } from "../../const";
+import { useEffect, useState } from "react";
+import { LikeIcon } from "../../components/svg/icons/other-icons/LikeIcon";
 import { useAppSelector } from "../../hooks/useAppSelector";
 import { useAppDispatch } from "../../hooks/useAppDispatch";
 import Animated, {
@@ -23,19 +23,41 @@ import Animated, {
   withSpring,
 } from "react-native-reanimated";
 import { addTaskLike, removeTaskLike } from "../../store/likesSlice";
+import { useLazyGetTaskLottieQuery, useLazyGetTaskQuery } from "../../api/api";
+import deepEqual from "deep-equal";
+import { getDataTaskCopy, getTaskInTask } from "../../store/tasksSelectors";
+import { useFileSystem } from "../../hooks/useFileSystem";
+import { normalize } from "../../utils";
+import { setTasksInTask, setDataTasksCopy } from "../../store/tasksSlice";
+import { getLikesTask } from "../../store/likesSelectors";
+import { getIsOffline } from "../../store/offlineSelectors";
+import { Tracker } from "../../components/ui/Tracker";
 
 export function Task() {
+  const [isActive, setIsActive] = useState(false);
   const route = useRoute();
-  const { task } = route.params as { task: TaskType };
+  const { taskId } = route.params as { taskId: string };
   const navigation = useNavigation<NotesScreenProp & TasksScreenProp>();
-  const likes = useAppSelector((state) => state.likes.likesTask);
+  const theme = useAppSelector((state) => state.theme.value);
+  const likes = useAppSelector(getLikesTask);
+  const dataTaskCopy = useAppSelector(getDataTaskCopy(taskId));
+  const task = useAppSelector(getTaskInTask(taskId));
+  const isOffline = useAppSelector(getIsOffline);
   const dispatch = useAppDispatch();
+  const [getTaskQuery] = useLazyGetTaskQuery();
+  const [getTaskLottieQuery] = useLazyGetTaskLottieQuery();
+  const {
+    deleteFile,
+    download,
+    getFilePath,
+    createDirectory,
+    downloadJSON,
+    readJSON,
+  } = useFileSystem();
   const scaleLike = useSharedValue(1);
   const likeStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scaleLike.value }],
   }));
-  const [isActive, setIsActive] = useState(false);
-  const theme = useAppSelector((state) => state.theme.value);
 
   const toggleLike = () => {
     scaleLike.value = withSequence(
@@ -44,66 +66,135 @@ export function Task() {
       withSpring(1)
     );
     if (isActive) {
-      dispatch(removeTaskLike(task.id));
+      dispatch(removeTaskLike(task._id));
     } else {
-      dispatch(addTaskLike(task.id));
+      dispatch(addTaskLike(task._id));
+    }
+  };
+
+  const downloadData = async () => {
+    const { data } = await getTaskQuery(taskId);
+
+    if (data) {
+      if (!deepEqual(data, dataTaskCopy)) {
+        await deleteFile(NameFolder.Tasks + `/${taskId}`);
+        await createDirectory(NameFolder.Tasks + `/${taskId}`);
+        const result = {} as DataTextLottieImage;
+        result.data = [];
+        result.kind = data.kind;
+        result.title = data.title;
+        result._id = data._id;
+        for (const node of data?.data) {
+          if (node.type === "image") {
+            const uri = await download(
+              BASE_URL +
+                ApiRoute.Tasks +
+                ApiRoute.Filename +
+                `/${node.payload}`,
+              NameFolder.Tasks + `/${taskId}`,
+              node.payload
+            );
+            uri &&
+              result.data.push({
+                type: node.type,
+                payload: uri,
+                _id: node._id,
+              });
+          } else if (node.type === "lottie") {
+            const response = await getTaskLottieQuery(node.payload);
+            response.data &&
+              (await downloadJSON(
+                NameFolder.Tasks + `/${taskId}`,
+                node.payload,
+                response.data
+              ));
+            const jsonObj = (await readJSON(
+              getFilePath(NameFolder.Tasks + `/${taskId}`, node.payload)
+            )) as string;
+            result.data.push({
+              type: node.type,
+              payload: jsonObj,
+              _id: node._id,
+            });
+          } else {
+            result.data.push({
+              type: node.type,
+              payload: node.payload,
+              _id: node._id,
+            });
+          }
+        }
+        dispatch(setTasksInTask(result));
+        dispatch(setDataTasksCopy(data));
+      }
     }
   };
 
   useEffect(() => {
-    setIsActive(likes.some((like) => like.id === task.id));
-  }, [likes]);
+    task && setIsActive(likes.some((like) => like.id === task._id));
+  }, [likes, task]);
+
+  useEffect(() => {
+    if (!isOffline) {
+      downloadData();
+    }
+  }, []);
 
   return (
     <>
       <GlobalScreen withoutScrollView>
         <CenterContainer>
-          <TopWithBack>
-            <TextTitle>{task.title}</TextTitle>
+          <HeaderWithBack>
+            <TextTitle>{task && task.title}</TextTitle>
             <Pressable onPress={toggleLike}>
               <Animated.View
                 style={[{ backgroundColor: "transparent" }, likeStyle]}
               >
                 <LikeIcon
-                  color={theme === "light" ? "#313131" : "#edecf5"}
+                  color={theme === Theme.Light ? Color.TextStandard : Color.TextWhite}
                   isActive={isActive}
                 />
               </Animated.View>
             </Pressable>
-          </TopWithBack>
+          </HeaderWithBack>
           <ScrollView showsVerticalScrollIndicator={false}>
             <Container>
-              {task.content.map((node, index) => {
-                if (node.type === "text") {
-                  return <TextNode key={index}>{node.payload}</TextNode>;
-                } else if (node.type === "image") {
-                  return (
-                    <ImageWrapper key={index}>
-                      <ImageNode source={node.payload} />
-                    </ImageWrapper>
-                  );
-                } else if (node.type === "lottie") {
-                  return (
-                    <LottieWrapper key={index}>
-                      <LottieNode
-                        source={node.payload}
-                        autoPlay
-                        loop
-                        resizeMode="cover"
-                      />
-                    </LottieWrapper>
-                  );
-                }
-              })}
+              {task &&
+                task.data.map((node) => {
+                  if (node.type === "text") {
+                    return <TextNode key={node._id}>{node.payload}</TextNode>;
+                  } else if (node.type === "image") {
+                    return (
+                      <ImageWrapper key={node._id}>
+                        <ImageNode source={{ uri: node.payload }} />
+                      </ImageWrapper>
+                    );
+                  } else if (node.type === "lottie") {
+                    return (
+                      <LottieWrapper key={node._id}>
+                        <LottieNode
+                          source={
+                            node.payload.charAt(0) === "{" &&
+                            JSON.parse(node.payload)
+                          }
+                          autoPlay
+                          loop
+                          resizeMode="cover"
+                        />
+                      </LottieWrapper>
+                    );
+                  }
+                })}
             </Container>
           </ScrollView>
         </CenterContainer>
       </GlobalScreen>
+      <Tracker id={taskId} title={task?.title} />
       <PressableStyled
         onPress={() =>
-          navigation.navigate("NotesStack", {
-            screen: "Notes",
-            params: { screen: "Note", task },
+          navigation.navigate(AppRoute.NotesStack, {
+            screen: AppRoute.Notes,
+            params: { screen: AppRoute.Note, task },
           })
         }
       >
@@ -117,36 +208,36 @@ export function Task() {
 
 const PressableStyled = styled.Pressable`
   position: absolute;
-  right: 40px;
-  bottom: 100px;
+  right: ${normalize(40)}px;
+  bottom: ${normalize(100)}px;
 `;
 
 const ViewPlus = styled.View`
   align-items: center;
   justify-content: center;
-  width: 50px;
-  height: 50px;
-  border-radius: 25px;
-  background-color: #313131;
+  width: ${normalize(50)}px;
+  height: ${normalize(50)}px;
+  border-radius: ${normalize(25)}px;
+  background-color: ${Color.TextStandard};
 `;
 
 const TextTitle = styled.Text`
   font-family: "Poppins-Medium";
-  font-size: 18px;
+  font-size: ${normalize(18)}px;
   color: ${({ theme }) => theme.color.standard};
 `;
 
 const Container = styled.View`
   gap: 20px;
-  margin-bottom: 270px;
+  margin-bottom: ${normalize(270)}px;
 `;
 
 const LottieWrapper = styled.View`
   overflow: hidden;
-  height: 250px;
+  height: ${normalize(250)}px;
   width: 100%;
-  border-radius: 25px;
-  border: 7px dotted ${COLORS.backgroundColors.taskCard};
+  border-radius: ${normalize(25)}px;
+  border: ${normalize(7)}px dotted ${Color.Task};
 `;
 
 const LottieNode = styled(LottieView)`
@@ -156,16 +247,16 @@ const LottieNode = styled(LottieView)`
 const TextNode = styled.Text`
   text-align: justify;
   font-family: "Poppins-Regular";
-  font-size: 18px;
-  line-height: 24px;
+  font-size: ${normalize(18)}px;
+  line-height: ${normalize(24)}px;
   color: ${({ theme }) => theme.color.standard};
 `;
 
 const ImageWrapper = styled.View`
-  height: 250px;
+  height: ${normalize(250)}px;
   width: 100%;
-  border-radius: 25px;
-  border: 7px dotted ${COLORS.backgroundColors.taskCard};
+  border-radius: ${normalize(25)}px;
+  border: ${normalize(7)}px dotted ${Color.Task};
   overflow: hidden;
 `;
 

@@ -1,80 +1,3 @@
-const DARK_THEME = {
-  color: {
-    standard: "#edecf5",
-    selected: "#000",
-    selectActive: "#313131",
-    meditation: "#edecf5",
-    task: "#313131",
-  },
-  backgroundColor: {
-    main: "#000",
-    primary: "#b5f2ea",
-    tabNavigator: "#1f1f1f",
-    selectActive: "#adc0e0",
-    taskCard: "#e6f4e5",
-    meditationCard: "#469ab2",
-    meditationCardPressed: "#377a8c",
-    blur: "rgba(49, 49, 49, 0.5)",
-  },
-  borderColor: {
-    meditationCard: "#313131",
-    searchOutline: "#000",
-  },
-};
-
-const LIGHT_THEME = {
-  color: {
-    standard: "#313131",
-    meditation: "#edecf5",
-    task: "#313131",
-    selected: "#edecf5",
-    selectActive: "#edecf5",
-  },
-  backgroundColor: {
-    main: "#f5f4fa",
-    primary: "#b5f2ea",
-    tabNavigator: "#313131",
-    selectActive: "#283957",
-    taskCard: "#d2f2d0",
-    meditationCard: "#469ab2",
-    meditationCardPressed: "#377a8c",
-    blur: "rgba(0, 0, 0, 0.3)",
-  },
-  borderColor: {
-    meditationCard: "#e8e7eb",
-    searchOutline: "#f5f4fa",
-  },
-};
-
-const MAIN_COLOR = {
-  normal: "#aef0f6",
-  normalPressed: "#98d3d8",
-  pastel: "#d1f9fe",
-  pastelPressed: "#badbdf",
-};
-
-const COLORS = {
-  mainColors: {
-    normal: "#aef0f6",
-    normalPressed: "#98d3d8",
-    pastel: "#d1f9fe",
-    pastelPressed: "#badbdf",
-  },
-  textColors: {
-    normal: "#313131",
-    meditationCard: "#edecf5",
-    taskCard: "#313131",
-  },
-  backgroundColors: {
-    dark: "#283957",
-    meditationCard: "#469ab2",
-    meditationCardPressed: "#377a8c",
-    taskCard: "#d2f2d0",
-    taskCardPressed: "#b9d5b7",
-  },
-  borderColors: {},
-};
-
 const MAIN_CARDS = [
   {
     id: 1,
@@ -98,258 +21,41 @@ const MAIN_CARDS = [
   },
 ];
 
-const OPTIONS_DATA = [
+const OPTIONS_DATA_TASKS = [
   {
     id: 1,
-    title: "Всё",
-    isActive: true,
+    title: "Все",
   },
   {
     id: 2,
-    title: "Тревога",
-    isActive: false,
+    title: "Легкое",
   },
   {
     id: 3,
-    title: "Стресс",
-    isActive: false,
+    title: "Среднее",
   },
   {
     id: 4,
-    title: "Депрессия",
-    isActive: false,
+    title: "Сложное",
   },
 ];
 
-const MEDITATIONS_DATA = [
+const OPTIONS_DATA_MEDITATIONS = [
   {
     id: 1,
-    title: "Bad Omens",
-    artist: "Mindfulness",
-    artwork: require("./assets/images/audio-player-image.png"),
-    url: require("./assets/audios/Bad_Omens_-_Like_A_Villain.mp3"),
-    kind: "Депрессия",
-    duration: 210,
-    textLines: [
-      { timeAt: 12, timeTo: 15.5, text: "Look into my face, then look again" },
-      {
-        timeAt: 15.5,
-        timeTo: 18,
-        text: "We are not the same, we're different",
-      },
-      { timeAt: 18, timeTo: 21, text: "To tell your tales and fables" },
-      { timeAt: 21, timeTo: 24, text: "You couldn't wait" },
-      {
-        timeAt: 24,
-        timeTo: 28,
-        text: "You need a new clean slate without the dents",
-      },
-      {
-        timeAt: 28,
-        timeTo: 32,
-        text: "A place to put your pain, your consequence",
-      },
-    ],
+    title: "Все",
   },
   {
     id: 2,
-    title: "Catch Your Breath",
-    artist: "Mindfulness",
-    artwork: require("./assets/images/audio-player-image.png"),
-    url: require("./assets/audios/Catch_Your_Breath_-_Dial_Tone.mp3"),
-    kind: "Тревога",
-    duration: 200,
-    textLines: [
-      { timeAt: 0, timeTo: 5, text: "Look into my face, then look again" },
-      { timeAt: 5, timeTo: 10, text: "We are not the same, we're different" },
-      { timeAt: 10, timeTo: 15, text: "To tell your tales and fables" },
-      { timeAt: 15, timeTo: 20, text: "You couldn't wait" },
-      {
-        timeAt: 20,
-        timeTo: 25,
-        text: "You need a new clean slate without the dents",
-      },
-      {
-        timeAt: 25,
-        timeTo: 30,
-        text: "A place to put your pain, your consequence",
-      },
-    ],
+    title: "Легкая",
   },
   {
     id: 3,
-    title: "Normandie",
-    artist: "Mindfulness",
-    artwork: require("./assets/images/audio-player-image.png"),
-    url: require("./assets/audios/Normandie_-_White_Flag.mp3"),
-    kind: "Тревога",
-    duration: 229,
-    textLines: [
-      { timeAt: 0, timeTo: 5, text: "Look into my face, then look again" },
-      { timeAt: 5, timeTo: 10, text: "We are not the same, we're different" },
-      { timeAt: 10, timeTo: 15, text: "To tell your tales and fables" },
-      { timeAt: 15, timeTo: 20, text: "You couldn't wait" },
-      {
-        timeAt: 20,
-        timeTo: 25,
-        text: "You need a new clean slate without the dents",
-      },
-      {
-        timeAt: 25,
-        timeTo: 30,
-        text: "A place to put your pain, your consequence",
-      },
-    ],
+    title: "Средняя",
   },
   {
     id: 4,
-    title: "Our Last Night",
-    artist: "Mindfulness",
-    artwork: require("./assets/images/audio-player-image.png"),
-    url: require("./assets/audios/Our_Last_Night_-_Bronze_Serpent.mp3"),
-    kind: "Депрессия",
-    duration: 250,
-    textLines: [
-      { timeAt: 0, timeTo: 5, text: "Look into my face, then look again" },
-      { timeAt: 5, timeTo: 10, text: "We are not the same, we're different" },
-      { timeAt: 10, timeTo: 15, text: "To tell your tales and fables" },
-      { timeAt: 15, timeTo: 20, text: "You couldn't wait" },
-      {
-        timeAt: 20,
-        timeTo: 25,
-        text: "You need a new clean slate without the dents",
-      },
-      {
-        timeAt: 25,
-        timeTo: 30,
-        text: "A place to put your pain, your consequence",
-      },
-    ],
-  },
-  {
-    id: 5,
-    title: "Sleep Token",
-    artist: "Mindfulness",
-    artwork: require("./assets/images/audio-player-image.png"),
-    url: require("./assets/audios/Sleep_Token_-_The_Apparition.mp3"),
-    kind: "Стресс",
-    duration: 268,
-    textLines: [
-      { timeAt: 0, timeTo: 5, text: "Look into my face, then look again" },
-      { timeAt: 5, timeTo: 10, text: "We are not the same, we're different" },
-      { timeAt: 10, timeTo: 15, text: "To tell your tales and fables" },
-      { timeAt: 15, timeTo: 20, text: "You couldn't wait" },
-      {
-        timeAt: 20,
-        timeTo: 25,
-        text: "You need a new clean slate without the dents",
-      },
-      {
-        timeAt: 25,
-        timeTo: 30,
-        text: "A place to put your pain, your consequence",
-      },
-    ],
-  },
-  {
-    id: 6,
-    title: "Three Days Grace",
-    artist: "Mindfulness",
-    artwork: require("./assets/images/audio-player-image.png"),
-    url: require("./assets/audios/Three_Days_Grace_-_Break.mp3"),
-    kind: "Депрессия",
-    duration: 193,
-    textLines: [
-      { timeAt: 0, timeTo: 5, text: "Look into my face, then look again" },
-      { timeAt: 5, timeTo: 10, text: "We are not the same, we're different" },
-      { timeAt: 10, timeTo: 15, text: "To tell your tales and fables" },
-      { timeAt: 15, timeTo: 20, text: "You couldn't wait" },
-      {
-        timeAt: 20,
-        timeTo: 25,
-        text: "You need a new clean slate without the dents",
-      },
-      {
-        timeAt: 25,
-        timeTo: 30,
-        text: "A place to put your pain, your consequence",
-      },
-    ],
-  },
-  {
-    id: 7,
-    title: "Three Days Grace",
-    artist: "Mindfulness",
-    artwork: require("./assets/images/audio-player-image.png"),
-    url: require("./assets/audios/Three_Days_Grace_–_Chalk_Outline.mp3"),
-    kind: "Тревога",
-    duration: 182,
-    textLines: [
-      { timeAt: 0, timeTo: 5, text: "Look into my face, then look again" },
-      { timeAt: 5, timeTo: 10, text: "We are not the same, we're different" },
-      { timeAt: 10, timeTo: 15, text: "To tell your tales and fables" },
-      { timeAt: 15, timeTo: 20, text: "You couldn't wait" },
-      {
-        timeAt: 20,
-        timeTo: 25,
-        text: "You need a new clean slate without the dents",
-      },
-      {
-        timeAt: 25,
-        timeTo: 30,
-        text: "A place to put your pain, your consequence",
-      },
-    ],
-  },
-  {
-    id: 8,
-    title: "Three Days Grace",
-    artist: "Mindfulness",
-    artwork: require("./assets/images/audio-player-image.png"),
-    url: require("./assets/audios/Three_Days_Grace_–_Human_Race.mp3"),
-    kind: "Стресс",
-    duration: 249,
-    textLines: [
-      { timeAt: 0, timeTo: 5, text: "Look into my face, then look again" },
-      { timeAt: 5, timeTo: 10, text: "We are not the same, we're different" },
-      { timeAt: 10, timeTo: 15, text: "To tell your tales and fables" },
-      { timeAt: 15, timeTo: 20, text: "You couldn't wait" },
-      {
-        timeAt: 20,
-        timeTo: 25,
-        text: "You need a new clean slate without the dents",
-      },
-      {
-        timeAt: 25,
-        timeTo: 30,
-        text: "A place to put your pain, your consequence",
-      },
-    ],
-  },
-  {
-    id: 9,
-    title: "Until I Wake",
-    artist: "Mindfulness",
-    artwork: require("./assets/images/audio-player-image.png"),
-    url: require("./assets/audios/Until_I_Wake_-_Cold.mp3"),
-    kind: "Депрессия",
-    duration: 179,
-    textLines: [
-      { timeAt: 0, timeTo: 5, text: "Look into my face, then look again" },
-      { timeAt: 5, timeTo: 10, text: "We are not the same, we're different" },
-      { timeAt: 10, timeTo: 15, text: "To tell your tales and fables" },
-      { timeAt: 15, timeTo: 20, text: "You couldn't wait" },
-      {
-        timeAt: 20,
-        timeTo: 25,
-        text: "You need a new clean slate without the dents",
-      },
-      {
-        timeAt: 25,
-        timeTo: 30,
-        text: "A place to put your pain, your consequence",
-      },
-    ],
+    title: "Сложная",
   },
 ];
 
@@ -372,417 +78,246 @@ const DATA_INPUTS_NOTE = [
   },
 ];
 
-const EMOTIONS = [
-  "Неловкость",
-  "Смущение",
-  "Стыд",
-  "Вина",
-  "Удовлетворение",
-  "Удовольствие",
-  "Радость",
-  "Восторг",
-  "Досада",
-  "Обида",
-  "Зависть",
-  "Безразличие",
-  "Спокойствие",
-  "Умиротворение",
-  "Разочарование",
-  "Печаль",
-  "Грусть",
-  "Тоска",
-  "Отчаяние",
-  "Горе",
-  "Недовольство",
-  "Неприязнь",
-  "Отвращение",
-  "Беспокойство",
-  "Тревога",
-  "Страх",
-  "Ужас",
-  "Удивление",
-  "Интерес",
-  "Предвкушение",
-  "Воодушевление",
-  "Раздражение",
-  "Злость",
-  "Гнев",
-  "Ярость",
-].sort();
-
-const TIP = [
-  {
-    type: "text",
-    payload:
-      "Медитация — практика, которая полезна практически всем. Она помогает снижать уровень стресса, справляться с агрессией, тренировать внимание, успокаиваться и прислушиваться к себе. Хотя кажется, что для нее нужны особые условия и инструктор, на самом деле это не так — есть простые техники, которые можно выполнять дома, например дыхательная медитация. Рассказываем, какие это техники и как с ними работать.",
-  },
-  {
-    type: "lottie",
-    payload: require("./assets/lottie/animaRound.json"),
-  },
-  {
-    type: "text",
-    payload:
-      "Медитация — практика, которая полезна практически всем. Она помогает снижать уровень стресса, справляться с агрессией, тренировать внимание, успокаиваться и прислушиваться к себе. Хотя кажется, что для нее нужны особые условия и инструктор, на самом деле это не так — есть простые техники, которые можно выполнять дома, например дыхательная медитация. Рассказываем, какие это техники и как с ними работать.",
-  },
-  {
-    type: "image",
-    payload: require("./assets/images/audio-player-image.png"),
-  },
-  {
-    type: "text",
-    payload:
-      "Медитация — практика, которая полезна практически всем. Она помогает снижать уровень стресса, справляться с агрессией, тренировать внимание, успокаиваться и прислушиваться к себе. Хотя кажется, что для нее нужны особые условия и инструктор, на самом деле это не так — есть простые техники, которые можно выполнять дома, например дыхательная медитация. Рассказываем, какие это техники и как с ними работать.",
-  },
+const MONTHS = [
+  "Всё",
+  "Январь",
+  "Февраль",
+  "Март",
+  "Апрель",
+  "Май",
+  "Июнь",
+  "Июль",
+  "Август",
+  "Сентябрь",
+  "Октябрь",
+  "Ноябрь",
+  "Декабрь",
 ];
 
-const TASKS = [
+const NOTIFICATIONS = [
   {
     id: 1,
-    title: "Задача 1",
-    kind: "Тревога",
-    content: [
-      {
-        type: "text",
-        payload:
-          "Медитация — практика, которая полезна практически всем. Она помогает снижать уровень стресса, справляться с агрессией, тренировать внимание, успокаиваться и прислушиваться к себе. Хотя кажется, что для нее нужны особые условия и инструктор, на самом деле это не так — есть простые техники, которые можно выполнять дома, например дыхательная медитация. Рассказываем, какие это техники и как с ними работать.",
-      },
-      {
-        type: "lottie",
-        payload: require("./assets/lottie/dotlottie.lottie"),
-      },
-      {
-        type: "text",
-        payload:
-          "Медитация — практика, которая полезна практически всем. Она помогает снижать уровень стресса, справляться с агрессией, тренировать внимание, успокаиваться и прислушиваться к себе. Хотя кажется, что для нее нужны особые условия и инструктор, на самом деле это не так — есть простые техники, которые можно выполнять дома, например дыхательная медитация. Рассказываем, какие это техники и как с ними работать.",
-      },
-      {
-        type: "image",
-        payload: require("./assets/images/audio-player-image.png"),
-      },
-      {
-        type: "text",
-        payload:
-          "Медитация — практика, которая полезна практически всем. Она помогает снижать уровень стресса, справляться с агрессией, тренировать внимание, успокаиваться и прислушиваться к себе. Хотя кажется, что для нее нужны особые условия и инструктор, на самом деле это не так — есть простые техники, которые можно выполнять дома, например дыхательная медитация. Рассказываем, какие это техники и как с ними работать.",
-      },
-    ],
+    hours: 19,
+    minutes: 0,
+    enable: true,
+    isOpen: false,
   },
   {
     id: 2,
-    title: "Задача 2",
-    kind: "Тревога",
-    content: [
-      {
-        type: "lottie",
-        payload: require("./assets/lottie/dotlottie.lottie"),
-      },
-      {
-        type: "text",
-        payload: "You need a new clean slate without the dents",
-      },
-      {
-        type: "image",
-        payload: require("./assets/images/audio-player-image.png"),
-      },
-    ],
+    hours: 0,
+    minutes: 0,
+    enable: false,
+    isOpen: false,
   },
   {
     id: 3,
-    title: "Задача 3",
-    kind: "Депрессия",
-    content: [
-      {
-        type: "lottie",
-        payload: require("./assets/lottie/mind.lottie"),
-      },
-      {
-        type: "text",
-        payload: "You need a new clean slate without the dents",
-      },
-      {
-        type: "image",
-        payload: require("./assets/images/audio-player-image.png"),
-      },
-    ],
+    hours: 0,
+    minutes: 0,
+    enable: false,
+    isOpen: false,
   },
   {
     id: 4,
-    title: "Задача 4",
-    kind: "Стресс",
-    content: [
-      // {
-      //   type: "lottie",
-      //   payload: require("./assets/lottie/dotlottie.lottie"),
-      // },
-      {
-        type: "text",
-        payload: "You need a new clean slate without the dents",
-      },
-      {
-        type: "image",
-        payload: require("./assets/images/audio-player-image.png"),
-      },
-    ],
+    hours: 0,
+    minutes: 0,
+    enable: false,
+    isOpen: false,
   },
   {
     id: 5,
-    title: "Задача 5",
-    kind: "Тревога",
-    content: [
-      // {
-      //   type: "lottie",
-      //   payload: require("./assets/lottie/dotlottie.lottie"),
-      // },
-      {
-        type: "text",
-        payload: "You need a new clean slate without the dents",
-      },
-      {
-        type: "image",
-        payload: require("./assets/images/audio-player-image.png"),
-      },
-    ],
-  },
-  {
-    id: 6,
-    title: "Задача 6",
-    kind: "Тревога",
-    content: [
-      // {
-      //   type: "lottie",
-      //   payload: require("./assets/lottie/dotlottie.lottie"),
-      // },
-      {
-        type: "text",
-        payload: "You need a new clean slate without the dents",
-      },
-      {
-        type: "image",
-        payload: require("./assets/images/audio-player-image.png"),
-      },
-    ],
-  },
-  {
-    id: 7,
-    title: "Задача 7",
-    kind: "Тревога",
-    content: [
-      // {
-      //   type: "lottie",
-      //   payload: require("./assets/lottie/dotlottie.lottie"),
-      // },
-      {
-        type: "text",
-        payload: "You need a new clean slate without the dents",
-      },
-      {
-        type: "image",
-        payload: require("./assets/images/audio-player-image.png"),
-      },
-    ],
-  },
-  {
-    id: 8,
-    title: "Задача 8",
-    kind: "Тревога",
-    content: [
-      // {
-      //   type: "lottie",
-      //   payload: require("./assets/lottie/dotlottie.lottie"),
-      // },
-      {
-        type: "text",
-        payload: "You need a new clean slate without the dents",
-      },
-      {
-        type: "image",
-        payload: require("./assets/images/audio-player-image.png"),
-      },
-    ],
-  },
-  {
-    id: 9,
-    title: "Задача 9",
-    kind: "Тревога",
-    content: [
-      // {
-      //   type: "lottie",
-      //   payload: require("./assets/lottie/dotlottie.lottie"),
-      // },
-      {
-        type: "text",
-        payload: "You need a new clean slate without the dents",
-      },
-      {
-        type: "image",
-        payload: require("./assets/images/audio-player-image.png"),
-      },
-    ],
-  },
-  {
-    id: 10,
-    title: "Задача 10",
-    kind: "Тревога",
-    content: [
-      // {
-      //   type: "lottie",
-      //   payload: require("./assets/lottie/dotlottie.lottie"),
-      // },
-      {
-        type: "text",
-        payload: "You need a new clean slate without the dents",
-      },
-      {
-        type: "image",
-        payload: require("./assets/images/audio-player-image.png"),
-      },
-    ],
-  },
-  {
-    id: 11,
-    title: "Задача 11",
-    kind: "Тревога",
-    content: [
-      // {
-      //   type: "lottie",
-      //   payload: require("./assets/lottie/dotlottie.lottie"),
-      // },
-      {
-        type: "text",
-        payload: "You need a new clean slate without the dents",
-      },
-      {
-        type: "image",
-        payload: require("./assets/images/audio-player-image.png"),
-      },
-    ],
-  },
-  {
-    id: 12,
-    title: "Задача 12",
-    kind: "Тревога",
-    content: [
-      // {
-      //   type: "lottie",
-      //   payload: require("./assets/lottie/dotlottie.lottie"),
-      // },
-      {
-        type: "text",
-        payload: "You need a new clean slate without the dents",
-      },
-      {
-        type: "image",
-        payload: require("./assets/images/audio-player-image.png"),
-      },
-    ],
-  },
-  {
-    id: 13,
-    title: "Задача 13",
-    kind: "Тревога",
-    content: [
-      // {
-      //   type: "lottie",
-      //   payload: require("./assets/lottie/dotlottie.lottie"),
-      // },
-      {
-        type: "text",
-        payload: "You need a new clean slate without the dents",
-      },
-      {
-        type: "image",
-        payload: require("./assets/images/audio-player-image.png"),
-      },
-    ],
-  },
-  {
-    id: 14,
-    title: "Задача 14",
-    kind: "Тревога",
-    content: [
-      // {
-      //   type: "lottie",
-      //   payload: require("./assets/lottie/dotlottie.lottie"),
-      // },
-      {
-        type: "text",
-        payload: "You need a new clean slate without the dents",
-      },
-      {
-        type: "image",
-        payload: require("./assets/images/audio-player-image.png"),
-      },
-    ],
-  },
-  {
-    id: 15,
-    title: "Задача 15",
-    kind: "Тревога",
-    content: [
-      // {
-      //   type: "lottie",
-      //   payload: require("./assets/lottie/dotlottie.lottie"),
-      // },
-      {
-        type: "text",
-        payload: "You need a new clean slate without the dents",
-      },
-      {
-        type: "image",
-        payload: require("./assets/images/audio-player-image.png"),
-      },
-    ],
-  },
-  {
-    id: 16,
-    title: "Задача 16",
-    kind: "Тревога",
-    content: [
-      // {
-      //   type: "lottie",
-      //   payload: require("./assets/lottie/dotlottie.lottie"),
-      // },
-      {
-        type: "text",
-        payload: "You need a new clean slate without the dents",
-      },
-      {
-        type: "image",
-        payload: require("./assets/images/audio-player-image.png"),
-      },
-    ],
-  },
-  {
-    id: 17,
-    title: "Задача 17",
-    kind: "Тревога",
-    content: [
-      // {
-      //   type: "lottie",
-      //   payload: require("./assets/lottie/dotlottie.lottie"),
-      // },
-      {
-        type: "text",
-        payload: "You need a new clean slate without the dents",
-      },
-      {
-        type: "image",
-        payload: require("./assets/images/audio-player-image.png"),
-      },
-    ],
+    hours: 0,
+    minutes: 0,
+    enable: false,
+    isOpen: false,
   },
 ];
+
+const NOTIFICATION_MEDITATION = {
+  id: 100,
+  hours: 20,
+  minutes: 0,
+  enable: true,
+  isOpen: false,
+};
+
+const NOTIFICATION_TASK = {
+  id: 200,
+  hours: 20,
+  minutes: 0,
+  enable: true,
+  isOpen: false,
+};
+
+const BASE_URL = 'https://api.mindflns.ru';
+
+const COUNT_DAYS_CALENDAR = 15;
+
+const DAYS_IN_TRACKER = 7;
+
+const NAME_FILE_JSON = "Mindfulness.json";
+
+const THEME_OPTIONS = ["Как на устройстве", "Темная тема", "Светлая тема"];
+
+const TYPES_OPTIONS = ["Всё", "Медитация", "Задание", "..."];
+
+const VERSION_APP = "v 1.0.0";
+
+const NICKNAME_DEVELOPER = "MVTT";
+
+const DARK_THEME = {
+  color: {
+    standard: "#edecf5",
+    selected: "#000",
+    selectActive: "#313131",
+  },
+  backgroundColor: {
+    main: "#000",
+    tabNavigator: "#1f1f1f",
+    selectActive: "#adc0e0",
+    blur: "rgba(49, 49, 49, 0.5)",
+  },
+  borderColor: {
+    meditationCard: "#313131",
+    searchOutline: "#000",
+  },
+};
+
+const LIGHT_THEME = {
+  color: {
+    standard: "#313131",
+    selected: "#edecf5",
+    selectActive: "#edecf5",
+  },
+  backgroundColor: {
+    main: "#f5f4fa",
+    tabNavigator: "#313131",
+    selectActive: "#283957",
+    blur: "rgba(0, 0, 0, 0.3)",
+  },
+  borderColor: {
+    meditationCard: "#e8e7eb",
+    searchOutline: "#f5f4fa",
+  },
+};
+
+enum Color {
+  Primary = '#aef0f6',
+  PrimaryPressed = '#98d3d8',
+  PrimaryPastel = '#d1f9fe',
+  PrimaryPastelPressed = '#badbdf',
+  TextStandard = '#313131',
+  TextWhite = '#edecf5',
+  Dark = '#283957',
+  Meditation = "#469ab2",
+  MeditationPressed = "#377a8c",
+  Task = "#d2f2d0",
+  TaskPressed = "#b9d5b7",
+  PlaceholderLight = "#929292",
+  PlaceholderDark = "#656566",
+  Error = "#ff6868",
+}
+
+enum ApiRoute {
+  Meditations = "/meditations",
+  Tasks = "/tasks",
+  Tips = "/tips",
+  Emotions = "/emotions",
+  Info = "/info",
+  Filename = "/filename",
+}
+
+enum SliceName {
+  Meditations = "meditations",
+  Tasks = "tasks",
+  Tips = "tips",
+  Emotions = "emotions",
+  Infos = 'infos',
+  Likes = 'likes',
+  TrackPlayer = 'trackPlayer',
+  Theme = 'theme',
+  DownloadAudio = 'downloadAudio',
+  Notes = 'notes',
+  Notifications = 'notifications',
+  Offline = 'offline',
+  Tracker = 'tracker',
+}
+
+enum Theme {
+  Dark = "dark",
+  Light = "light",
+}
+
+enum AppRoute {
+  Statistics = "Statistics",
+  Meditations = "Meditations",
+  Tasks = "Tasks",
+  Meditation = "Meditation",
+  Task = "Task",
+  Home = "Home",
+  InfoAndSettings = "InfoAndSettings",
+  InfoAndSettingsStack = "InfoAndSettingsStack",
+  Contacts = "Contacts",
+  Service = "Service",
+  MeditationsStack = "MeditationsStack",
+  TasksStack = "TasksStack",
+  NotesStack = "NotesStack",
+  Text = "Text",
+  Notes = "Notes",
+  Note = "Note",
+  Notification = "Notification",
+  ImportAndExport = "ImportAndExport",
+  Storage = "Storage",
+  Tips = "Tips",
+}
+
+enum NameFolder {
+  Meditations = "meditations",
+  Tasks = "tasks",
+  Infos = "infos",
+  Tips = "tips",
+}
+
+enum ErrorMessage {
+  NoConnect = "Не удалось связаться с сервером. Проверьте связь или включите оффлайн режим.",
+  PositionTrack = "Невозможно получить позицию медитации.",
+  Player = "Плеер сломан",
+  PreviousTrack = "Невозможно перемотать медитацию в начало",
+  SeekTrack = "Невозможно перемотать медитацию",
+}
+
+enum SuccessMessage {}
+
+enum PlatformEnum {
+  Android = "android",
+  IOS = "ios",
+};
 
 export {
   DARK_THEME,
   LIGHT_THEME,
   MAIN_CARDS,
-  OPTIONS_DATA,
-  MEDITATIONS_DATA,
-  MAIN_COLOR,
-  COLORS,
   DATA_INPUTS_NOTE,
-  EMOTIONS,
-  TASKS,
-  TIP,
+  BASE_URL,
+  OPTIONS_DATA_TASKS,
+  OPTIONS_DATA_MEDITATIONS,
+  MONTHS,
+  COUNT_DAYS_CALENDAR,
+  DAYS_IN_TRACKER,
+  NAME_FILE_JSON,
+  THEME_OPTIONS,
+  TYPES_OPTIONS,
+  VERSION_APP,
+  NICKNAME_DEVELOPER,
+  NOTIFICATIONS,
+  NOTIFICATION_MEDITATION,
+  NOTIFICATION_TASK,
+  ApiRoute,
+  SliceName,
+  Theme,
+  AppRoute,
+  ErrorMessage,
+  SuccessMessage,
+  PlatformEnum,
+  Color,
+  NameFolder
 };

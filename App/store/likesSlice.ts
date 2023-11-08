@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { Like } from "../types";
+import { SliceName } from '../const';
 
 const initialState = {
   likesMeditation: [] as Like[],
@@ -7,7 +8,7 @@ const initialState = {
 };
 
 export const likesSlice = createSlice({
-  name: "likes",
+  name: SliceName.Likes,
   initialState,
   reducers: {
     addMeditationLike(state, action) {

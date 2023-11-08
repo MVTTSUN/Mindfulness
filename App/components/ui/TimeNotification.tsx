@@ -1,6 +1,6 @@
 import { styled } from "styled-components/native";
-import { Tumbler } from "./Tumbler";
-import { TimePicker } from "./TimePicker";
+import { Tumbler } from "./inputs/Tumbler";
+import { TimePicker } from "./inputs/TimePicker";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -12,122 +12,189 @@ import { Notification } from "../../types";
 import { useAppDispatch } from "../../hooks/useAppDispatch";
 import {
   closeNotification,
+  closeTrackerMeditationNotification,
+  closeTrackerTaskNotification,
   openNotification,
+  openTrackerMeditationNotification,
+  openTrackerTaskNotification,
   setTime,
+  setTimeTrackerMeditationNotification,
+  setTimeTrackerTaskNotification,
+  toggleNotification,
+  toggleTrackerMeditationNotification,
+  toggleTrackerTaskNotification,
 } from "../../store/notificationsSlice";
-import { TouchableHighlight } from "./Touchables/TouchableHighlight";
+import { TouchableHighlight } from "./touchables/TouchableHighlight";
 import { useNotifee } from "../../hooks/useNotifee";
+import { normalize } from "../../utils";
 
 type TimeNotificationProps = {
   notification: Notification;
+  typeTracker?: "meditation" | "task";
 };
 
-export const TimeNotification = memo(
-  ({ notification }: TimeNotificationProps) => {
-    const { id, hours, minutes, enable, isOpen } = notification;
-    const dispatch = useAppDispatch();
-    const [hoursHandle, setHoursHandle] = useState(hours);
-    const [minutesHandle, setMinutesHandle] = useState(minutes);
-    const height = useSharedValue(0);
-    const styleSelectTimeContainer = useAnimatedStyle(() => ({
-      height: height.value,
-    }));
-    const {
-      onCreateTriggerNotification,
-      cancelNotification,
-      getTriggerNotificationIds,
-    } = useNotifee();
+export const TimeNotification = memo((props: TimeNotificationProps) => {
+  const { notification, typeTracker } = props;
+  const { id, hours, minutes, enable, isOpen } = notification;
+  const [hoursHandle, setHoursHandle] = useState(hours);
+  const [minutesHandle, setMinutesHandle] = useState(minutes);
+  const dispatch = useAppDispatch();
+  const {
+    onCreateTriggerNotification,
+    cancelNotification,
+    getTriggerNotificationIds,
+    onCreateTriggerNotificationForTrackersMeditation,
+    onCreateTriggerNotificationForTrackersTask,
+  } = useNotifee();
+  const heightSelectTime = useSharedValue(0);
+  const styleSelectTimeContainer = useAnimatedStyle(() => ({
+    height: heightSelectTime.value,
+  }));
 
-    const togglePicker = () => {
-      if (isOpen) {
-        height.value = withTiming(0, { duration: 300 });
-        dispatch(closeNotification(id));
+  const togglePicker = () => {
+    if (isOpen) {
+      heightSelectTime.value = withTiming(0, { duration: 300 });
+      if (typeTracker === "meditation") {
+        dispatch(closeTrackerMeditationNotification());
+      } else if (typeTracker === "task") {
+        dispatch(closeTrackerTaskNotification());
       } else {
-        height.value = withSpring(290, { mass: 0.5 });
+        dispatch(closeNotification(id));
+      }
+    } else {
+      heightSelectTime.value = withSpring(normalize(290), { mass: 0.5 });
+      if (typeTracker === "meditation") {
+        dispatch(openTrackerMeditationNotification());
+      } else if (typeTracker === "task") {
+        dispatch(openTrackerTaskNotification());
+      } else {
         dispatch(openNotification(id));
       }
-    };
+    }
+  };
 
-    const createTriggerNotificationAsync = async () => {
+  const setTimeNotification = () => {
+    if (typeTracker === "meditation") {
+      dispatch(
+        setTimeTrackerMeditationNotification({
+          id,
+          hours: hoursHandle,
+          minutes: minutesHandle,
+        })
+      );
+    } else if (typeTracker === "task") {
+      dispatch(
+        setTimeTrackerTaskNotification({
+          id,
+          hours: hoursHandle,
+          minutes: minutesHandle,
+        })
+      );
+    } else {
+      dispatch(setTime({ id, hours: hoursHandle, minutes: minutesHandle }));
+    }
+  };
+
+  const createTriggerNotificationAsync = async () => {
+    if (typeTracker === "meditation") {
+      await onCreateTriggerNotificationForTrackersMeditation(
+        hoursHandle,
+        minutesHandle
+      );
+    } else if (typeTracker === "task") {
+      await onCreateTriggerNotificationForTrackersTask(
+        hoursHandle,
+        minutesHandle
+      );
+    } else {
       const ids = await getTriggerNotificationIds();
       !ids.includes(String(id)) &&
-        onCreateTriggerNotification(id, hoursHandle, minutesHandle);
+        (await onCreateTriggerNotification(id, hoursHandle, minutesHandle));
+    }
+  };
+
+  const cancelNotificationAsync = async () => {
+    const ids = await getTriggerNotificationIds();
+    ids.includes(String(id)) && (await cancelNotification(id));
+  };
+
+  const createOrCancelNotification = async () => {
+    if (enable) {
+      await createTriggerNotificationAsync();
+    } else {
+      await cancelNotificationAsync();
+    }
+  };
+
+  useEffect(() => {
+    if (!isOpen) {
+      heightSelectTime.value = withTiming(0);
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    createOrCancelNotification();
+  }, [enable]);
+
+  useEffect(() => {
+    return () => {
+      dispatch(closeNotification(id));
+      dispatch(closeTrackerMeditationNotification());
+      dispatch(closeTrackerTaskNotification());
     };
+  }, []);
 
-    const cancelNotificationAsync = async () => {
-      const ids = await getTriggerNotificationIds();
-      ids.includes(String(id)) && cancelNotification(id);
-    };
-
-    useEffect(() => {
-      return () => {
-        dispatch(closeNotification(id));
-      };
-    }, []);
-
-    useEffect(() => {
-      if (!isOpen) {
-        height.value = withTiming(0);
-      }
-    }, [isOpen]);
-
-    useEffect(() => {
-      if (enable) {
-        createTriggerNotificationAsync();
-      } else {
-        cancelNotificationAsync();
-      }
-    }, [enable]);
-
-    return (
-      <Container>
-        <EnableContainer onPress={togglePicker}>
-          <TimeContainer>
-            <TextTime>
-              {hours < 10 ? `0${hours}` : hours}:
-              {minutes < 10 ? `0${minutes}` : minutes}
-            </TextTime>
-            <TextTimeInfo>Каждый день</TextTimeInfo>
-          </TimeContainer>
-          <Tumbler id={id} enable={enable} />
-        </EnableContainer>
-        <SelectTimeContainer style={styleSelectTimeContainer}>
-          <PickerContainer>
-            <TimePicker
-              count={24}
-              setTimeHandle={setHoursHandle}
-              time={hours}
-            />
-            <LineBetweenPicker />
-            <TimePicker
-              count={60}
-              setTimeHandle={setMinutesHandle}
-              time={minutes}
-            />
-          </PickerContainer>
-          <TouchableHighlight
-            onPress={() => {
-              dispatch(
-                setTime({ id, hours: hoursHandle, minutes: minutesHandle })
-              );
-              togglePicker();
-              if (enable) {
-                onCreateTriggerNotification(id, hoursHandle, minutesHandle);
-              }
-            }}
-          >
-            Сохранить
-          </TouchableHighlight>
-        </SelectTimeContainer>
-      </Container>
-    );
-  }
-);
+  return (
+    <Container>
+      <EnableContainer onPress={togglePicker}>
+        <TimeContainer>
+          <TextTime>
+            {hours < 10 ? `0${hours}` : hours}:
+            {minutes < 10 ? `0${minutes}` : minutes}
+          </TextTime>
+          {!typeTracker && <TextTimeInfo>Каждый день</TextTimeInfo>}
+        </TimeContainer>
+        <Tumbler
+          enable={enable}
+          onChange={() => {
+            if (typeTracker === "meditation") {
+              dispatch(toggleTrackerMeditationNotification());
+            } else if (typeTracker === "task") {
+              dispatch(toggleTrackerTaskNotification());
+            } else {
+              dispatch(toggleNotification(id));
+            }
+          }}
+        />
+      </EnableContainer>
+      <SelectTimeContainer style={styleSelectTimeContainer}>
+        <PickerContainer>
+          <TimePicker count={24} setTimeHandle={setHoursHandle} time={hours} />
+          <LineBetweenPicker />
+          <TimePicker
+            count={60}
+            setTimeHandle={setMinutesHandle}
+            time={minutes}
+          />
+        </PickerContainer>
+        <TouchableHighlight
+          onPress={async () => {
+            setTimeNotification();
+            togglePicker();
+            await createOrCancelNotification();
+          }}
+        >
+          Сохранить
+        </TouchableHighlight>
+      </SelectTimeContainer>
+    </Container>
+  );
+});
 
 const Container = styled.View`
-  padding: 20px;
+  padding: ${normalize(20)}px;
   background-color: ${({ theme }) => theme.backgroundColor.main};
-  border-radius: 25px;
+  border-radius: ${normalize(25)}px;
 `;
 
 const EnableContainer = styled.Pressable`
@@ -142,16 +209,16 @@ const TimeContainer = styled.View`
 `;
 
 const TextTime = styled.Text`
-  line-height: 50px;
+  line-height: ${normalize(50)}px;
   font-family: "Poppins-Regular";
-  font-size: 36px;
+  font-size: ${normalize(36)}px;
   color: ${({ theme }) => theme.color.standard};
 `;
 
 const TextTimeInfo = styled.Text`
-  line-height: 14px;
+  line-height: ${normalize(14)}px;
   font-family: "Poppins-Regular";
-  font-size: 14px;
+  font-size: ${normalize(14)}px;
   color: ${({ theme }) => theme.color.standard};
 `;
 
@@ -168,7 +235,7 @@ const PickerContainer = styled.View`
 
 const LineBetweenPicker = styled.View`
   opacity: 0.5;
-  width: 0.3px;
+  width: ${normalize(0.3)}px;
   height: 70%;
   background-color: ${({ theme }) => theme.color.standard};
 `;

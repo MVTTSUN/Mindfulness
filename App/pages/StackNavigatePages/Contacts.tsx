@@ -1,23 +1,84 @@
-import { Linking, ScrollView, View } from "react-native";
+import { Linking, ScrollView } from "react-native";
 import { CenterContainer } from "../../components/CenterContainer";
-import { GlobalScreen } from "../../components/GlobalScreen";
-import { TopWithBack } from "../../components/ui/TopWithBack";
+import { GlobalScreen } from "../../components/GlobalScreenWrapper";
+import { HeaderWithBack } from "../../components/ui/headers/HeaderWithBack";
 import { styled } from "styled-components/native";
-import { TouchableHighlight } from "../../components/ui/Touchables/TouchableHighlight";
-import { Subtitle } from "../../components/ui/Titles/Subtitle";
-import { InstagramIcon } from "../../components/icons/Socials/InstagramIcon";
-import { TelegramIcon } from "../../components/icons/Socials/TelegramIcon";
-import { VKIcon } from "../../components/icons/Socials/VKIcon";
-import { WhatsappIcon } from "../../components/icons/Socials/WhatsappIcon";
+import { TouchableHighlight } from "../../components/ui/touchables/TouchableHighlight";
+import { Subtitle } from "../../components/ui/titles/Subtitle";
+import { InstagramIcon } from "../../components/svg/icons/socials/InstagramIcon";
+import { TelegramIcon } from "../../components/svg/icons/socials/TelegramIcon";
+import { VKIcon } from "../../components/svg/icons/socials/VKIcon";
 import LottieView from "lottie-react-native";
+import { useAppSelector } from "../../hooks/useAppSelector";
+import { useAppDispatch } from "../../hooks/useAppDispatch";
+import { useLazyGetInfoQuery } from "../../api/api";
+import { getDataInfosCopy, getInfos } from "../../store/infosSelectors";
+import { useFileSystem } from "../../hooks/useFileSystem";
+import { useEffect } from "react";
+import deepEqual from "deep-equal";
+import { setDataInfosCopy, setInfos } from "../../store/infosSlice";
+import { DataInformation } from "../../types";
+import { ApiRoute, BASE_URL, NameFolder } from "../../const";
+import { normalize } from "../../utils";
+import { getIsOffline } from "../../store/offlineSelectors";
+import { PulseCircle } from "../../components/ui/PulseCircle";
 
 export function Contacts() {
+  const infos = useAppSelector(getInfos);
+  const dataInfosCopy = useAppSelector(getDataInfosCopy);
+  const isOffline = useAppSelector(getIsOffline);
+  const dispatch = useAppDispatch();
+  const [getInfoQuery] = useLazyGetInfoQuery();
+  const { deleteFile, download, createDirectory } = useFileSystem();
+
+  const downloadData = async () => {
+    const { data } = await getInfoQuery();
+
+    if (data) {
+      if (!deepEqual(dataInfosCopy, data)) {
+        await deleteFile(NameFolder.Infos);
+        await createDirectory(NameFolder.Infos);
+        const result = JSON.parse(JSON.stringify(data[0])) as DataInformation;
+        const uriAvatarPsycho = await download(
+          BASE_URL +
+            ApiRoute.Info +
+            ApiRoute.Filename +
+            `/${result.avatarPsycho}`,
+          NameFolder.Infos,
+          result.avatarPsycho
+        );
+        const uriAvatarDevelop = await download(
+          BASE_URL +
+            ApiRoute.Info +
+            ApiRoute.Filename +
+            `/${result.avatarDevelop}`,
+          NameFolder.Infos,
+          result.avatarDevelop
+        );
+        if (uriAvatarPsycho) {
+          result.avatarPsycho = uriAvatarPsycho;
+        }
+        if (uriAvatarDevelop) {
+          result.avatarDevelop = uriAvatarDevelop;
+        }
+        dispatch(setInfos(result));
+        dispatch(setDataInfosCopy(data));
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (!isOffline) {
+      downloadData();
+    }
+  }, []);
+
   return (
     <GlobalScreen withoutScrollView>
       <CenterContainer>
-        <TopWithBack>
+        <HeaderWithBack>
           <TextTitle>Контакты</TextTitle>
-        </TopWithBack>
+        </HeaderWithBack>
         <ScrollView showsVerticalScrollIndicator={false}>
           <ViewMargin>
             <Subtitle>Психотерапевт</Subtitle>
@@ -27,57 +88,55 @@ export function Contacts() {
                 autoPlay
                 loop
               />
-              <ImageStyled source={require("../../assets/images/avatar.jpg")} />
+              <PulseCircle />
+              <ImageStyled source={{ uri: infos.avatarPsycho }} />
             </RoundedImage>
-            <TextName>Тумарова Дарья Сергеевна</TextName>
+            <TextName>{`${infos.secondNamePsycho} ${infos.firstNamePsycho} ${infos.surnamePsycho}`}</TextName>
           </ViewMargin>
+          <Subtitle>Краткая информация</Subtitle>
+          <TextInfo>{infos.info}</TextInfo>
           <Subtitle>Мои соцсети</Subtitle>
           <ViewSociety>
             <TouchableHighlight
               isRound
               onPress={() =>
-                Linking.openURL("instagram://user?username=tumarova_psy").catch(
-                  () => {
-                    Linking.openURL("https://www.instagram.com/tumarova_psy");
-                  }
-                )
+                Linking.openURL(
+                  `instagram://user?username=${infos.nicknameInstagram}`
+                ).catch(() => {
+                  Linking.openURL(
+                    `https://www.instagram.com/${infos.nicknameInstagram}`
+                  );
+                })
               }
             >
               <InstagramIcon />
             </TouchableHighlight>
             <TouchableHighlight
               isRound
-              onPress={() => Linking.openURL("https://t.me/MVTTSUN")}
+              onPress={() =>
+                Linking.openURL(`https://t.me/${infos.nicknameTelegram}`)
+              }
             >
               <TelegramIcon />
             </TouchableHighlight>
             <TouchableHighlight
               isRound
-              onPress={() => Linking.openURL("https://vk.com/mvtthew")}
-            >
-              <VKIcon />
-            </TouchableHighlight>
-            <TouchableHighlight
-              isRound
               onPress={() =>
-                Linking.openURL(
-                  "whatsapp://send?text=Здравствуйте, хочу записаться на консультацию&phone=79625770212"
-                ).catch(() => {
-                  Linking.openURL("https://wa.me/79625770212");
-                })
+                Linking.openURL(`https://vk.com/${infos.nicknameVK}`)
               }
             >
-              <WhatsappIcon />
+              <VKIcon />
             </TouchableHighlight>
           </ViewSociety>
           <ViewMargin>
             <Subtitle>Моя почта</Subtitle>
             <TouchableHighlight
-              onPress={() => Linking.openURL("mailto:ryabtzun2011@yandex.ru")}
+              onPress={() => Linking.openURL(`mailto:${infos.emailPsycho}`)}
             >
-              ryabtzun2011@yandex.ru
+              {infos.emailPsycho}
             </TouchableHighlight>
           </ViewMargin>
+          <SpaceBottom />
         </ScrollView>
       </CenterContainer>
     </GlobalScreen>
@@ -86,15 +145,22 @@ export function Contacts() {
 
 const TextTitle = styled.Text`
   font-family: "Poppins-Medium";
-  font-size: 18px;
+  font-size: ${normalize(18)}px;
   color: ${({ theme }) => theme.color.standard};
 `;
 
 const TextName = styled.Text`
   align-self: center;
   font-family: "Poppins-Regular";
-  font-size: 14px;
+  font-size: ${normalize(14)}px;
   color: ${({ theme }) => theme.color.standard};
+`;
+
+const TextInfo = styled.Text`
+  font-family: "Poppins-Regular";
+  font-size: ${normalize(16)}px;
+  color: ${({ theme }) => theme.color.standard};
+  text-align: justify;
 `;
 
 const ViewSociety = styled.View`
@@ -102,7 +168,7 @@ const ViewSociety = styled.View`
   flex-direction: row;
   align-items: center;
   justify-content: space-around;
-  gap: 10px;
+  gap: ${normalize(10)}px;
 `;
 
 const ViewMargin = styled.View`
@@ -114,18 +180,22 @@ const RoundedImage = styled.View`
   align-self: center;
   justify-content: center;
   align-items: center;
-  height: 95px;
-  width: 95px;
+  height: ${normalize(95)}px;
+  width: ${normalize(95)}px;
 `;
 
 const ImageStyled = styled.Image`
-  height: 80px;
-  width: 80px;
-  border-radius: 50px;
+  height: ${normalize(80)}px;
+  width: ${normalize(80)}px;
+  border-radius: ${normalize(50)}px;
 `;
 
 const LottieViewStyled = styled(LottieView)`
   position: absolute;
-  height: 155px;
-  width: 155px;
+  height: ${normalize(155)}px;
+  width: ${normalize(155)}px;
+`;
+
+const SpaceBottom = styled.View`
+  height: ${normalize(140)}px;
 `;

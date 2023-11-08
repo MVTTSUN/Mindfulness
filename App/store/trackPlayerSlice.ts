@@ -1,19 +1,25 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { SliceName } from '../const';
+import { MeditationPlayer } from '../types';
 
 const initialState = {
-  lastMeditationId: null as number | null,
+  lastMeditation: null as MeditationPlayer | null,
+  isInitializedPlayer: false,
 };
 
 export const trackPlayerSlice = createSlice({
-  name: "trackPlayer",
+  name: SliceName.TrackPlayer,
   initialState,
   reducers: {
-    setLastMeditationId(state, action) {
-      state.lastMeditationId = action.payload;
+    setLastMeditation(state, action) {
+      state.lastMeditation = action.payload;
     },
+    setIsInitializedPlayer(state, action) {
+      state.isInitializedPlayer = action.payload;
+    }
   },
 });
 
-export const { setLastMeditationId } = trackPlayerSlice.actions;
+export const { setLastMeditation, setIsInitializedPlayer } = trackPlayerSlice.actions;
 
 export default trackPlayerSlice.reducer;

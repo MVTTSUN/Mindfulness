@@ -1,30 +1,31 @@
-import { GlobalScreen } from "../../components/GlobalScreen";
-import { Title } from "../../components/ui/Titles/Title";
+import { GlobalScreen } from "../../components/GlobalScreenWrapper";
+import { Title } from "../../components/ui/titles/Title";
 import { CenterContainer } from "../../components/CenterContainer";
-import { Input } from "../../components/ui/Input";
+import { Input } from "../../components/ui/inputs/Input";
 import { styled } from "styled-components/native";
-import { Select } from "../../components/ui/Select";
-import { COLORS, OPTIONS_DATA } from "../../const";
-import { CardListTasks } from "../../components/ui/CardListTasks";
-import { LikeIcon } from "../../components/icons/LikeIcon";
+import { Select } from "../../components/ui/inputs/Select";
+import { Color, OPTIONS_DATA_TASKS } from "../../const";
+import { CardListTasks } from "../../components/ui/lists/CardListTasks";
+import { LikeIcon } from "../../components/svg/icons/other-icons/LikeIcon";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withSequence,
   withSpring,
 } from "react-native-reanimated";
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import { useAppDispatch } from "../../hooks/useAppDispatch";
 import { useAppSelector } from "../../hooks/useAppSelector";
-import { likeTasks, searchTasks } from "../../store/tasksSlice";
 import { useFocusEffect } from "@react-navigation/native";
+import { setIsLikeTasks, setSearchTasks } from "../../store/tasksSlice";
+import { normalize } from "../../utils";
+import { getIsLikeTasks, getSearchTasks } from "../../store/tasksSelectors";
 
 export function Tasks() {
-  const [isActive, setIsActive] = useState(false);
-  const [text, setText] = useState("");
-  const scaleLike = useSharedValue(1);
+  const searchTasks = useAppSelector(getSearchTasks);
+  const isLikeTasks = useAppSelector(getIsLikeTasks);
   const dispatch = useAppDispatch();
-  const likes = useAppSelector((state) => state.likes.likesTask);
+  const scaleLike = useSharedValue(1);
   const likeStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scaleLike.value }],
   }));
@@ -35,23 +36,21 @@ export function Tasks() {
       withSpring(1.2),
       withSpring(1)
     );
-    if (isActive) {
-      dispatch(likeTasks(null));
+    if (isLikeTasks) {
+      dispatch(setIsLikeTasks(false));
     } else {
-      dispatch(likeTasks(likes));
+      dispatch(setIsLikeTasks(true));
     }
-    setIsActive(!isActive);
   };
 
   const onChangeText = (text: string) => {
-    setText(text);
-    dispatch(searchTasks(text));
+    dispatch(setSearchTasks(text));
   };
 
   useFocusEffect(
     useCallback(() => {
       return () => {
-        setText("");
+        dispatch(setSearchTasks(""));
       };
     }, [])
   );
@@ -62,25 +61,22 @@ export function Tasks() {
         <Title>Задания</Title>
         <SearchView>
           <Input
-            value={text}
+            value={searchTasks}
             onChangeText={onChangeText}
             width="70%"
             placeholder="Поиск"
           />
           <FavoritesButton
             onPress={findFavorites}
-            underlayColor={COLORS.backgroundColors.taskCardPressed}
+            underlayColor={Color.TaskPressed}
           >
             <Animated.View style={likeStyle}>
-              <LikeIcon
-                color={COLORS.textColors.taskCard}
-                isActive={isActive}
-              />
+              <LikeIcon color={Color.Task} isActive={isLikeTasks} />
             </Animated.View>
           </FavoritesButton>
         </SearchView>
       </CenterContainer>
-      <Select optionsData={OPTIONS_DATA} />
+      <Select optionsData={OPTIONS_DATA_TASKS} />
       <CenterContainer>
         <CardListTasks count={12} />
       </CenterContainer>
@@ -91,12 +87,13 @@ export function Tasks() {
 const SearchView = styled.View`
   flex-direction: row;
   gap: 5px;
+  margin-bottom: 12px;
 `;
 
 const FavoritesButton = styled.TouchableHighlight`
-  height: 30px;
-  padding: 3px 10px;
-  background-color: ${COLORS.backgroundColors.taskCard};
-  border-radius: 20px;
+  height: ${normalize(30)}px;
+  padding: ${normalize(3)}px ${normalize(10)}px;
+  background-color: ${Color.Task};
+  border-radius: ${normalize(20)}px;
   transform: translateY(7px);
 `;

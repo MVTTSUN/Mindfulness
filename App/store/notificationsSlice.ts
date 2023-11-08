@@ -1,33 +1,14 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { NOTIFICATIONS, NOTIFICATION_MEDITATION, NOTIFICATION_TASK, SliceName } from '../const';
 
 const initialState = {
-  notifications: [
-    {
-      id: 1,
-      hours: 19,
-      minutes: 0,
-      enable: true,
-      isOpen: false,
-    },
-    {
-      id: 2,
-      hours: 0,
-      minutes: 0,
-      enable: false,
-      isOpen: false,
-    },
-    {
-      id: 3,
-      hours: 0,
-      minutes: 0,
-      enable: false,
-      isOpen: false,
-    },
-  ],
+  notifications: NOTIFICATIONS,
+  trackerMeditationNotification: NOTIFICATION_MEDITATION,
+  trackerTaskNotification: NOTIFICATION_TASK,
 };
 
 export const notificationsSlice = createSlice({
-  name: "notifications",
+  name: SliceName.Notifications,
   initialState,
   reducers: {
     toggleNotification(state, action) {
@@ -38,6 +19,12 @@ export const notificationsSlice = createSlice({
         return notification;
       });
     },
+    toggleTrackerMeditationNotification(state) {
+      state.trackerMeditationNotification.enable = !state.trackerMeditationNotification.enable;
+    },
+    toggleTrackerTaskNotification(state) {
+      state.trackerTaskNotification.enable = !state.trackerTaskNotification.enable;
+    },
     setTime(state, action) {
       state.notifications = state.notifications.map((notification) => {
         if (notification.id === action.payload.id) {
@@ -47,7 +34,17 @@ export const notificationsSlice = createSlice({
         return notification;
       });
     },
+    setTimeTrackerMeditationNotification(state, action) {
+      state.trackerMeditationNotification.hours = action.payload.hours;
+      state.trackerMeditationNotification.minutes = action.payload.minutes;
+    },
+    setTimeTrackerTaskNotification(state, action) {
+      state.trackerTaskNotification.hours = action.payload.hours;
+      state.trackerTaskNotification.minutes = action.payload.minutes;
+    },
     openNotification(state, action) {
+      state.trackerTaskNotification.isOpen = false;
+      state.trackerMeditationNotification.isOpen = false;
       state.notifications = state.notifications.map((notification) => {
         if (notification.id === action.payload) {
           notification.isOpen = true;
@@ -57,6 +54,24 @@ export const notificationsSlice = createSlice({
         return notification;
       });
     },
+    openTrackerMeditationNotification(state) {
+      state.notifications = state.notifications.map((notification) => {
+        notification.isOpen = false;
+
+        return notification;
+      });
+      state.trackerTaskNotification.isOpen = false;
+      state.trackerMeditationNotification.isOpen = true;
+    },
+    openTrackerTaskNotification(state) {
+      state.notifications = state.notifications.map((notification) => {
+        notification.isOpen = false;
+        
+        return notification;
+      });
+      state.trackerMeditationNotification.isOpen = false;
+      state.trackerTaskNotification.isOpen = true;
+    },
     closeNotification(state, action) {
       state.notifications = state.notifications.map((notification) => {
         if (notification.id === action.payload) {
@@ -65,13 +80,27 @@ export const notificationsSlice = createSlice({
         return notification;
       });
     },
+    closeTrackerMeditationNotification(state) {
+      state.trackerMeditationNotification.isOpen = false;
+    },
+    closeTrackerTaskNotification(state) {
+      state.trackerTaskNotification.isOpen = false;
+    }
   },
 });
 
 export const {
   toggleNotification,
+  toggleTrackerMeditationNotification,
+  toggleTrackerTaskNotification,
   setTime,
+  setTimeTrackerMeditationNotification,
+  setTimeTrackerTaskNotification,
   openNotification,
+  openTrackerMeditationNotification,
+  openTrackerTaskNotification,
+  closeTrackerMeditationNotification,
+  closeTrackerTaskNotification,
   closeNotification,
 } = notificationsSlice.actions;
 

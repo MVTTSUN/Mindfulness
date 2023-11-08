@@ -1,20 +1,23 @@
 import { styled } from "styled-components/native";
-import { GlobalScreen } from "../../components/GlobalScreen";
+import { GlobalScreen } from "../../components/GlobalScreenWrapper";
 import { CenterContainer } from "../../components/CenterContainer";
-import { Title } from "../../components/ui/Titles/Title";
-import { Input } from "../../components/ui/Input";
-import { AddIcon } from "../../components/icons/AddIcon";
+import { Title } from "../../components/ui/titles/Title";
+import { Input } from "../../components/ui/inputs/Input";
+import { AddIcon } from "../../components/svg/icons/other-icons/AddIcon";
 import {
   useFocusEffect,
   useNavigation,
   useRoute,
 } from "@react-navigation/native";
-import { MeditationData, NotesScreenProp, TaskType } from "../../types";
+import {
+  DataTextLottieImage,
+  MeditationPlayer,
+  NotesScreenProp,
+} from "../../types";
 import { useCallback, useEffect, useState } from "react";
 import { useAppSelector } from "../../hooks/useAppSelector";
-import { CheckBox } from "../../components/ui/CheckBox";
-import { COLORS } from "../../const";
-import { DeleteIcon } from "../../components/icons/DeleteIcon";
+import { CheckBox } from "../../components/ui/inputs/CheckBox";
+import { DeleteIcon } from "../../components/svg/icons/other-icons/DeleteIcon";
 import { Pressable, ScrollView } from "react-native";
 import Animated, {
   RollOutLeft,
@@ -22,41 +25,32 @@ import Animated, {
   ZoomInDown,
   ZoomOut,
   ZoomOutDown,
-  cancelAnimation,
 } from "react-native-reanimated";
 import { useAppDispatch } from "../../hooks/useAppDispatch";
 import {
   removeNotes,
   resetQueries,
-  searchNotes,
   updateQueries,
 } from "../../store/notesSlice";
-import { NotesFilter } from "../../components/ui/NotesFilter";
-import { TypesPopup } from "../../components/TypesPopup";
-import { MonthsPopup } from "../../components/MonthsPopup";
-import { YearsPopup } from "../../components/YearsPopup";
+import { NotesFilter } from "../../components/ui/inputs/NotesFilter";
+import { TypesPopup } from "../../components/ui/popups/TypesPopup";
+import { MonthsPopup } from "../../components/ui/popups/MonthsPopup";
+import { YearsPopup } from "../../components/ui/popups/YearsPopup";
+import { normalize } from "../../utils";
+import { getFilteredNotes, getNotesQueries } from "../../store/notesSelectors";
+import { AppRoute, Color } from "../../const";
 
 export function Notes() {
-  const navigation = useNavigation<NotesScreenProp>();
-  const route = useRoute();
   const [isDelete, setIsDelete] = useState(false);
   const [notesId, setNotesId] = useState<string[]>([]);
-  const dispatch = useAppDispatch();
-  const notes = useAppSelector((state) => state.notes.notesSearched);
-  const [text, setText] = useState("");
   const [isOpenTypesPopup, setIsOpenTypesPopup] = useState(false);
   const [isOpenMonthsPopup, setIsOpenMonthsPopup] = useState(false);
   const [isOpenYearsPopup, setIsOpenYearsPopup] = useState(false);
-
-  useFocusEffect(
-    useCallback(() => {
-      return () => {
-        setText("");
-        dispatch(resetQueries());
-        dispatch(searchNotes());
-      };
-    }, [])
-  );
+  const route = useRoute();
+  const navigation = useNavigation<NotesScreenProp>();
+  const filteredNotes = useAppSelector(getFilteredNotes);
+  const queries = useAppSelector(getNotesQueries);
+  const dispatch = useAppDispatch();
 
   const toggleCheckbox = (currentId: string) => {
     setNotesId((prevState) => {
@@ -69,9 +63,7 @@ export function Notes() {
   };
 
   const onChangeText = (text: string) => {
-    setText(text);
     dispatch(updateQueries({ property: "search", value: text }));
-    dispatch(searchNotes());
   };
 
   const deleteNotes = () => {
@@ -79,17 +71,25 @@ export function Notes() {
     setIsDelete(false);
   };
 
+  useFocusEffect(
+    useCallback(() => {
+      return () => {
+        dispatch(resetQueries());
+      };
+    }, [])
+  );
+
   useEffect(() => {
     if (route.params) {
-      const { meditation } = route.params as { meditation: MeditationData };
-      const { task } = route.params as { task: TaskType };
+      const { meditation } = route.params as { meditation: MeditationPlayer };
+      const { task } = route.params as { task: DataTextLottieImage };
 
       if (meditation) {
-        navigation.navigate("Note", { meditation });
+        navigation.navigate(AppRoute.Note, { meditation });
       }
 
       if (task) {
-        navigation.navigate("Note", { task });
+        navigation.navigate(AppRoute.Note, { task });
       }
     }
   }, [route.params]);
@@ -114,31 +114,33 @@ export function Notes() {
             )}
           </TitleContainer>
           <ScrollView showsVerticalScrollIndicator={false}>
-            <Input
-              value={text}
-              editable={!isDelete}
-              onChangeText={onChangeText}
-              width="100%"
-              placeholder="Поиск заметок"
-            />
-            <NotesFilter
-              setIsOpenTypesPopup={setIsOpenTypesPopup}
-              setIsOpenYearsPopup={setIsOpenYearsPopup}
-              setIsOpenMonthsPopup={setIsOpenMonthsPopup}
-            />
-            <CountCards>{`Всего заметок: ${notes.length}`}</CountCards>
+            <SearchView>
+              <Input
+                value={queries.search}
+                editable={!isDelete}
+                onChangeText={onChangeText}
+                width="100%"
+                placeholder="Поиск заметок"
+              />
+              <NotesFilter
+                setIsOpenTypesPopup={setIsOpenTypesPopup}
+                setIsOpenYearsPopup={setIsOpenYearsPopup}
+                setIsOpenMonthsPopup={setIsOpenMonthsPopup}
+              />
+            </SearchView>
+            <CountCards>{`Всего заметок: ${filteredNotes.length}`}</CountCards>
             <NotesContainer>
-              {notes.map((note) => (
+              {filteredNotes.map((note) => (
                 <CardAnimated key={note.id} exiting={RollOutLeft.duration(600)}>
                   <TouchableHighlightNote
                     $backgroundColor={note.backgroundColor}
                     onPress={
                       isDelete
                         ? () => toggleCheckbox(note.id)
-                        : () => navigation.navigate("Note", { note })
+                        : () => navigation.navigate(AppRoute.Note, { note })
                     }
                     onLongPress={() => setIsDelete(true)}
-                    delayLongPress={500}
+                    delayLongPress={300}
                     underlayColor={note.underlayColor}
                   >
                     <>
@@ -167,8 +169,8 @@ export function Notes() {
                             exiting={ZoomOut}
                           >
                             <CheckBox
-                              color={COLORS.textColors.meditationCard}
-                              backgroundColor={COLORS.backgroundColors.dark}
+                              color={Color.TextWhite}
+                              backgroundColor={Color.Dark}
                               isActive={notesId.includes(note.id)}
                               isStroke={false}
                               isRound
@@ -200,7 +202,7 @@ export function Notes() {
       </GlobalScreen>
       {!isDelete && (
         <Animated.View entering={ZoomInDown} exiting={ZoomOutDown}>
-          <PressableStyled onPress={() => navigation.navigate("Note")}>
+          <PressableStyled onPress={() => navigation.navigate(AppRoute.Note)}>
             <ViewPlus>
               <AddIcon />
             </ViewPlus>
@@ -250,8 +252,8 @@ const NoPressableStyled = styled.Pressable`
 
 const CountCards = styled.Text`
   font-family: "Poppins-Medium";
-  font-size: 16px;
-  line-height: 20px;
+  font-size: ${normalize(16)}px;
+  line-height: ${normalize(20)}px;
   color: ${({ theme }) => theme.color.standard};
   margin-bottom: 20px;
 `;
@@ -264,10 +266,10 @@ const TitleContainer = styled.View`
 
 const CountDeleteCards = styled.Text`
   font-family: "Poppins-Medium";
-  font-size: 16px;
+  font-size: ${normalize(16)}px;
   height: 100%;
   vertical-align: middle;
-  line-height: 22px;
+  line-height: ${normalize(22)}px;
   color: ${({ theme }) => theme.color.standard};
 `;
 
@@ -278,23 +280,23 @@ const AnimatedTrash = styled(Animated.View)`
 
 const PressableStyled = styled.Pressable`
   position: absolute;
-  right: 40px;
-  bottom: 100px;
+  right: ${normalize(40)}px;
+  bottom: ${normalize(100)}px;
 `;
 
 const ViewPlus = styled.View`
   align-items: center;
   justify-content: center;
-  width: 50px;
-  height: 50px;
-  border-radius: 25px;
-  background-color: #313131;
+  width: ${normalize(50)}px;
+  height: ${normalize(50)}px;
+  border-radius: ${normalize(25)}px;
+  background-color: ${Color.TextStandard};
 `;
 
 const NotesContainer = styled.View`
   flex-direction: row;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: ${normalize(10)}px;
   margin-bottom: 20px;
 `;
 
@@ -309,14 +311,14 @@ const TouchableHighlightNote = styled.TouchableHighlight<{
 }>`
   width: 100%;
   height: 100%;
-  padding: 15px;
+  padding: ${normalize(15)}px;
   background-color: ${({ $backgroundColor }) => $backgroundColor};
-  border-radius: 25px;
+  border-radius: ${normalize(25)}px;
 `;
 
 const NoteTitle = styled.Text<{ $color: string }>`
   font-family: "Poppins-Medium";
-  font-size: 14px;
+  font-size: ${normalize(14)}px;
   color: ${({ $color }) => $color};
 `;
 
@@ -324,14 +326,14 @@ const NoteText = styled.Text<{ $color: string }>`
   flex: 1;
   opacity: 0.6;
   font-family: "Poppins-Medium";
-  font-size: 12px;
+  font-size: ${normalize(12)}px;
   color: ${({ $color }) => $color};
 `;
 
 const NoteFooterContainer = styled.View`
   align-items: center;
   flex-direction: row;
-  height: 25px;
+  height: ${normalize(25)}px;
 `;
 
 const DateText = styled.Text<{ $color: string }>`
@@ -340,11 +342,15 @@ const DateText = styled.Text<{ $color: string }>`
   flex: 1;
   opacity: 0.6;
   font-family: "Poppins-Regular";
-  font-size: 12px;
-  line-height: 18px;
+  font-size: ${normalize(12)}px;
+  line-height: ${normalize(18)}px;
   color: ${({ $color }) => $color};
 `;
 
 const BottomSpace = styled.View`
-  height: 170px;
+  height: ${normalize(170)}px;
+`;
+
+const SearchView = styled.View`
+  gap: 12px;
 `;

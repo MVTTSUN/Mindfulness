@@ -3,11 +3,8 @@ import { Provider } from "react-redux";
 import store, { persistor } from "./store/store";
 import { registerRootComponent } from "expo";
 import { PersistGate } from "redux-persist/integration/react";
-import TrackPlayer, {
-  AppKilledPlaybackBehavior,
-  Capability,
-} from "react-native-track-player";
-import { useEffect } from "react";
+import TrackPlayer from "react-native-track-player";
+import { PlaybackService } from "./services";
 
 const RNRedux = () => {
   return (
@@ -20,4 +17,4 @@ const RNRedux = () => {
 };
 
 registerRootComponent(RNRedux);
-TrackPlayer.registerPlaybackService(() => require("./service"));
+TrackPlayer.registerPlaybackService(() => PlaybackService);

@@ -1,38 +1,44 @@
 import styled from "styled-components/native";
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect } from "react";
 import { CenterContainer } from "../../components/CenterContainer";
-import { GlobalScreen } from "../../components/GlobalScreen";
-import { TopWithBack } from "../../components/ui/TopWithBack";
-import { NotesFilter } from "../../components/ui/NotesFilter";
+import { GlobalScreen } from "../../components/GlobalScreenWrapper";
+import { HeaderWithBack } from "../../components/ui/headers/HeaderWithBack";
+import { NotesFilter } from "../../components/ui/inputs/NotesFilter";
 import { useState } from "react";
-import { Dimensions, Pressable, ScrollView } from "react-native";
-import { HorizontalChartBar } from "../../components/ui/HorizontalChartBar";
-import { TypesPopup } from "../../components/TypesPopup";
-import { MonthsPopup } from "../../components/MonthsPopup";
-import { YearsPopup } from "../../components/YearsPopup";
+import { Pressable } from "react-native";
+import { HorizontalChartBar } from "../../components/ui/charts/HorizontalChartBar";
+import { TypesPopup } from "../../components/ui/popups/TypesPopup";
+import { MonthsPopup } from "../../components/ui/popups/MonthsPopup";
+import { YearsPopup } from "../../components/ui/popups/YearsPopup";
 import { useAppSelector } from "../../hooks/useAppSelector";
-import { EMOTIONS } from "../../const";
-import { processDataForChart } from "../../utils";
-import { resetQueries, searchNotes } from "../../store/notesSlice";
+import { normalize, processDataForChart } from "../../utils";
+import { resetQueries } from "../../store/notesSlice";
 import { useAppDispatch } from "../../hooks/useAppDispatch";
-import { NoteType } from "../../types";
 import { useFocusEffect } from "@react-navigation/native";
+import {
+  getDataEmotionsCopy,
+  getEmotions,
+} from "../../store/emotionsSelectors";
+import { useLazyGetEmotionsQuery } from "../../api/api";
+import { setDataEmotionsCopy, setEmotions } from "../../store/emotionsSlice";
+import deepEqual from "deep-equal";
+import { getFilteredNotes } from "../../store/notesSelectors";
 
 export function Statistics() {
-  const dispatch = useAppDispatch();
   const [isOpenTypesPopup, setIsOpenTypesPopup] = useState(false);
   const [isOpenMonthsPopup, setIsOpenMonthsPopup] = useState(false);
   const [isOpenYearsPopup, setIsOpenYearsPopup] = useState(false);
-  const isFirstRendering = useRef(true);
-  const notes = useAppSelector((state) => state.notes.notes);
-  const notesSearched = useAppSelector((state) => state.notes.notesSearched);
-  const [notesState, setNotesState] = useState<NoteType[]>(notes);
-  const emotionsAfter = processDataForChart(EMOTIONS, notesState, "after");
-  const emotionsBefore = processDataForChart(EMOTIONS, notesState, "before");
+  const notesFiltered = useAppSelector(getFilteredNotes);
+  const emotions = useAppSelector(getEmotions);
+  const emotionsDataCopy = useAppSelector(getDataEmotionsCopy);
+  const dispatch = useAppDispatch();
+  const [getEmotionsQuery] = useLazyGetEmotionsQuery();
+  const emotionsAfter = processDataForChart(emotions, notesFiltered, "after");
+  const emotionsBefore = processDataForChart(emotions, notesFiltered, "before");
   const maxCount =
-    emotionsAfter[0].counts.all > emotionsBefore[0].counts.all
-      ? emotionsAfter[0].counts.all
-      : emotionsBefore[0].counts.all;
+    emotionsAfter[0]?.counts.all > emotionsBefore[0]?.counts.all
+      ? emotionsAfter[0]?.counts.all
+      : emotionsBefore[0]?.counts.all;
   let maxCountBar =
     maxCount === 0
       ? 10
@@ -40,30 +46,36 @@ export function Statistics() {
       ? maxCount - (maxCount % 10) + 10
       : maxCount;
 
+  const loadingData = async () => {
+    const { data } = await getEmotionsQuery();
+
+    if (data) {
+      if (!deepEqual(emotionsDataCopy, data)) {
+        dispatch(setEmotions(data));
+        dispatch(setDataEmotionsCopy(data));
+      }
+    }
+  };
+
   useFocusEffect(
     useCallback(() => {
       return () => {
         dispatch(resetQueries());
-        dispatch(searchNotes());
       };
     }, [])
   );
 
   useEffect(() => {
-    if (isFirstRendering.current) {
-      isFirstRendering.current = false;
-    } else {
-      setNotesState(notesSearched);
-    }
-  }, [notesSearched]);
+    loadingData();
+  }, []);
 
   return (
     <>
       <GlobalScreen withoutScrollView>
         <CenterContainer>
-          <TopWithBack>
+          <HeaderWithBack>
             <TextTitle>Статистика</TextTitle>
-          </TopWithBack>
+          </HeaderWithBack>
           <NotesFilter
             setIsOpenTypesPopup={setIsOpenTypesPopup}
             setIsOpenMonthsPopup={setIsOpenMonthsPopup}
@@ -135,19 +147,19 @@ const NoPressableStyled = styled.Pressable`
 
 const TextTitle = styled.Text`
   font-family: "Poppins-Medium";
-  font-size: 18px;
+  font-size: ${normalize(18)}px;
   color: ${({ theme }) => theme.color.standard};
 `;
 
 const ScrollViewStyled = styled.ScrollView`
-  height: ${Math.floor((Dimensions.get("window").height / 100) * 31)}px;
+  height: ${normalize(200)}px;
   margin-bottom: 10px;
 `;
 
 const TitleChart = styled.Text`
   margin-bottom: 5px;
   font-family: "Poppins-Medium";
-  font-size: 20px;
-  line-height: 24px;
+  font-size: ${normalize(20)}px;
+  line-height: ${normalize(24)}px;
   color: ${({ theme }) => theme.color.standard};
 `;

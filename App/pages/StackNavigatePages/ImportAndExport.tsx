@@ -1,86 +1,94 @@
 import { styled } from "styled-components/native";
 import { CenterContainer } from "../../components/CenterContainer";
-import { GlobalScreen } from "../../components/GlobalScreen";
-import { TopWithBack } from "../../components/ui/TopWithBack";
-import { Platform } from "react-native";
-import * as FileSystem from "expo-file-system";
+import { GlobalScreen } from "../../components/GlobalScreenWrapper";
+import { HeaderWithBack } from "../../components/ui/headers/HeaderWithBack";
 import { useAppSelector } from "../../hooks/useAppSelector";
-import { TouchableHighlight } from "../../components/ui/Touchables/TouchableHighlight";
-import { shareAsync } from "expo-sharing";
+import { TouchableHighlight } from "../../components/ui/touchables/TouchableHighlight";
 import { useAppDispatch } from "../../hooks/useAppDispatch";
-import * as DocumentPicker from "expo-document-picker";
 import { setLikes } from "../../store/likesSlice";
 import { setNotes } from "../../store/notesSlice";
+import { normalize } from "../../utils";
+import { getNotes } from "../../store/notesSelectors";
+import { getAllLikes } from "../../store/likesSelectors";
+import {
+  getAllTrackers,
+  getTrackersMeditation,
+  getTrackersTask,
+} from "../../store/trackerSelectors";
+import { setTrackers } from "../../store/trackerSlice";
+import { useEffect } from "react";
+import {
+  getTrackerMeditationNotifications,
+  getTrackerTaskNotifications,
+} from "../../store/notificationsSelectors";
+import { useNotifee } from "../../hooks/useNotifee";
+import { NAME_FILE_JSON } from "../../const";
+import { useFileSystem } from "../../hooks/useFileSystem";
 
 export function ImportAndExport() {
-  const likes = useAppSelector((state) => state.likes);
-  const notes = useAppSelector((state) => state.notes.notes);
+  const likes = useAppSelector(getAllLikes);
+  const notes = useAppSelector(getNotes);
+  const trackers = useAppSelector(getAllTrackers);
+  const trackerMeditationNotifications = useAppSelector(
+    getTrackerMeditationNotifications
+  );
+  const trackerTaskNotifications = useAppSelector(getTrackerTaskNotifications);
+  const trackersMeditation = useAppSelector(getTrackersMeditation);
+  const trackersTask = useAppSelector(getTrackersTask);
   const dispatch = useAppDispatch();
+  const { exportFileJSON, importFileJSON } = useFileSystem();
+  const {
+    onCreateTriggerNotificationForTrackersMeditation,
+    onCreateTriggerNotificationForTrackersTask,
+  } = useNotifee();
 
   const exportFile = async () => {
-    const data = { likes, notes };
+    const data = { likes, notes, trackers };
 
-    if (Platform.OS === "android") {
-      const permissions =
-        await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
-
-      if (permissions.granted) {
-        const directoryUri = permissions.directoryUri;
-
-        await FileSystem.StorageAccessFramework.createFileAsync(
-          directoryUri,
-          "Mindfulness",
-          "application/json"
-        )
-          .then(async (fileUri) => {
-            await FileSystem.writeAsStringAsync(fileUri, JSON.stringify(data), {
-              encoding: FileSystem.EncodingType.UTF8,
-            });
-          })
-          .catch((e) => {
-            console.log(e);
-          });
-      } else {
-        alert("You must allow permission to save.");
-      }
-    }
-
-    if (Platform.OS === "ios") {
-      const fileUri = FileSystem.documentDirectory + "Mindfulness.json";
-      FileSystem.writeAsStringAsync(fileUri, JSON.stringify(data), {
-        encoding: FileSystem.EncodingType.UTF8,
-      });
-      const UTI = "Mindfulness.json";
-      await shareAsync(fileUri, { UTI });
-    }
+    await exportFileJSON(data);
   };
 
   const importFile = async () => {
-    let parsedData = { likes: [], notes: [] };
-    const fileInfo = await DocumentPicker.getDocumentAsync({
-      type: "application/json",
-    });
+    const parsedData = await importFileJSON();
 
-    if (fileInfo.type === "success") {
-      const data = await FileSystem.readAsStringAsync(fileInfo.uri);
-      parsedData = JSON.parse(data);
-    }
-
-    if (parsedData.likes.length !== 0 && parsedData.notes.length !== 0) {
+    if (
+      JSON.stringify(parsedData.likes) !== JSON.stringify({}) ||
+      parsedData.notes.length !== 0 ||
+      JSON.stringify(parsedData.trackers) !== JSON.stringify({})
+    ) {
       dispatch(setLikes(parsedData.likes));
       dispatch(setNotes(parsedData.notes));
+      dispatch(setTrackers(parsedData.trackers));
     }
   };
+
+  useEffect(() => {
+    if (trackersMeditation && trackerMeditationNotifications.enable) {
+      onCreateTriggerNotificationForTrackersMeditation(
+        trackerMeditationNotifications.hours,
+        trackerMeditationNotifications.minutes
+      );
+    }
+  }, [trackersMeditation]);
+
+  useEffect(() => {
+    if (trackersTask && trackerTaskNotifications.enable) {
+      onCreateTriggerNotificationForTrackersTask(
+        trackerTaskNotifications.hours,
+        trackerTaskNotifications.minutes
+      );
+    }
+  }, [trackersTask]);
 
   return (
     <GlobalScreen>
       <CenterContainer>
-        <TopWithBack>
+        <HeaderWithBack>
           <TextTitle>Импорт/экспорт</TextTitle>
-        </TopWithBack>
+        </HeaderWithBack>
         <TextInfo>
-          Экспортируются только избранные медитации, задания и ежедневник. Файл
-          будет иметь такой вид: "Mindfulness.json"
+          {`Экспортируются только избранные медитации и задания, трекеры медитаций
+          и заданий, и ежедневник. Файл будет иметь такой вид: "${NAME_FILE_JSON}"`}
         </TextInfo>
         <ButtonContainer>
           <TouchableHighlight onPress={exportFile}>Экспорт</TouchableHighlight>
@@ -93,7 +101,7 @@ export function ImportAndExport() {
 
 const TextTitle = styled.Text`
   font-family: "Poppins-Medium";
-  font-size: 18px;
+  font-size: ${normalize(18)}px;
   color: ${({ theme }) => theme.color.standard};
 `;
 
@@ -101,14 +109,14 @@ const TextInfo = styled.Text`
   margin-bottom: 20px;
   text-align: justify;
   font-family: "Poppins-Regular";
-  font-size: 16px;
-  line-height: 20px;
+  font-size: ${normalize(16)}px;
+  line-height: ${normalize(20)}px;
   color: ${({ theme }) => theme.color.standard};
 `;
 
 const ButtonContainer = styled.View`
   flex-direction: row;
-  gap: 10px;
+  gap: ${normalize(10)}px;
   align-items: center;
   justify-content: center;
 `;

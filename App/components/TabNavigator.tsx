@@ -3,46 +3,46 @@ import {
   createBottomTabNavigator,
 } from "@react-navigation/bottom-tabs";
 import { useAppSelector } from "../hooks/useAppSelector";
-import { Home } from "../pages/TabNavigatePages/Home";
-import { MeditationStackScreen } from "../stackScreens/MeditationStackScreen";
-import { HomeIcon } from "./icons/NavigateIcons/HomeIcon";
-import { MeditationIcon } from "./icons/NavigateIcons/MeditationIcon";
-import { NotesIcon } from "./icons/NavigateIcons/NotesIcon";
-import { Notes } from "../pages/TabNavigatePages/Notes";
-import { InfoAndSettings } from "../pages/TabNavigatePages/InfoAndSettings";
-import { InfoAndSettingsIcon } from "./icons/NavigateIcons/InfoAndSettingsIcon";
-import { InfoAndSettingsStackScreen } from "../stackScreens/InfoAndSettingsStackScreen";
-import { NotesStackScreen } from "../stackScreens/NotesStackScreen";
-import { Tasks } from "../pages/TabNavigatePages/Tasks";
-import { TasksIcon } from "./icons/NavigateIcons/TasksIcon";
-import { TasksStackScreen } from "../stackScreens/TasksStackScreen";
+import { Home } from "../pages/tabNavigatePages/Home";
+import { MeditationsStackScreen } from "../pages/stackScreens/MeditationsStack";
+import { HomeIcon } from "./svg/icons/navigate-icons/HomeIcon";
+import { MeditationIcon } from "./svg/icons/navigate-icons/MeditationIcon";
+import { NotesIcon } from "./svg/icons/navigate-icons/NotesIcon";
+import { InfoAndSettingsIcon } from "./svg/icons/navigate-icons/InfoAndSettingsIcon";
+import { InfoAndSettingsStackScreen } from "../pages/stackScreens/InfoAndSettingsStack";
+import { NotesStackScreen } from "../pages/stackScreens/NotesStack";
+import { TasksIcon } from "./svg/icons/navigate-icons/TasksIcon";
+import { TasksStackScreen } from "../pages/stackScreens/TasksStack";
+import { normalize } from "../utils";
+import { getValueTheme } from "../store/themeSelectors";
+import { AppRoute, Color, Theme } from "../const";
 
 const Tab = createBottomTabNavigator();
 
 export function TabNavigator() {
-  const theme = useAppSelector((state) => state.theme.value);
+  const theme = useAppSelector(getValueTheme);
   const tabNavigatorOptions: BottomTabNavigationOptions = {
     headerShown: false,
     tabBarShowLabel: false,
     tabBarStyle: {
-      height: 70,
-      backgroundColor: theme === "light" ? "#313131" : "#101010",
+      height: normalize(70),
+      backgroundColor: theme === Theme.Light ? Color.TextStandard : "#101010",
       position: "absolute",
       bottom: 0,
       zIndex: 0,
-      borderTopLeftRadius: 35,
-      borderTopRightRadius: 35,
+      borderTopLeftRadius: normalize(35),
+      borderTopRightRadius: normalize(35),
       borderTopWidth: 0,
-      paddingHorizontal: 20,
+      paddingHorizontal: normalize(20),
       paddingVertical: 0,
-      paddingTop: 19,
-      paddingBottom: 19,
+      paddingTop: normalize(19),
+      paddingBottom: normalize(19),
     },
-    tabBarInactiveTintColor: theme === "light" ? "#6b6b6d" : "#3e3e3f",
-    tabBarActiveTintColor: "#edecf5",
+    tabBarInactiveTintColor: theme === Theme.Light ? "#6b6b6d" : "#3e3e3f",
+    tabBarActiveTintColor: Color.TextWhite,
     tabBarIconStyle: {
-      width: 32,
-      height: 32,
+      width: normalize(32),
+      height: normalize(32),
     },
     unmountOnBlur: true,
   };
@@ -50,7 +50,7 @@ export function TabNavigator() {
   return (
     <Tab.Navigator screenOptions={tabNavigatorOptions}>
       <Tab.Screen
-        name="Home"
+        name={AppRoute.Home}
         component={Home}
         options={{
           tabBarIcon: ({ color }) => <HomeIcon color={color} />,
@@ -60,8 +60,8 @@ export function TabNavigator() {
         })}
       />
       <Tab.Screen
-        name="MeditationStack"
-        component={MeditationStackScreen}
+        name={AppRoute.MeditationsStack}
+        component={MeditationsStackScreen}
         options={{
           tabBarIcon: ({ color }) => <MeditationIcon color={color} />,
         }}
@@ -70,7 +70,7 @@ export function TabNavigator() {
         })}
       />
       <Tab.Screen
-        name="TasksStack"
+        name={AppRoute.TasksStack}
         component={TasksStackScreen}
         options={{
           tabBarIcon: ({ color }) => <TasksIcon color={color} />,
@@ -80,7 +80,7 @@ export function TabNavigator() {
         })}
       />
       <Tab.Screen
-        name="NotesStack"
+        name={AppRoute.NotesStack}
         component={NotesStackScreen}
         options={{
           tabBarIcon: ({ color }) => <NotesIcon color={color} />,
@@ -90,7 +90,7 @@ export function TabNavigator() {
         })}
       />
       <Tab.Screen
-        name="InfoAndSettingsStack"
+        name={AppRoute.InfoAndSettingsStack}
         component={InfoAndSettingsStackScreen}
         options={{
           tabBarIcon: ({ color }) => <InfoAndSettingsIcon color={color} />,

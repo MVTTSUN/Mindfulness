@@ -1,54 +1,46 @@
 import { styled } from "styled-components/native";
 import { CenterContainer } from "../../components/CenterContainer";
-import { GlobalScreen } from "../../components/GlobalScreen";
-import { TopWithBack } from "../../components/ui/TopWithBack";
-import { CheckIcon } from "../../components/icons/CheckIcon";
-import { InputTextareaTransparent } from "../../components/ui/InputTextareaTransparent";
-import { memo, useCallback, useEffect, useRef, useState } from "react";
+import { GlobalScreen } from "../../components/GlobalScreenWrapper";
+import { HeaderWithBack } from "../../components/ui/headers/HeaderWithBack";
+import { CheckIcon } from "../../components/svg/icons/other-icons/CheckIcon";
+import { Textarea } from "../../components/ui/inputs/Textarea";
+import { memo, useEffect, useRef, useState } from "react";
 import { AppState, Dimensions, FlatList, Pressable } from "react-native";
-import {
-  useFocusEffect,
-  useNavigation,
-  useRoute,
-} from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import {
   DataInput,
-  MeditationData,
+  DataTextLottieImage,
+  MeditationPlayer,
   NoteType,
   NotesScreenProp,
-  TaskType,
 } from "../../types";
-import { TouchableHighlight } from "../../components/ui/Touchables/TouchableHighlight";
-import { MeditationsAndTasksPopup } from "../../components/MeditationsAndTasksPopup";
-import { COLORS, DATA_INPUTS_NOTE } from "../../const";
-import EmotionsPopup from "../../components/EmotionsPopup";
+import { TouchableHighlight } from "../../components/ui/touchables/TouchableHighlight";
+import { MeditationsAndTasksPopup } from "../../components/ui/popups/MeditationsAndTasksPopup";
+import { AppRoute, Color, DATA_INPUTS_NOTE } from "../../const";
+import EmotionsPopup from "../../components/ui/popups/EmotionsPopup";
 import { useAppDispatch } from "../../hooks/useAppDispatch";
 import { addNote, removeNotes, updateNote } from "../../store/notesSlice";
+import { normalize } from "../../utils";
 
 function Note() {
   const [isRenderOne, setIsRenderOne] = useState(false);
   const [id, setId] = useState<string | null>(null);
   const [createdAt, setCreatedAt] = useState<string>("");
   const [isUpdate, setIsUpdate] = useState(false);
-  const [typeEmotions, setTypeEmotions] = useState("");
-  const route = useRoute();
-  const flatListRef = useRef<FlatList>(null);
+  const [typeEmotions, setTypeEmotions] = useState<string>("");
   const [nameNote, setNameNote] = useState("");
   const [emotionsBefore, setEmotionsBefore] = useState<string[]>([]);
   const [emotionsAfter, setEmotionsAfter] = useState<string[]>([]);
   const [isOpenMeditationAndTasksPopup, setIsOpenMeditationAndTasksPopup] =
     useState(false);
   const [isOpenEmotionsPopup, setIsOpenEmotionsPopup] = useState(false);
-  const [color, setColor] = useState(COLORS.textColors.normal);
-  const [backgroundColor, setBackgroundColor] = useState(
-    COLORS.mainColors.normal
-  );
-  const [underlayColor, setUnderlayColor] = useState(
-    COLORS.mainColors.normalPressed
+  const [color, setColor] = useState<string>(Color.TextStandard);
+  const [backgroundColor, setBackgroundColor] = useState<string>(Color.Primary);
+  const [underlayColor, setUnderlayColor] = useState<string>(
+    Color.PrimaryPressed
   );
   const [texts, setTexts] = useState(["", "", "", ""]);
-  const navigation = useNavigation<NotesScreenProp>();
-  const dispatch = useAppDispatch();
+  const flatListRef = useRef<FlatList>(null);
   const dataAfterUnmount = useRef({
     id,
     emotionsAfter,
@@ -62,6 +54,9 @@ function Note() {
   });
   const isUpdateAfterUnmount = useRef(isUpdate);
   const prevStateAfterUnmount = useRef(dataAfterUnmount.current);
+  const route = useRoute();
+  const navigation = useNavigation<NotesScreenProp>();
+  const dispatch = useAppDispatch();
 
   const setNameNoteHandle = (
     nameNote: string,
@@ -147,21 +142,21 @@ function Note() {
 
   useEffect(() => {
     if (route.params) {
-      const { meditation } = route.params as { meditation: MeditationData };
-      const { task } = route.params as { task: TaskType };
+      const { meditation } = route.params as { meditation: MeditationPlayer };
+      const { task } = route.params as { task: DataTextLottieImage };
       const { note } = route.params as { note: NoteType };
 
       if (meditation) {
-        setColor(COLORS.textColors.meditationCard);
-        setBackgroundColor(COLORS.backgroundColors.meditationCard);
-        setUnderlayColor(COLORS.backgroundColors.meditationCardPressed);
+        setColor(Color.TextWhite);
+        setBackgroundColor(Color.Meditation);
+        setUnderlayColor(Color.MeditationPressed);
         setNameNote(`Медитация: ${meditation.title}`);
       }
 
       if (task) {
-        setColor(COLORS.textColors.taskCard);
-        setBackgroundColor(COLORS.backgroundColors.taskCard);
-        setUnderlayColor(COLORS.backgroundColors.taskCardPressed);
+        setColor(Color.TextStandard);
+        setBackgroundColor(Color.Task);
+        setUnderlayColor(Color.TaskPressed);
         setNameNote(`Задание: ${task.title}`);
       }
 
@@ -182,7 +177,7 @@ function Note() {
 
     const appStateListener = AppState.addEventListener("change", (state) => {
       if (state !== "active") {
-        navigation.navigate("Notes");
+        navigation.navigate(AppRoute.Notes);
       }
     });
 
@@ -196,11 +191,11 @@ function Note() {
     <>
       <GlobalScreen withoutScrollView>
         <CenterContainer>
-          <TopWithBack isCustomPress onPress={back}>
+          <HeaderWithBack isCustomPress onPress={back}>
             <Pressable onPress={back}>
               <CheckIcon />
             </Pressable>
-          </TopWithBack>
+          </HeaderWithBack>
           <FlatList
             ref={flatListRef}
             showsVerticalScrollIndicator={false}
@@ -235,7 +230,7 @@ function Note() {
                         setTypeEmotions("before");
                       }}
                     >
-                      Настроение до медитации или задания
+                      Эмоции до медитации или задания
                     </TouchableHighlight>
                     {!!emotionsBefore.length && (
                       <TextStyled>
@@ -253,7 +248,7 @@ function Note() {
                         setTypeEmotions("after");
                       }}
                     >
-                      Настроение после медитации или задания
+                      Эмоции после медитации или задания
                     </TouchableHighlight>
                     {!!emotionsAfter.length && (
                       <TextStyled>
@@ -273,7 +268,7 @@ function Note() {
               return (
                 <>
                   <TitleInput>{title}</TitleInput>
-                  <InputTextareaTransparent
+                  <Textarea
                     value={texts[id - 1]}
                     onTouchEnd={() => onTouchEnd(id - 1)}
                     placeholder="Начните ввод"
@@ -358,8 +353,8 @@ const DateText = styled.Text`
   align-self: flex-end;
   opacity: 0.6;
   font-family: "Poppins-Regular";
-  font-size: 14px;
-  line-height: 18px;
+  font-size: ${normalize(14)}px;
+  line-height: ${normalize(18)}px;
   margin-bottom: 10px;
   color: ${({ theme }) => theme.color.standard};
 `;
@@ -367,7 +362,7 @@ const DateText = styled.Text`
 const TitleInput = styled.Text`
   margin: 10px 0;
   font-family: "Poppins-Medium";
-  font-size: 20px;
+  font-size: ${normalize(20)}px;
   color: ${({ theme }) => theme.color.standard};
 `;
 
@@ -378,7 +373,7 @@ const BottomSpace = styled.View`
 const TextStyled = styled.Text`
   text-align: center;
   font-family: "Poppins-Regular";
-  font-size: 16px;
-  line-height: 20px;
+  font-size: ${normalize(16)}px;
+  line-height: ${normalize(20)}px;
   color: ${({ theme }) => theme.color.standard};
 `;

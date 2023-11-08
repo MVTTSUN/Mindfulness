@@ -1,26 +1,32 @@
 import styled from "styled-components/native";
 import { CenterContainer } from "../../components/CenterContainer";
-import { GlobalScreen } from "../../components/GlobalScreen";
-import { Title } from "../../components/ui/Titles/Title";
-import { Dimensions, Image, Linking, Pressable } from "react-native";
-import { ThemeIcon } from "../../components/icons/ThemeIcon";
+import { GlobalScreen } from "../../components/GlobalScreenWrapper";
+import { Title } from "../../components/ui/titles/Title";
+import { Pressable } from "react-native";
+import { ThemeIcon } from "../../components/svg/icons/other-icons/ThemeIcon";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { InfoAndSettingsScreenProp } from "../../types";
-import { ContactsIcon } from "../../components/icons/ContactsIcon";
-import { useCallback, useEffect, useState } from "react";
-import { ThemePopup } from "../../components/ThemePopup";
-import { Subtitle } from "../../components/ui/Titles/Subtitle";
-import { TouchableHighlight } from "../../components/ui/Touchables/TouchableHighlight";
-import { InstagramIcon } from "../../components/icons/Socials/InstagramIcon";
-import { TelegramIcon } from "../../components/icons/Socials/TelegramIcon";
-import { VKIcon } from "../../components/icons/Socials/VKIcon";
-import { ServiceIcon } from "../../components/icons/ServiceIcon";
-import { NotificationIcon } from "../../components/icons/NotificationIcon";
-import { ImportAndExportIcon } from "../../components/icons/ImportAndExportIcon";
+import { ContactsIcon } from "../../components/svg/icons/other-icons/ContactsIcon";
+import { useCallback, useState } from "react";
+import { ThemePopup } from "../../components/ui/popups/ThemePopup";
+import { ServiceIcon } from "../../components/svg/icons/other-icons/ServiceIcon";
+import { NotificationIcon } from "../../components/svg/icons/other-icons/NotificationIcon";
+import { ImportAndExportIcon } from "../../components/svg/icons/other-icons/ImportAndExportIcon";
+import { normalize } from "../../utils";
+import { OfflineIcon } from "../../components/svg/icons/other-icons/OfflineIcon";
+import { Tumbler } from "../../components/ui/inputs/Tumbler";
+import { useAppDispatch } from "../../hooks/useAppDispatch";
+import { useAppSelector } from "../../hooks/useAppSelector";
+import { getIsOffline } from "../../store/offlineSelectors";
+import { setIsOffline } from "../../store/offlineSlice";
+import { StorageIcon } from "../../components/svg/icons/other-icons/StorageIcon";
+import { AppRoute, NICKNAME_DEVELOPER, VERSION_APP } from "../../const";
 
 export function InfoAndSettings() {
-  const navigation = useNavigation<InfoAndSettingsScreenProp>();
   const [isOpenThemePopup, setIsOpenThemePopup] = useState(false);
+  const navigation = useNavigation<InfoAndSettingsScreenProp>();
+  const isOffline = useAppSelector(getIsOffline);
+  const dispatch = useAppDispatch();
 
   useFocusEffect(
     useCallback(() => {
@@ -44,7 +50,9 @@ export function InfoAndSettings() {
             </Pressable>
           </ViewGap>
           <ViewGap>
-            <Pressable onPress={() => navigation.navigate("Notification")}>
+            <Pressable
+              onPress={() => navigation.navigate(AppRoute.Notification)}
+            >
               <ViewLine>
                 <NotificationIcon />
                 <TextLine>Уведомления</TextLine>
@@ -52,16 +60,34 @@ export function InfoAndSettings() {
             </Pressable>
           </ViewGap>
           <ViewGap>
-            <Pressable onPress={() => navigation.navigate("ImportAndExport")}>
+            <Pressable
+              onPress={() => navigation.navigate(AppRoute.ImportAndExport)}
+            >
               <ViewLine>
                 <ImportAndExportIcon />
                 <TextLine>Импорт/экспорт</TextLine>
               </ViewLine>
             </Pressable>
+            <Pressable onPress={() => navigation.navigate(AppRoute.Storage)}>
+              <ViewLine>
+                <StorageIcon />
+                <TextLine>Хранилище</TextLine>
+              </ViewLine>
+            </Pressable>
+            <ViewLineOffline>
+              <ViewIconAndText>
+                <OfflineIcon />
+                <TextLine>Оффлайн режим</TextLine>
+              </ViewIconAndText>
+              <Tumbler
+                enable={isOffline}
+                onChange={() => dispatch(setIsOffline(!isOffline))}
+              />
+            </ViewLineOffline>
           </ViewGap>
           <Title>Информация</Title>
           <ViewGap>
-            <Pressable onPress={() => navigation.navigate("Contacts")}>
+            <Pressable onPress={() => navigation.navigate(AppRoute.Contacts)}>
               <ViewLine>
                 <ContactsIcon />
                 <TextLine>Контакты психотерапевта</TextLine>
@@ -69,7 +95,7 @@ export function InfoAndSettings() {
             </Pressable>
           </ViewGap>
           <ViewGap>
-            <Pressable onPress={() => navigation.navigate("Service")}>
+            <Pressable onPress={() => navigation.navigate(AppRoute.Service)}>
               <ViewLine>
                 <ServiceIcon />
                 <TextLine>Поддержка</TextLine>
@@ -79,8 +105,10 @@ export function InfoAndSettings() {
         </CenterContainer>
       </GlobalScreen>
       <ViewMade>
-        <TextMade>v 1.0.0</TextMade>
-        <TextMade>© {new Date().getFullYear()} Made by MVTT</TextMade>
+        <TextMade>{VERSION_APP}</TextMade>
+        <TextMade>
+          © {new Date().getFullYear()} Made by {NICKNAME_DEVELOPER}
+        </TextMade>
       </ViewMade>
       {isOpenThemePopup && (
         <PressableBlur onPress={() => setIsOpenThemePopup(false)}>
@@ -105,7 +133,6 @@ const PressableBlur = styled.Pressable`
 `;
 
 const ViewGap = styled.View`
-  align-items: flex-start;
   gap: 20px;
   margin-bottom: 20px;
 `;
@@ -116,22 +143,35 @@ const ViewLine = styled.View`
   gap: 10px;
 `;
 
+const ViewLineOffline = styled.View`
+  align-items: center;
+  justify-content: space-between;
+  flex-direction: row;
+  gap: 10px;
+`;
+
+const ViewIconAndText = styled.View`
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+`;
+
 const TextLine = styled.Text`
   font-family: "Poppins-Medium";
-  font-size: 18px;
+  font-size: ${normalize(18)}px;
   color: ${({ theme }) => theme.color.standard};
 `;
 
 const ViewMade = styled.View`
-  padding-top: 10px;
-  height: 122px;
+  padding-top: ${normalize(10)}px;
+  height: ${normalize(122)}px;
   align-items: center;
   background-color: ${({ theme }) => theme.backgroundColor.main};
 `;
 
 const TextMade = styled.Text`
   font-family: "Poppins-Regular";
-  font-size: 14px;
-  line-height: 18px;
+  font-size: ${normalize(14)}px;
+  line-height: ${normalize(18)}px;
   color: ${({ theme }) => theme.color.standard};
 `;

@@ -1,62 +1,81 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { TaskType } from "../types";
-import { TASKS } from "../const";
+import { DataTextLottieImage } from "../types";
+import { SliceName } from "../const";
 
 const initialState = {
-  tasks: TASKS as TaskType[],
-  tasksFiltered: TASKS as TaskType[],
-  tasksSearched: TASKS as TaskType[],
-  tasksLike: TASKS as TaskType[],
+  tasks: [] as DataTextLottieImage[],
+  tasksInTask: [] as DataTextLottieImage[],
+  dataTasksCopy: [] as DataTextLottieImage[],
+  searchTasks: "",
+  kindTasks: "Все",
+  isLikeTasks: false,
+  countTasks: 0,
 };
 
 export const tasksSlice = createSlice({
-  name: "tasks",
+  name: SliceName.Tasks,
   initialState,
   reducers: {
-    filterTasks(state, action) {
-      action.payload === "Всё"
-        ? (state.tasksFiltered = state.tasks)
-        : (state.tasksFiltered = state.tasks.filter(
-            (task) => task.kind === action.payload
-          ));
+    setTasks(state, action) {
+      const tasks = JSON.parse(JSON.stringify(action.payload)) as DataTextLottieImage[];
+
+      state.tasks = tasks.sort((a, b) => a.title && b.title ? a.title.localeCompare(b.title) : -1);
     },
-    searchTasks(state, action) {
-      action.payload.trim() === ""
-        ? (state.tasksSearched = state.tasks)
-        : (state.tasksSearched = state.tasks.filter((task) =>
-            task.title
-              .split(" ")
-              .reverse()
-              .reduce(
-                (acc: string[], curr) => (
-                  acc.push(`${curr} ${acc}`.trim()), acc
-                ),
-                []
-              )
-              .some((el) =>
-                el.match(
-                  RegExp(
-                    `^${action.payload
-                      .trim()
-                      .replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&")}`,
-                    "i"
-                  )
-                )
-              )
-          ));
+    setTasksInTask(state, action) {
+      if (state.tasksInTask.some((task) => task._id === action.payload._id)) {
+        state.tasksInTask = state.tasksInTask.map((task) => {
+          if (task._id === action.payload._id) {
+            return action.payload;
+          }
+          return task;
+        });
+      } else {
+        state.tasksInTask.push(action.payload);
+      }
     },
-    likeTasks(state, action) {
-      action.payload === null
-        ? (state.tasksLike = state.tasks)
-        : (state.tasksLike = state.tasks.filter((task) =>
-            action.payload.some(
-              (like: { id: number; isLike: boolean }) => like.id === task.id
-            )
-          ));
+    setDataTasksCopy (state, action) {
+      if (state.dataTasksCopy.some((task) => task._id === action.payload._id)) {
+        state.dataTasksCopy = state.dataTasksCopy.map((task) => {
+          if (task._id === action.payload._id) {
+            return action.payload;
+          }
+          return task;
+        });
+      } else {
+        state.dataTasksCopy.push(action.payload);
+      }
+    },
+    deleteTasksInTask(state, action) {
+      state.tasksInTask = state.tasksInTask.filter((task) => task._id !== action.payload._id);
+    },
+    deleteDataTasksCopy(state, action) {
+      state.dataTasksCopy = state.dataTasksCopy.filter((task) => task._id !== action.payload._id);
+    },
+    setSearchTasks(state, action) {
+      state.searchTasks = action.payload;
+    },
+    setKindTasks(state, action) {
+      state.kindTasks = action.payload;
+    },
+    setIsLikeTasks(state, action) {
+      state.isLikeTasks = action.payload;
+    },
+    setCountTasks(state, action) {
+      state.countTasks = action.payload;
     },
   },
 });
 
-export const { filterTasks, searchTasks, likeTasks } = tasksSlice.actions;
+export const {
+  setTasks,
+  setTasksInTask,
+  setSearchTasks,
+  deleteTasksInTask,
+  setKindTasks,
+  setIsLikeTasks,
+  setCountTasks,
+  setDataTasksCopy,
+  deleteDataTasksCopy,
+} = tasksSlice.actions;
 
 export default tasksSlice.reducer;

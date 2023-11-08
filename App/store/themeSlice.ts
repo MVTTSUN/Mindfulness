@@ -1,12 +1,13 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { SliceName, Theme } from '../const';
 
 const initialState = {
-  value: "light",
+  value: Theme.Light,
   idRadioButton: 2,
 };
 
 export const themeSlice = createSlice({
-  name: "theme",
+  name: SliceName.Theme,
   initialState,
   reducers: {
     changeTheme(state, action) {

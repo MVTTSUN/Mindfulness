@@ -4,11 +4,11 @@
     "slug": "Mindfulness",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/images/mindfulness-icon.jpg",
     "userInterfaceStyle": "automatic",
     "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
+      "image": "./assets/images/mindfulness-splash.jpg",
+      "resizeMode": "cover",
       "backgroundColor": "#f5f4fa"
     },
     "assetBundlePatterns": [
@@ -33,19 +33,20 @@
         "MEDIA_LIBRARY"
       ],
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/images/mindfulness-adaptive-icon.jpg",
         "backgroundColor": "#f5f4fa"
       },
       "softwareKeyboardLayoutMode": "pan",
       "package": "com.anonymous.Mindfulness"
     },
-    "web": {
-      "favicon": "./assets/favicon.png"
-    },
     "extra": {
       "eas": {
         "projectId": "1d74851d-5931-4047-a4d3-8db3b23782ec"
       }
+    },
+    "notification": {
+      "icon": "./assets/notification_icon.png",
+      "color": "#aef0f6"
     },
     "plugins": [
       "@notifee/react-native"

@@ -8,19 +8,18 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { useAppSelector } from "../../../hooks/useAppSelector";
-import { DARK_THEME, LIGHT_THEME } from "../../../const";
+import { DARK_THEME, LIGHT_THEME, Theme } from "../../../const";
+import { normalize } from "../../../utils";
+import { getValueTheme } from "../../../store/themeSelectors";
 
 type TouchableOptionProps = PropsWithChildren<{
   onPress: () => void;
   isActive: boolean;
 }>;
 
-function TouchableOption({
-  children,
-  onPress,
-  isActive,
-}: TouchableOptionProps) {
-  const theme = useAppSelector((state) => state.theme.value);
+function TouchableOption(props: TouchableOptionProps) {
+  const { children, onPress, isActive } = props;
+  const theme = useAppSelector(getValueTheme);
   const backgroundColor = useSharedValue(isActive ? 1 : 0);
   const backgroundColorStyle = useAnimatedStyle(() => ({
     backgroundColor: interpolateColor(
@@ -28,7 +27,7 @@ function TouchableOption({
       [0, 1],
       [
         "transparent",
-        theme === "light"
+        theme === Theme.Light
           ? LIGHT_THEME.backgroundColor.selectActive
           : DARK_THEME.backgroundColor.selectActive,
       ]
@@ -42,10 +41,10 @@ function TouchableOption({
       borderColor.value,
       [0, 1],
       [
-        theme === "light"
+        theme === Theme.Light
           ? LIGHT_THEME.color.standard
           : DARK_THEME.color.standard,
-        theme === "light"
+        theme === Theme.Light
           ? LIGHT_THEME.backgroundColor.selectActive
           : DARK_THEME.backgroundColor.selectActive,
       ]
@@ -57,10 +56,10 @@ function TouchableOption({
       color.value,
       [0, 1],
       [
-        theme === "light"
+        theme === Theme.Light
           ? LIGHT_THEME.color.standard
           : DARK_THEME.color.standard,
-        theme === "light"
+        theme === Theme.Light
           ? LIGHT_THEME.color.selectActive
           : DARK_THEME.color.selectActive,
       ]
@@ -103,14 +102,14 @@ const ViewStyled = styled(Animated.View)<{
 }>`
   align-items: center;
   width: 10%;
-  height: 31px;
+  height: ${normalize(31)}px;
   flex: auto;
   justify-content: center;
-  border-radius: 42px;
+  border-radius: ${normalize(42)}px;
 `;
 
 const TextStyled = styled(Animated.Text)<{ $isActive: boolean }>`
   font-family: "Poppins-Regular";
-  font-size: 12px;
-  line-height: 18px;
+  font-size: ${normalize(12)}px;
+  line-height: ${normalize(18)}px;
 `;

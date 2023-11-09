@@ -13,7 +13,7 @@ import { LikeIcon } from "../../components/svg/icons/other-icons/LikeIcon";
 import { AudioPlayer } from "../../components/ui/AudioPlayer";
 import { useAppSelector } from "../../hooks/useAppSelector";
 import { useAppDispatch } from "../../hooks/useAppDispatch";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import {
   addMeditationLike,
   removeMeditationLike,
@@ -43,13 +43,15 @@ import {
   AppRoute,
   BASE_URL,
   Color,
+  ErrorMessage,
   NameFolder,
+  SuccessMessage,
   Theme,
 } from "../../const";
 import { useExpoAudio } from "../../hooks/useExpoAudio";
 import { ProgressCircle } from "../../components/ui/progress/ProgressCircle";
-import { getDownloadAudios } from "../../store/downloadAudioSelectors";
-import { getLikesMeditation } from "../../store/likesSelectors";
+import { getIsDownloadAudios } from "../../store/downloadAudioSelectors";
+import { getIsLikeMeditation } from "../../store/likesSelectors";
 import {
   addDownloadAudio,
   removeDownloadAudio,
@@ -57,29 +59,29 @@ import {
 import { getIsOffline } from "../../store/offlineSelectors";
 import { Tracker } from "../../components/ui/Tracker";
 import { getValueTheme } from "../../store/themeSelectors";
+import { useToastCustom } from "../../hooks/useToastCustom";
 
 export function Meditation() {
-  const [isActive, setIsActive] = useState(false);
-  const [isDownload, setIsDownload] = useState(false);
-  const statusDownloadAudio = useRef<"download" | "delete" | "inProgress">(
-    "download"
-  );
   const route = useRoute();
   const { meditationId } = route.params as { meditationId: string };
   const navigation = useNavigation<MeditationScreenProp & NotesScreenProp>();
   const theme = useAppSelector(getValueTheme);
-  const likes = useAppSelector(getLikesMeditation);
-  const downloadAudios = useAppSelector(getDownloadAudios);
+  const isLike = useAppSelector(getIsLikeMeditation(meditationId));
   const dataMeditationCopy = useAppSelector(
     getDataMeditationCopy(meditationId)
   );
   const meditation = useAppSelector(getMeditationInMeditation(meditationId));
   const isOffline = useAppSelector(getIsOffline);
+  const isDownload = useAppSelector(getIsDownloadAudios(meditationId));
   const dispatch = useAppDispatch();
+  const statusDownloadAudio = useRef<"download" | "delete" | "inProgress">(
+    isDownload ? "delete" : "download"
+  );
   const [getMeditationQuery] = useLazyGetMeditationQuery();
   const { deleteFile, download, createDirectory, downloadProgress } =
     useFileSystem();
   const { getAudioDuration } = useExpoAudio();
+  const { onErrorToast, onSuccessToast } = useToastCustom();
   const scaleLike = useSharedValue(1);
   const likeStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scaleLike.value }],
@@ -91,7 +93,7 @@ export function Meditation() {
       withSpring(1.2),
       withSpring(1)
     );
-    if (isActive) {
+    if (isLike) {
       dispatch(removeMeditationLike(meditation.id));
     } else {
       dispatch(addMeditationLike(meditation.id));
@@ -117,8 +119,13 @@ export function Meditation() {
         dispatch(setMeditationsInMeditation({ ...meditation, url: uriAudio }));
         dispatch(addDownloadAudio(meditationId));
         statusDownloadAudio.current = "delete";
-      } catch (error) {
-        console.log(error);
+        onSuccessToast(
+          SuccessMessage.DownloadMeditation + ` (${meditation.title})`
+        );
+      } catch {
+        onErrorToast(
+          ErrorMessage.DownloadMeditation + ` (${meditation.title})`
+        );
         statusDownloadAudio.current = "download";
       }
     } else if (statusDownloadAudio.current === "delete") {
@@ -139,8 +146,11 @@ export function Meditation() {
         );
         dispatch(removeDownloadAudio(meditationId));
         statusDownloadAudio.current = "download";
-      } catch (error) {
-        console.log(error);
+        onSuccessToast(
+          SuccessMessage.DeleteMeditation + ` (${meditation.title})`
+        );
+      } catch {
+        onErrorToast(ErrorMessage.DeleteMeditation + ` (${meditation.title})`);
         statusDownloadAudio.current = "delete";
       }
     }
@@ -148,64 +158,53 @@ export function Meditation() {
 
   const downloadData = async () => {
     const { data } = await getMeditationQuery(meditationId);
+
     if (data) {
       if (!deepEqual(data, dataMeditationCopy)) {
-        await deleteFile(NameFolder.Meditations + `/${meditationId}`);
-        await createDirectory(NameFolder.Meditations + `/${meditationId}`);
-        const result = {} as MeditationPlayer;
-        result.title = data.title;
-        result.kind = data.kind;
-        result.artist = "Mindfulness";
-        result.textLines = data.textLines;
-        result.title = data.title;
-        result.id = data._id;
-        const duration = await getAudioDuration(
-          BASE_URL + ApiRoute.Meditations + ApiRoute.Filename + `/${data.audio}`
-        );
-        if (duration) {
-          result.duration = duration;
-        }
-        result.url =
-          BASE_URL +
-          ApiRoute.Meditations +
-          ApiRoute.Filename +
-          `/${data.audio}`;
-        const uriImage = await download(
-          BASE_URL +
+        try {
+          await deleteFile(NameFolder.Meditations + `/${meditationId}`);
+          await createDirectory(NameFolder.Meditations + `/${meditationId}`);
+          const result = {} as MeditationPlayer;
+          result.title = data.title;
+          result.kind = data.kind;
+          result.artist = "Mindfulness";
+          result.textLines = data.textLines;
+          result.title = data.title;
+          result.id = data._id;
+          const duration = await getAudioDuration(
+            BASE_URL +
+              ApiRoute.Meditations +
+              ApiRoute.Filename +
+              `/${data.audio}`
+          );
+          if (duration) {
+            result.duration = duration;
+          }
+          result.url =
+            BASE_URL +
             ApiRoute.Meditations +
             ApiRoute.Filename +
-            `/${data.image}`,
-          NameFolder.Meditations + `/${meditationId}`,
-          data.image
-        );
-        if (uriImage) {
-          result.artwork = uriImage;
+            `/${data.audio}`;
+          const uriImage = await download(
+            BASE_URL +
+              ApiRoute.Meditations +
+              ApiRoute.Filename +
+              `/${data.image}`,
+            NameFolder.Meditations + `/${meditationId}`,
+            data.image
+          );
+          if (uriImage) {
+            result.artwork = uriImage;
+          }
+          dispatch(setMeditationsInMeditation(result));
+          dispatch(setDataMeditationsCopy(data));
+          dispatch(removeDownloadAudio(meditationId));
+        } catch {
+          onErrorToast(ErrorMessage.DownloadFile);
         }
-        dispatch(setMeditationsInMeditation(result));
-        dispatch(setDataMeditationsCopy(data));
-        dispatch(removeDownloadAudio(meditationId));
       }
     }
   };
-
-  useEffect(() => {
-    meditation && setIsActive(likes.some((like) => like.id === meditation.id));
-  }, [likes, meditation]);
-
-  useEffect(() => {
-    meditation &&
-      setIsDownload(
-        downloadAudios.some(
-          (downloadAudio) => downloadAudio.id === meditation.id
-        )
-      );
-  }, [downloadAudios]);
-
-  useEffect(() => {
-    if (isDownload) {
-      statusDownloadAudio.current = "delete";
-    }
-  }, [isDownload]);
 
   useEffect(() => {
     if (!isOffline) {
@@ -233,7 +232,7 @@ export function Meditation() {
                   style={[{ backgroundColor: "transparent" }, likeStyle]}
                 >
                   <LikeIcon
-                    isActive={isActive}
+                    isActive={isLike}
                     color={
                       theme === Theme.Light
                         ? Color.TextStandard

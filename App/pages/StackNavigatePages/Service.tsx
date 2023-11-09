@@ -13,12 +13,13 @@ import { useLazyGetInfoQuery } from "../../api/api";
 import { useFileSystem } from "../../hooks/useFileSystem";
 import { useEffect } from "react";
 import deepEqual from "deep-equal";
-import { ApiRoute, BASE_URL, NameFolder } from "../../const";
+import { ApiRoute, BASE_URL, ErrorMessage, NameFolder } from "../../const";
 import { DataInformation } from "../../types";
 import { setDataInfosCopy, setInfos } from "../../store/infosSlice";
 import { normalize } from "../../utils";
 import { getIsOffline } from "../../store/offlineSelectors";
 import { PulseCircle } from "../../components/ui/PulseCircle";
+import { useToastCustom } from "../../hooks/useToastCustom";
 
 export function Service() {
   const infos = useAppSelector(getInfos);
@@ -27,39 +28,44 @@ export function Service() {
   const dispatch = useAppDispatch();
   const [getInfoQuery] = useLazyGetInfoQuery();
   const { deleteFile, download, createDirectory } = useFileSystem();
+  const { onErrorToast } = useToastCustom();
 
   const downloadData = async () => {
     const { data } = await getInfoQuery();
 
     if (data) {
       if (!deepEqual(dataInfosCopy, data)) {
-        await deleteFile(NameFolder.Infos);
-        await createDirectory(NameFolder.Infos);
-        const result = JSON.parse(JSON.stringify(data[0])) as DataInformation;
-        const uriAvatarPsycho = await download(
-          BASE_URL +
-            ApiRoute.Info +
-            ApiRoute.Filename +
-            `/${result.avatarPsycho}`,
-          NameFolder.Infos,
-          result.avatarPsycho
-        );
-        const uriAvatarDevelop = await download(
-          BASE_URL +
-            ApiRoute.Info +
-            ApiRoute.Filename +
-            `/${result.avatarDevelop}`,
-          NameFolder.Infos,
-          result.avatarDevelop
-        );
-        if (uriAvatarPsycho) {
-          result.avatarPsycho = uriAvatarPsycho;
+        try {
+          await deleteFile(NameFolder.Infos);
+          await createDirectory(NameFolder.Infos);
+          const result = JSON.parse(JSON.stringify(data[0])) as DataInformation;
+          const uriAvatarPsycho = await download(
+            BASE_URL +
+              ApiRoute.Info +
+              ApiRoute.Filename +
+              `/${result.avatarPsycho}`,
+            NameFolder.Infos,
+            result.avatarPsycho
+          );
+          const uriAvatarDevelop = await download(
+            BASE_URL +
+              ApiRoute.Info +
+              ApiRoute.Filename +
+              `/${result.avatarDevelop}`,
+            NameFolder.Infos,
+            result.avatarDevelop
+          );
+          if (uriAvatarPsycho) {
+            result.avatarPsycho = uriAvatarPsycho;
+          }
+          if (uriAvatarDevelop) {
+            result.avatarDevelop = uriAvatarDevelop;
+          }
+          dispatch(setInfos(result));
+          dispatch(setDataInfosCopy(data));
+        } catch {
+          onErrorToast(ErrorMessage.DownloadFile);
         }
-        if (uriAvatarDevelop) {
-          result.avatarDevelop = uriAvatarDevelop;
-        }
-        dispatch(setInfos(result));
-        dispatch(setDataInfosCopy(data));
       }
     }
   };

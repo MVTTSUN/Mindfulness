@@ -20,7 +20,8 @@ import {
 import { normalize } from "../../../utils";
 import { useFileSystem } from "../../../hooks/useFileSystem";
 import { getIsOffline } from "../../../store/offlineSelectors";
-import { AppRoute, Color, NameFolder } from "../../../const";
+import { AppRoute, Color, ErrorMessage, NameFolder } from "../../../const";
+import { useToastCustom } from "../../../hooks/useToastCustom";
 
 type CardListTasksProps = {
   count: number;
@@ -35,6 +36,7 @@ export function CardListTasks(props: CardListTasksProps) {
   const dispatch = useAppDispatch();
   const [getTasksQuery] = useLazyGetTasksQuery();
   const { deleteFile } = useFileSystem();
+  const { onErrorToast } = useToastCustom();
 
   const seeAll = () => {
     dispatch(setCountTasks(tasks.length));
@@ -45,15 +47,19 @@ export function CardListTasks(props: CardListTasksProps) {
 
     if (data) {
       if (!deepEqual(tasks, data)) {
-        const TasksForDeleting = tasks.filter(
-          (oldTask) => !data.some((newTask) => oldTask._id === newTask._id)
-        );
-        for (const task of TasksForDeleting) {
-          await deleteFile(NameFolder.Tasks + task._id);
-          dispatch(deleteDataTasksCopy(task));
-          dispatch(deleteTasksInTask(task));
+        try {
+          const TasksForDeleting = tasks.filter(
+            (oldTask) => !data.some((newTask) => oldTask._id === newTask._id)
+          );
+          for (const task of TasksForDeleting) {
+            await deleteFile(NameFolder.Tasks + task._id);
+            dispatch(deleteDataTasksCopy(task));
+            dispatch(deleteTasksInTask(task));
+          }
+          dispatch(setTasks(data));
+        } catch {
+          onErrorToast(ErrorMessage.DeleteFile);
         }
-        dispatch(setTasks(data));
       }
     }
   };

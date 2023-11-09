@@ -22,8 +22,9 @@ import {
   getTrackerTaskNotifications,
 } from "../../store/notificationsSelectors";
 import { useNotifee } from "../../hooks/useNotifee";
-import { NAME_FILE_JSON } from "../../const";
+import { ErrorMessage, NAME_FILE_JSON, SuccessMessage } from "../../const";
 import { useFileSystem } from "../../hooks/useFileSystem";
+import { useToastCustom } from "../../hooks/useToastCustom";
 
 export function ImportAndExport() {
   const likes = useAppSelector(getAllLikes);
@@ -41,42 +42,69 @@ export function ImportAndExport() {
     onCreateTriggerNotificationForTrackersMeditation,
     onCreateTriggerNotificationForTrackersTask,
   } = useNotifee();
+  const { onErrorToast, onSuccessToast } = useToastCustom();
 
   const exportFile = async () => {
-    const data = { likes, notes, trackers };
+    try {
+      const data = { likes, notes, trackers };
 
-    await exportFileJSON(data);
+      await exportFileJSON(data);
+      onSuccessToast(SuccessMessage.Export);
+    } catch {
+      onErrorToast(ErrorMessage.Export);
+    }
   };
 
   const importFile = async () => {
-    const parsedData = await importFileJSON();
+    try {
+      const parsedData = await importFileJSON();
 
-    if (
-      JSON.stringify(parsedData.likes) !== JSON.stringify({}) ||
-      parsedData.notes.length !== 0 ||
-      JSON.stringify(parsedData.trackers) !== JSON.stringify({})
-    ) {
-      dispatch(setLikes(parsedData.likes));
-      dispatch(setNotes(parsedData.notes));
-      dispatch(setTrackers(parsedData.trackers));
+      if (
+        JSON.stringify(parsedData.likes) !== JSON.stringify({}) ||
+        parsedData.notes.length !== 0 ||
+        JSON.stringify(parsedData.trackers) !== JSON.stringify({})
+      ) {
+        dispatch(setLikes(parsedData.likes));
+        dispatch(setNotes(parsedData.notes));
+        dispatch(setTrackers(parsedData.trackers));
+      }
+      onSuccessToast(SuccessMessage.Import);
+    } catch {
+      onErrorToast(ErrorMessage.Import);
+    }
+  };
+
+  const onCreateTriggerNotificationForTrackersMeditationAsync = async () => {
+    try {
+      await onCreateTriggerNotificationForTrackersMeditation(
+        trackerMeditationNotifications.hours,
+        trackerMeditationNotifications.minutes
+      );
+    } catch {
+      onErrorToast(ErrorMessage.CreateNotification);
+    }
+  };
+
+  const onCreateTriggerNotificationForTrackersTaskAsync = async () => {
+    try {
+      await onCreateTriggerNotificationForTrackersTask(
+        trackerTaskNotifications.hours,
+        trackerTaskNotifications.minutes
+      );
+    } catch {
+      onErrorToast(ErrorMessage.CreateNotification);
     }
   };
 
   useEffect(() => {
     if (trackersMeditation && trackerMeditationNotifications.enable) {
-      onCreateTriggerNotificationForTrackersMeditation(
-        trackerMeditationNotifications.hours,
-        trackerMeditationNotifications.minutes
-      );
+      onCreateTriggerNotificationForTrackersMeditationAsync();
     }
   }, [trackersMeditation]);
 
   useEffect(() => {
     if (trackersTask && trackerTaskNotifications.enable) {
-      onCreateTriggerNotificationForTrackersTask(
-        trackerTaskNotifications.hours,
-        trackerTaskNotifications.minutes
-      );
+      onCreateTriggerNotificationForTrackersTaskAsync();
     }
   }, [trackersTask]);
 
@@ -87,8 +115,7 @@ export function ImportAndExport() {
           <TextTitle>Импорт/экспорт</TextTitle>
         </HeaderWithBack>
         <TextInfo>
-          {`Экспортируются только избранные медитации и задания, трекеры медитаций
-          и заданий, и ежедневник. Файл будет иметь такой вид: "${NAME_FILE_JSON}"`}
+          {`Экспортируются только избранные медитации и задания, трекеры медитаций и заданий, и ежедневник. Файл будет иметь такой вид: "${NAME_FILE_JSON}"`}
         </TextInfo>
         <ButtonContainer>
           <TouchableHighlight onPress={exportFile}>Экспорт</TouchableHighlight>

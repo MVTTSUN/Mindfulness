@@ -39,9 +39,9 @@ module.exports = async (req, _, next) => {
                             statisticItemCopy[i].years[j].months[k].month === new Date().getMonth()
                           ) {
                             statisticItemCopy[i].years[j].months[k].count += 1;
-                            if (platform === 'windows') {
+                            if (platform === 'android') {
                               statisticItemCopy[i].years[j].months[k].android += 1;
-                            } else {
+                            } else if (platform === 'ios') {
                               statisticItemCopy[i].years[j].months[k].ios += 1;
                             }
 

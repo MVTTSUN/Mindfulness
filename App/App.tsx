@@ -4,7 +4,7 @@ import { memo, useCallback, useEffect } from "react";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { ThemeProvider, styled } from "styled-components/native";
-import { Color, DARK_THEME, LIGHT_THEME, Theme } from "./const";
+import { Color, DARK_THEME, ErrorMessage, LIGHT_THEME, Theme } from "./const";
 import { useAppSelector } from "./hooks/useAppSelector";
 import { TabNavigator } from "./components/TabNavigator";
 import TrackPlayer, {
@@ -17,6 +17,7 @@ import { setIsInitializedPlayer } from "./store/trackPlayerSlice";
 import { ToastProvider } from "react-native-toast-notifications";
 import { normalize } from "./utils";
 import { getValueTheme } from "./store/themeSelectors";
+import { useToastCustom } from "./hooks/useToastCustom";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -29,10 +30,15 @@ export const App = memo(() => {
     "Poppins-Medium": require("./assets/fonts/Poppins-Medium.ttf"),
     "Poppins-SemiBold": require("./assets/fonts/Poppins-SemiBold.ttf"),
   });
+  const { onErrorToast } = useToastCustom();
 
   const onLayoutRootView = useCallback(async () => {
     if (fontsLoaded) {
-      await SplashScreen.hideAsync();
+      try {
+        await SplashScreen.hideAsync();
+      } catch {
+        onErrorToast(ErrorMessage.HideSplash);
+      }
     }
   }, [fontsLoaded]);
 
@@ -56,8 +62,8 @@ export const App = memo(() => {
         ],
       });
       dispatch(setIsInitializedPlayer(true));
-    } catch (err) {
-      console.log(err);
+    } catch {
+      onErrorToast(ErrorMessage.IntializePlayer);
     }
   };
 

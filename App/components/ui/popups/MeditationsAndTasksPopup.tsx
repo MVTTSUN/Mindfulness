@@ -25,7 +25,8 @@ import {
   setTasks,
 } from "../../../store/tasksSlice";
 import { getIsOffline } from "../../../store/offlineSelectors";
-import { Color, NameFolder } from "../../../const";
+import { Color, ErrorMessage, NameFolder } from "../../../const";
+import { useToastCustom } from "../../../hooks/useToastCustom";
 
 type MeditationsAndTasksPopupProps = {
   nameNote: string;
@@ -50,24 +51,29 @@ export function MeditationsAndTasksPopup(props: MeditationsAndTasksPopupProps) {
   const [getMeditationsQuery] = useLazyGetMeditationsQuery();
   const [getTasksQuery] = useLazyGetTasksQuery();
   const { deleteFile } = useFileSystem();
+  const { onErrorToast } = useToastCustom();
 
   const loadingData = async () => {
     const { data: dataMeditations } = await getMeditationsQuery();
 
     if (dataMeditations) {
       if (!deepEqual(meditations, dataMeditations)) {
-        const MeditationsForDeleting = meditations.filter(
-          (oldMeditation) =>
-            !dataMeditations.some(
-              (newMeditation) => oldMeditation._id === newMeditation._id
-            )
-        );
-        for (const meditation of MeditationsForDeleting) {
-          await deleteFile(NameFolder.Meditations + `/${meditation._id}`);
-          dispatch(deleteDataMeditationsCopy(meditation));
-          dispatch(deleteMeditationsInMeditation(meditation));
+        try {
+          const MeditationsForDeleting = meditations.filter(
+            (oldMeditation) =>
+              !dataMeditations.some(
+                (newMeditation) => oldMeditation._id === newMeditation._id
+              )
+          );
+          for (const meditation of MeditationsForDeleting) {
+            await deleteFile(NameFolder.Meditations + `/${meditation._id}`);
+            dispatch(deleteDataMeditationsCopy(meditation));
+            dispatch(deleteMeditationsInMeditation(meditation));
+          }
+          dispatch(setMeditations(dataMeditations));
+        } catch {
+          onErrorToast(ErrorMessage.DeleteFile);
         }
-        dispatch(setMeditations(dataMeditations));
       }
     }
 
@@ -75,15 +81,19 @@ export function MeditationsAndTasksPopup(props: MeditationsAndTasksPopupProps) {
 
     if (dataTasks) {
       if (!deepEqual(tasks, dataTasks)) {
-        const TasksForDeleting = tasks.filter(
-          (oldTask) => !dataTasks.some((newTask) => oldTask._id === newTask._id)
-        );
-        for (const task of TasksForDeleting) {
-          await deleteFile(NameFolder.Tasks + `/${task._id}`);
-          dispatch(deleteDataTasksCopy(task));
-          dispatch(deleteTasksInTask(task));
+        try {
+          const TasksForDeleting = tasks.filter(
+            (oldTask) => !dataTasks.some((newTask) => oldTask._id === newTask._id)
+          );
+          for (const task of TasksForDeleting) {
+            await deleteFile(NameFolder.Tasks + `/${task._id}`);
+            dispatch(deleteDataTasksCopy(task));
+            dispatch(deleteTasksInTask(task));
+          }
+          dispatch(setTasks(dataTasks));
+        } catch {
+          onErrorToast(ErrorMessage.DeleteFile);
         }
-        dispatch(setTasks(dataTasks));
       }
     }
   };

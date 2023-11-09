@@ -4,7 +4,13 @@ import { GlobalScreen } from "../../components/GlobalScreenWrapper";
 import { HeaderWithBack } from "../../components/ui/headers/HeaderWithBack";
 import { ScrollView } from "react-native";
 import LottieView from "lottie-react-native";
-import { ApiRoute, BASE_URL, Color, NameFolder } from "../../const";
+import {
+  ApiRoute,
+  BASE_URL,
+  Color,
+  ErrorMessage,
+  NameFolder,
+} from "../../const";
 import { useEffect } from "react";
 import { useLazyGetTipsLottieQuery, useLazyGetTipsQuery } from "../../api/api";
 import { useFileSystem } from "../../hooks/useFileSystem";
@@ -15,6 +21,7 @@ import { setDataTipsCopy, setTips } from "../../store/tipsSlice";
 import deepEqual from "deep-equal";
 import { normalize } from "../../utils";
 import { getIsOffline } from "../../store/offlineSelectors";
+import { useToastCustom } from "../../hooks/useToastCustom";
 
 export function Tips() {
   const tips = useAppSelector(getTips);
@@ -31,45 +38,53 @@ export function Tips() {
     downloadJSON,
     readJSON,
   } = useFileSystem();
+  const { onErrorToast } = useToastCustom();
 
   const downloadData = async () => {
     const { data } = await getTipsQuery();
 
     if (data) {
       if (!deepEqual(dataTipsCopy, data[0]?.data)) {
-        await deleteFile(NameFolder.Tips);
-        await createDirectory(NameFolder.Tips);
-        const result = [];
-        for (const node of data[0]?.data) {
-          if (node.type === "image") {
-            const uri = await download(
-              BASE_URL + ApiRoute.Tips + ApiRoute.Filename + `/${node.payload}`,
-              NameFolder.Tips,
-              node.payload
-            );
-            result.push({ type: node.type, payload: uri, id: node._id });
-          } else if (node.type === "lottie") {
-            const response = await getTipsLottieQuery(node.payload);
-            response.data &&
-              (await downloadJSON(
+        try {
+          await deleteFile(NameFolder.Tips);
+          await createDirectory(NameFolder.Tips);
+          const result = [];
+          for (const node of data[0]?.data) {
+            if (node.type === "image") {
+              const uri = await download(
+                BASE_URL +
+                  ApiRoute.Tips +
+                  ApiRoute.Filename +
+                  `/${node.payload}`,
                 NameFolder.Tips,
-                node.payload,
-                response.data
-              ));
-            const jsonObj = (await readJSON(
-              getFilePath(NameFolder.Tips, node.payload)
-            )) as string;
-            result.push({ type: node.type, payload: jsonObj, id: node._id });
-          } else {
-            result.push({
-              type: node.type,
-              payload: node.payload,
-              id: node._id,
-            });
+                node.payload
+              );
+              result.push({ type: node.type, payload: uri, id: node._id });
+            } else if (node.type === "lottie") {
+              const response = await getTipsLottieQuery(node.payload);
+              response.data &&
+                (await downloadJSON(
+                  NameFolder.Tips,
+                  node.payload,
+                  response.data
+                ));
+              const jsonObj = (await readJSON(
+                getFilePath(NameFolder.Tips, node.payload)
+              )) as string;
+              result.push({ type: node.type, payload: jsonObj, id: node._id });
+            } else {
+              result.push({
+                type: node.type,
+                payload: node.payload,
+                id: node._id,
+              });
+            }
           }
+          dispatch(setTips(result));
+          dispatch(setDataTipsCopy(data[0]?.data));
+        } catch {
+          onErrorToast(ErrorMessage.DownloadFile);
         }
-        dispatch(setTips(result));
-        dispatch(setDataTipsCopy(data[0]?.data));
       }
     }
   };

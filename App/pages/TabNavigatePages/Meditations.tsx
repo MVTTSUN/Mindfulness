@@ -9,7 +9,12 @@ import { CenterContainer } from "../../components/CenterContainer";
 import { Title } from "../../components/ui/titles/Title";
 import { Input } from "../../components/ui/inputs/Input";
 import { Select } from "../../components/ui/inputs/Select";
-import { AppRoute, Color, OPTIONS_DATA_MEDITATIONS } from "../../const";
+import {
+  AppRoute,
+  Color,
+  ErrorMessage,
+  OPTIONS_DATA_MEDITATIONS,
+} from "../../const";
 import { Subtitle } from "../../components/ui/titles/Subtitle";
 import { CardListMeditation } from "../../components/ui/lists/CardListMeditation";
 import { useAppDispatch } from "../../hooks/useAppDispatch";
@@ -44,6 +49,7 @@ import {
   getIsLikeMeditations,
   getSearchMeditations,
 } from "../../store/meditationsSelectors";
+import { useToastCustom } from "../../hooks/useToastCustom";
 
 export function Meditations() {
   const route = useRoute();
@@ -54,6 +60,7 @@ export function Meditations() {
   const searchMeditations = useAppSelector(getSearchMeditations);
   const dispatch = useAppDispatch();
   const playbackState = usePlaybackState();
+  const { onErrorToast } = useToastCustom();
   const borderRadius = useSharedValue(normalize(20));
   const rotate = useSharedValue(0);
   const playButtonStyle = useAnimatedStyle(() => ({
@@ -99,15 +106,19 @@ export function Meditations() {
   };
 
   const toggleAudio = async () => {
-    if (playbackState === State.Stopped && lastMeditation !== null) {
-      await TrackPlayer.reset();
-      await TrackPlayer.add([lastMeditation]);
-      await TrackPlayer.play();
-    }
-    if (playbackState === State.Paused || playbackState === State.Ready) {
-      await TrackPlayer.play();
-    } else if (playbackState === State.Playing) {
-      await TrackPlayer.pause();
+    try {
+      if (playbackState === State.Stopped && lastMeditation !== null) {
+        await TrackPlayer.reset();
+        await TrackPlayer.add([lastMeditation]);
+        await TrackPlayer.play();
+      }
+      if (playbackState === State.Paused || playbackState === State.Ready) {
+        await TrackPlayer.play();
+      } else if (playbackState === State.Playing) {
+        await TrackPlayer.pause();
+      }
+    } catch {
+      onErrorToast(ErrorMessage.Player);
     }
   };
 
@@ -162,7 +173,7 @@ export function Meditations() {
             underlayColor={Color.MeditationPressed}
           >
             <Animated.View style={likeStyle}>
-              <LikeIcon color={Color.Meditation} isActive={isLikeMeditations} />
+              <LikeIcon color={Color.TextWhite} isActive={isLikeMeditations} />
             </Animated.View>
           </FavoritesButton>
           <FavoritesButton
@@ -171,7 +182,7 @@ export function Meditations() {
           >
             <Animated.View style={downloadStyle}>
               <ProgressCircle
-                color={Color.Meditation}
+                color={Color.TextWhite}
                 isActive={isDownloadMeditations}
               />
             </Animated.View>

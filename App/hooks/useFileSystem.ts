@@ -7,7 +7,7 @@ import { Platform } from 'react-native';
 import { NAME_FILE_JSON, PlatformEnum } from '../const';
 import { shareAsync } from 'expo-sharing';
 
-const useFileSystem = () => {
+export const useFileSystem = () => {
   const [downloadProgress, setDownloadProgress] = useState(0);
 
   const exportFileJSON = async (data: ExportJSONData) => {
@@ -56,59 +56,39 @@ const useFileSystem = () => {
   };
 
   const createDirectory = async (nameDirectory: string) => {
-    try {
-      const dirInfo = await FileSystem.getInfoAsync(FileSystem.documentDirectory + `${nameDirectory}/`);
+    const dirInfo = await FileSystem.getInfoAsync(FileSystem.documentDirectory + `${nameDirectory}/`);
 
-      if (!dirInfo.exists) {
-        await FileSystem.makeDirectoryAsync(FileSystem.documentDirectory + `${nameDirectory}/`, { intermediates: true });
-      }
-    } catch (e) {
-      console.error("Couldn't create directory:", e);
+    if (!dirInfo.exists) {
+      await FileSystem.makeDirectoryAsync(FileSystem.documentDirectory + `${nameDirectory}/`, { intermediates: true });
     }
   };
 
   const getTotalCapacity = async () => {
-    try {
-      const total = await FileSystem.getTotalDiskCapacityAsync();
+    const total = await FileSystem.getTotalDiskCapacityAsync();
 
-      return total;
-    } catch (e) {
-      console.error("Couldn't get total capacity:", e);
-    }
+    return total;
   };
 
   const getFreeCapacity = async () => {
-    try {
-      const free = await FileSystem.getFreeDiskStorageAsync();
+    const free = await FileSystem.getFreeDiskStorageAsync();
 
-      return free;
-    } catch (e) {
-      console.error("Couldn't get free capacity:", e);
-    }
+    return free;
   };
 
   const getDownloadCapacityMeditations = async (meditations: MeditationPlayer[]) => {
-    try {
-      let totalSizeMeditations = 0;
+    let totalSizeMeditations = 0;
 
-      for (const meditation of meditations) {
-        const { size } = await FileSystem.getInfoAsync(meditation.url) as { size: number };
-        totalSizeMeditations += size;
-      }
-
-      return totalSizeMeditations;
-    } catch (e) {
-      console.error("Couldn't get download capacity:", e);
+    for (const meditation of meditations) {
+      const { size } = await FileSystem.getInfoAsync(meditation.url) as { size: number };
+      totalSizeMeditations += size;
     }
+
+    return totalSizeMeditations;
   };
 
   const deleteAllMeditations = async (meditations: MeditationPlayer[]) => {
-    try {
-      for (const meditation of meditations) {
-        await FileSystem.deleteAsync(meditation.url);
-      }
-    } catch (e) {
-      console.error("Couldn't delete all meditations:", e);
+    for (const meditation of meditations) {
+      await FileSystem.deleteAsync(meditation.url);
     }
   };
 
@@ -139,35 +119,23 @@ const useFileSystem = () => {
   };
 
   const download = async (urlFile: string, nameDirectory: string, nameWithExtension: string) => {
-    try {
-      const { uri } = await downloadResumable(urlFile, nameDirectory, nameWithExtension).downloadAsync() as FileSystem.FileSystemDownloadResult;
+    const { uri } = await downloadResumable(urlFile, nameDirectory, nameWithExtension).downloadAsync() as FileSystem.FileSystemDownloadResult;
 
-      return uri;
-    } catch (e) {
-      console.error(e);
-    }
+    return uri;
   };
 
   const downloadJSON = async (nameDirectory: string, nameWithExtension: string, data: Object) => {
-    try {
-      await FileSystem.writeAsStringAsync(FileSystem.documentDirectory + `${nameDirectory}/` + nameWithExtension, JSON.stringify(data), {
-        encoding: FileSystem.EncodingType.UTF8,
-      });
-    } catch (e) {
-      console.error(e);
-    }
+    await FileSystem.writeAsStringAsync(FileSystem.documentDirectory + `${nameDirectory}/` + nameWithExtension, JSON.stringify(data), {
+      encoding: FileSystem.EncodingType.UTF8,
+    });
   };
 
   const readJSON = async (path: string) => {
-    try {
-      const data = await FileSystem.readAsStringAsync(path, {
-        encoding: FileSystem.EncodingType.UTF8,
-      });
+    const data = await FileSystem.readAsStringAsync(path, {
+      encoding: FileSystem.EncodingType.UTF8,
+    });
 
-      return data;
-    } catch (err) {
-      console.error(err);
-    }
+    return data;
   };
 
   return {
@@ -186,5 +154,3 @@ const useFileSystem = () => {
     importFileJSON,
   };
 };
-
-export { useFileSystem };

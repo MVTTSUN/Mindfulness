@@ -27,7 +27,8 @@ import {
   setSearchMeditations,
 } from "../../../store/meditationsSlice";
 import { getIsOffline } from "../../../store/offlineSelectors";
-import { AppRoute, Color, NameFolder } from "../../../const";
+import { AppRoute, Color, ErrorMessage, NameFolder } from "../../../const";
+import { useToastCustom } from "../../../hooks/useToastCustom";
 
 type CardListMeditationProps = {
   count: number;
@@ -43,6 +44,7 @@ export function CardListMeditation(props: CardListMeditationProps) {
   const dispatch = useAppDispatch();
   const [getMeditationsQuery] = useLazyGetMeditationsQuery();
   const { deleteFile } = useFileSystem();
+  const { onErrorToast } = useToastCustom();
 
   const seeAll = () => {
     dispatch(setCountMeditations(meditations.length));
@@ -56,18 +58,22 @@ export function CardListMeditation(props: CardListMeditationProps) {
 
     if (data) {
       if (!deepEqual(meditations, data)) {
-        const MeditationsForDeleting = meditations.filter(
-          (oldMeditation) =>
-            !data.some(
-              (newMeditation) => oldMeditation._id === newMeditation._id
-            )
-        );
-        for (const meditation of MeditationsForDeleting) {
-          await deleteFile(NameFolder.Meditations + meditation._id);
-          dispatch(deleteDataMeditationsCopy(meditation));
-          dispatch(deleteMeditationsInMeditation(meditation));
+        try {
+          const MeditationsForDeleting = meditations.filter(
+            (oldMeditation) =>
+              !data.some(
+                (newMeditation) => oldMeditation._id === newMeditation._id
+              )
+          );
+          for (const meditation of MeditationsForDeleting) {
+            await deleteFile(NameFolder.Meditations + meditation._id);
+            dispatch(deleteDataMeditationsCopy(meditation));
+            dispatch(deleteMeditationsInMeditation(meditation));
+          }
+          dispatch(setMeditations(data));
+        } catch {
+          onErrorToast(ErrorMessage.DeleteFile);
         }
-        dispatch(setMeditations(data));
       }
     }
   };

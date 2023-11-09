@@ -11,8 +11,16 @@ import {
 import { Pressable, ScrollView } from "react-native";
 import { AddIcon } from "../../components/svg/icons/other-icons/AddIcon";
 import LottieView from "lottie-react-native";
-import { ApiRoute, AppRoute, BASE_URL, Color, NameFolder, Theme } from "../../const";
-import { useEffect, useState } from "react";
+import {
+  ApiRoute,
+  AppRoute,
+  BASE_URL,
+  Color,
+  ErrorMessage,
+  NameFolder,
+  Theme,
+} from "../../const";
+import { useEffect } from "react";
 import { LikeIcon } from "../../components/svg/icons/other-icons/LikeIcon";
 import { useAppSelector } from "../../hooks/useAppSelector";
 import { useAppDispatch } from "../../hooks/useAppDispatch";
@@ -29,17 +37,17 @@ import { getDataTaskCopy, getTaskInTask } from "../../store/tasksSelectors";
 import { useFileSystem } from "../../hooks/useFileSystem";
 import { normalize } from "../../utils";
 import { setTasksInTask, setDataTasksCopy } from "../../store/tasksSlice";
-import { getLikesTask } from "../../store/likesSelectors";
+import { getIsLikeTask} from "../../store/likesSelectors";
 import { getIsOffline } from "../../store/offlineSelectors";
 import { Tracker } from "../../components/ui/Tracker";
+import { useToastCustom } from "../../hooks/useToastCustom";
 
 export function Task() {
-  const [isActive, setIsActive] = useState(false);
   const route = useRoute();
   const { taskId } = route.params as { taskId: string };
   const navigation = useNavigation<NotesScreenProp & TasksScreenProp>();
   const theme = useAppSelector((state) => state.theme.value);
-  const likes = useAppSelector(getLikesTask);
+  const isLike = useAppSelector(getIsLikeTask(taskId));
   const dataTaskCopy = useAppSelector(getDataTaskCopy(taskId));
   const task = useAppSelector(getTaskInTask(taskId));
   const isOffline = useAppSelector(getIsOffline);
@@ -54,6 +62,7 @@ export function Task() {
     downloadJSON,
     readJSON,
   } = useFileSystem();
+  const { onErrorToast } = useToastCustom();
   const scaleLike = useSharedValue(1);
   const likeStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scaleLike.value }],
@@ -65,7 +74,7 @@ export function Task() {
       withSpring(1.2),
       withSpring(1)
     );
-    if (isActive) {
+    if (isLike) {
       dispatch(removeTaskLike(task._id));
     } else {
       dispatch(addTaskLike(task._id));
@@ -77,62 +86,62 @@ export function Task() {
 
     if (data) {
       if (!deepEqual(data, dataTaskCopy)) {
-        await deleteFile(NameFolder.Tasks + `/${taskId}`);
-        await createDirectory(NameFolder.Tasks + `/${taskId}`);
-        const result = {} as DataTextLottieImage;
-        result.data = [];
-        result.kind = data.kind;
-        result.title = data.title;
-        result._id = data._id;
-        for (const node of data?.data) {
-          if (node.type === "image") {
-            const uri = await download(
-              BASE_URL +
-                ApiRoute.Tasks +
-                ApiRoute.Filename +
-                `/${node.payload}`,
-              NameFolder.Tasks + `/${taskId}`,
-              node.payload
-            );
-            uri &&
+        try {
+          await deleteFile(NameFolder.Tasks + `/${taskId}`);
+          await createDirectory(NameFolder.Tasks + `/${taskId}`);
+          const result = {} as DataTextLottieImage;
+          result.data = [];
+          result.kind = data.kind;
+          result.title = data.title;
+          result._id = data._id;
+          for (const node of data?.data) {
+            if (node.type === "image") {
+              const uri = await download(
+                BASE_URL +
+                  ApiRoute.Tasks +
+                  ApiRoute.Filename +
+                  `/${node.payload}`,
+                NameFolder.Tasks + `/${taskId}`,
+                node.payload
+              );
+              uri &&
+                result.data.push({
+                  type: node.type,
+                  payload: uri,
+                  _id: node._id,
+                });
+            } else if (node.type === "lottie") {
+              const response = await getTaskLottieQuery(node.payload);
+              response.data &&
+                (await downloadJSON(
+                  NameFolder.Tasks + `/${taskId}`,
+                  node.payload,
+                  response.data
+                ));
+              const jsonObj = (await readJSON(
+                getFilePath(NameFolder.Tasks + `/${taskId}`, node.payload)
+              )) as string;
               result.data.push({
                 type: node.type,
-                payload: uri,
+                payload: jsonObj,
                 _id: node._id,
               });
-          } else if (node.type === "lottie") {
-            const response = await getTaskLottieQuery(node.payload);
-            response.data &&
-              (await downloadJSON(
-                NameFolder.Tasks + `/${taskId}`,
-                node.payload,
-                response.data
-              ));
-            const jsonObj = (await readJSON(
-              getFilePath(NameFolder.Tasks + `/${taskId}`, node.payload)
-            )) as string;
-            result.data.push({
-              type: node.type,
-              payload: jsonObj,
-              _id: node._id,
-            });
-          } else {
-            result.data.push({
-              type: node.type,
-              payload: node.payload,
-              _id: node._id,
-            });
+            } else {
+              result.data.push({
+                type: node.type,
+                payload: node.payload,
+                _id: node._id,
+              });
+            }
           }
+          dispatch(setTasksInTask(result));
+          dispatch(setDataTasksCopy(data));
+        } catch {
+          onErrorToast(ErrorMessage.DownloadFile);
         }
-        dispatch(setTasksInTask(result));
-        dispatch(setDataTasksCopy(data));
       }
     }
   };
-
-  useEffect(() => {
-    task && setIsActive(likes.some((like) => like.id === task._id));
-  }, [likes, task]);
 
   useEffect(() => {
     if (!isOffline) {
@@ -151,8 +160,10 @@ export function Task() {
                 style={[{ backgroundColor: "transparent" }, likeStyle]}
               >
                 <LikeIcon
-                  color={theme === Theme.Light ? Color.TextStandard : Color.TextWhite}
-                  isActive={isActive}
+                  color={
+                    theme === Theme.Light ? Color.TextStandard : Color.TextWhite
+                  }
+                  isActive={isLike}
                 />
               </Animated.View>
             </Pressable>

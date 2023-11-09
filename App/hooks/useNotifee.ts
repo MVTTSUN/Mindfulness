@@ -9,7 +9,7 @@ import notifee, {
 import { useAppSelector } from './useAppSelector';
 import { getDaysInShouldNotificationMeditation, getDaysInShouldNotificationTask, getTrackersMeditation, getTrackersTask } from '../store/trackerSelectors';
 
-export function useNotifee() {
+export const useNotifee = () => {
   const trackersMeditation = useAppSelector(getTrackersMeditation);
   const trackersTask = useAppSelector(getTrackersTask);
   const daysInShouldNotificationMeditation = useAppSelector(getDaysInShouldNotificationMeditation);

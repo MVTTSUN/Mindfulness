@@ -9,6 +9,8 @@ import { useCallback, useEffect, useState } from "react";
 import { normalize } from "../../utils";
 import { useFrameInterval } from "../../hooks/useFrameInterval";
 import { MeditationPlayer } from "../../types";
+import { useToastCustom } from "../../hooks/useToastCustom";
+import { ErrorMessage } from "../../const";
 
 export function Text() {
   const [position, setPosition] = useState(0);
@@ -16,21 +18,35 @@ export function Text() {
   const route = useRoute();
   const { meditation } = route.params as { meditation: MeditationPlayer };
   const playbackState = usePlaybackState();
+  const { onErrorToast } = useToastCustom();
   const { startAnimating, stopAnimating } = useFrameInterval(100, async () => {
-    const position = await TrackPlayer.getPosition();
-    setPosition(position);
+    try {
+      const position = await TrackPlayer.getPosition();
+      setPosition(position);
+    } catch {
+      onErrorToast(ErrorMessage.PositionTrack);
+    }
   });
 
   const changePosition = async (time: string) => {
-    await TrackPlayer.seekTo(Number(time));
+    try {
+      await TrackPlayer.seekTo(Number(time));
+    } catch {
+      onErrorToast(ErrorMessage.SeekTrack);
+    }
   };
 
   const currentAudio = async () => {
-    const currentAudio = await TrackPlayer.getTrack(0);
-    if (currentAudio?.id === meditation.id) {
-      setIsCurrentAudio(true);
-    } else {
-      setIsCurrentAudio(false);
+    try {
+      const currentAudio = await TrackPlayer.getTrack(0);
+
+      if (currentAudio?.id === meditation.id) {
+        setIsCurrentAudio(true);
+      } else {
+        setIsCurrentAudio(false);
+      }
+    } catch {
+      onErrorToast(ErrorMessage.Player);
     }
   };
 

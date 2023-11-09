@@ -27,6 +27,8 @@ import {
 import { TouchableHighlight } from "./touchables/TouchableHighlight";
 import { useNotifee } from "../../hooks/useNotifee";
 import { normalize } from "../../utils";
+import { useToastCustom } from "../../hooks/useToastCustom";
+import { ErrorMessage } from '../../const';
 
 type TimeNotificationProps = {
   notification: Notification;
@@ -46,6 +48,7 @@ export const TimeNotification = memo((props: TimeNotificationProps) => {
     onCreateTriggerNotificationForTrackersMeditation,
     onCreateTriggerNotificationForTrackersTask,
   } = useNotifee();
+  const { onErrorToast } = useToastCustom();
   const heightSelectTime = useSharedValue(0);
   const styleSelectTimeContainer = useAnimatedStyle(() => ({
     height: heightSelectTime.value,
@@ -120,9 +123,17 @@ export const TimeNotification = memo((props: TimeNotificationProps) => {
 
   const createOrCancelNotification = async () => {
     if (enable) {
-      await createTriggerNotificationAsync();
+      try {
+        await createTriggerNotificationAsync();
+      } catch (error) {
+        onErrorToast(ErrorMessage.CreateNotification);
+      }
     } else {
-      await cancelNotificationAsync();
+      try {
+        await cancelNotificationAsync();
+      } catch (error) {
+        onErrorToast(ErrorMessage.DeleteNotification);
+      }
     }
   };
 

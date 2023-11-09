@@ -4,7 +4,7 @@ import { GlobalScreen } from "../../components/GlobalScreenWrapper";
 import { HeaderWithBack } from "../../components/ui/headers/HeaderWithBack";
 import { bytesFormatTo, normalize } from "../../utils";
 import { useFileSystem } from "../../hooks/useFileSystem";
-import { ApiRoute, BASE_URL, Color } from "../../const";
+import { ApiRoute, BASE_URL, Color, ErrorMessage, SuccessMessage } from "../../const";
 import { useEffect, useState } from "react";
 import Animated, {
   useAnimatedStyle,
@@ -18,6 +18,7 @@ import { useAppDispatch } from "../../hooks/useAppDispatch";
 import { clearDownloadAudio } from "../../store/downloadAudioSlice";
 import { MeditationPlayer } from "../../types";
 import { setMeditationsInMeditation } from "../../store/meditationsSlice";
+import { useToastCustom } from "../../hooks/useToastCustom";
 
 export function Storage() {
   const [totalCapacityState, setTotalCapacityState] = useState<
@@ -37,6 +38,7 @@ export function Storage() {
     getDownloadCapacityMeditations,
     deleteAllMeditations,
   } = useFileSystem();
+  const { onErrorToast, onSuccessToast } = useToastCustom();
   const sizeWithoutAudio = useSharedValue(0);
   const lineWithoutAudio = useAnimatedStyle(() => ({
     width: `${sizeWithoutAudio.value}%`,
@@ -61,57 +63,70 @@ export function Storage() {
   };
 
   const setSizeLineBarWithoutAudio = async () => {
-    const meditationsCapacity = await getDownloadCapacityMeditations(
-      downloadMeditations
-    );
-    const totalCapacity = await getTotalCapacityInState();
-    const freeCapacity = await getFreeCapacityInState();
-
-    if (totalCapacity && freeCapacity && meditationsCapacity !== undefined) {
-      sizeWithoutAudio.value = withTiming(
-        (totalCapacity - freeCapacity - meditationsCapacity) /
-          (totalCapacity / 100),
-        { duration: 500 }
+    try {
+      const meditationsCapacity = await getDownloadCapacityMeditations(
+        downloadMeditations
       );
+      const totalCapacity = await getTotalCapacityInState();
+      const freeCapacity = await getFreeCapacityInState();
+
+      if (totalCapacity && freeCapacity && meditationsCapacity !== undefined) {
+        sizeWithoutAudio.value = withTiming(
+          (totalCapacity - freeCapacity - meditationsCapacity) /
+            (totalCapacity / 100),
+          { duration: 500 }
+        );
+      }
+    } catch {
+      onErrorToast(ErrorMessage.CapacityWithoutAudios);
     }
   };
 
   const getAudiosCapacityInState = async () => {
-    const meditationsCapacity = await getDownloadCapacityMeditations(
-      downloadMeditations
-    );
-    const totalCapacity = await getTotalCapacityInState();
-
-    setMeditationsCapacityState(meditationsCapacity);
-
-    if (meditationsCapacity !== undefined && totalCapacity) {
-      sizeAudio.value = withTiming(
-        meditationsCapacity / (totalCapacity / 100),
-        { duration: 500 }
+    try {
+      const meditationsCapacity = await getDownloadCapacityMeditations(
+        downloadMeditations
       );
+      const totalCapacity = await getTotalCapacityInState();
+
+      setMeditationsCapacityState(meditationsCapacity);
+
+      if (meditationsCapacity !== undefined && totalCapacity) {
+        sizeAudio.value = withTiming(
+          meditationsCapacity / (totalCapacity / 100),
+          { duration: 500 }
+        );
+      }
+    } catch {
+      onErrorToast(ErrorMessage.CapacityAudios);
     }
   };
 
   const deleteMeditations = async () => {
-    const downloadMeditationsCopy = JSON.parse(
-      JSON.stringify(downloadMeditations)
-    ) as MeditationPlayer[];
-    await deleteAllMeditations(downloadMeditations);
-    for (const meditation of downloadMeditationsCopy) {
-      const fileName =
-        meditation.url.split("/")[meditation.url.split("/").length - 1];
-      dispatch(
-        setMeditationsInMeditation({
-          ...meditation,
-          url:
-            BASE_URL +
-            ApiRoute.Meditations +
-            ApiRoute.Filename +
-            `/${fileName}`,
-        })
-      );
+    try {
+      const downloadMeditationsCopy = JSON.parse(
+        JSON.stringify(downloadMeditations)
+      ) as MeditationPlayer[];
+      await deleteAllMeditations(downloadMeditations);
+      for (const meditation of downloadMeditationsCopy) {
+        const fileName =
+          meditation.url.split("/")[meditation.url.split("/").length - 1];
+        dispatch(
+          setMeditationsInMeditation({
+            ...meditation,
+            url:
+              BASE_URL +
+              ApiRoute.Meditations +
+              ApiRoute.Filename +
+              `/${fileName}`,
+          })
+        );
+      }
+      dispatch(clearDownloadAudio());
+      onSuccessToast(SuccessMessage.DeleteAllMeditations);
+    } catch {
+      onErrorToast(ErrorMessage.DeleteFile);
     }
-    dispatch(clearDownloadAudio());
   };
 
   useEffect(() => {

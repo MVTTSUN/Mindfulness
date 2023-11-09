@@ -71,7 +71,7 @@ export function Tasks() {
             underlayColor={Color.TaskPressed}
           >
             <Animated.View style={likeStyle}>
-              <LikeIcon color={Color.Task} isActive={isLikeTasks} />
+              <LikeIcon color={Color.TextStandard} isActive={isLikeTasks} />
             </Animated.View>
           </FavoritesButton>
         </SearchView>

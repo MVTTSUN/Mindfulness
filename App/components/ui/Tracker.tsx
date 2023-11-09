@@ -1,6 +1,6 @@
 import styled from "styled-components/native";
 import { normalize } from "../../utils";
-import { AppRoute, Color } from "../../const";
+import { AppRoute, Color, ErrorMessage } from "../../const";
 import { CheckIcon } from "../svg/icons/other-icons/CheckIcon";
 import { Dimensions, Pressable } from "react-native";
 import Animated, {
@@ -35,6 +35,7 @@ import {
   getTrackerTaskNotifications,
 } from "../../store/notificationsSelectors";
 import { useNotifee } from "../../hooks/useNotifee";
+import { useToastCustom } from "../../hooks/useToastCustom";
 
 type TrackerProps = {
   id: string;
@@ -58,6 +59,7 @@ export function Tracker(props: TrackerProps) {
     onCreateTriggerNotificationForTrackersMeditation,
     onCreateTriggerNotificationForTrackersTask,
   } = useNotifee();
+  const { onErrorToast } = useToastCustom();
   const translateXValue = useSharedValue(
     -Dimensions.get("window").width * 0.8 + normalize(35)
   );
@@ -135,21 +137,37 @@ export function Tracker(props: TrackerProps) {
     setSinceDay(null);
   };
 
-  useEffect(() => {
-    if (trackerMeditation && trackerMeditationNotifications.enable) {
+  const onCreateTriggerNotificationForTrackersMeditationAsync = async () => {
+    try {
       onCreateTriggerNotificationForTrackersMeditation(
         trackerMeditationNotifications.hours,
         trackerMeditationNotifications.minutes
       );
+    } catch {
+      onErrorToast(ErrorMessage.CreateNotification);
+    }
+  };
+
+  const onCreateTriggerNotificationForTrackersTaskAsync = async () => {
+    try {
+      onCreateTriggerNotificationForTrackersTask(
+        trackerTaskNotifications.hours,
+        trackerTaskNotifications.minutes
+      );
+    } catch {
+      onErrorToast(ErrorMessage.CreateNotification);
+    }
+  };
+
+  useEffect(() => {
+    if (trackerMeditation && trackerMeditationNotifications.enable) {
+      onCreateTriggerNotificationForTrackersMeditationAsync();
     }
   }, [trackerMeditation]);
 
   useEffect(() => {
     if (trackerTask && trackerTaskNotifications.enable) {
-      onCreateTriggerNotificationForTrackersTask(
-        trackerTaskNotifications.hours,
-        trackerTaskNotifications.minutes
-      );
+      onCreateTriggerNotificationForTrackersTaskAsync();
     }
   }, [trackerTask]);
 

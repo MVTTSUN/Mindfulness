@@ -279,13 +279,31 @@ enum NameFolder {
 
 enum ErrorMessage {
   NoConnect = "Не удалось связаться с сервером. Проверьте связь или включите оффлайн режим.",
-  PositionTrack = "Невозможно получить позицию медитации.",
+  PositionTrack = "Не удалось получить позицию медитации.",
   Player = "Плеер сломан",
-  PreviousTrack = "Невозможно перемотать медитацию в начало",
-  SeekTrack = "Невозможно перемотать медитацию",
+  PreviousTrack = "Не удалось перемотать медитацию в начало",
+  SeekTrack = "Не удалось перемотать медитацию",
+  DeleteFile = "Не удалось удалить данные",
+  CreateNotification = "Не удалось создать уведомление",
+  DeleteNotification = "Не удалось удалить уведомление",
+  DownloadFile = "Не удалось сохранить данные с сервера, чтобы обновить данные",
+  DownloadMeditation = "Не удалось сохранить медитацию",
+  DeleteMeditation = "Не удалось удалить медитацию",
+  Export = "Не удалось экспортировать данные",
+  Import = "Не удалось импортировать данные",
+  CapacityAudios = "Не удалось узнать объем медитаций",
+  CapacityWithoutAudios = "Не удалось узнать объем без медитаций",
+  IntializePlayer = "Не удалось инициализировать плеер",
+  HideSplash = "Не удалось скрыть сплэш",
 }
 
-enum SuccessMessage {}
+enum SuccessMessage {
+  Export = "Данные успешно экспортированы",
+  Import = "Данные успешно импортированы",
+  DeleteAllMeditations = "Все медитации удалены",
+  DownloadMeditation = "Медитация успешно сохранена",
+  DeleteMeditation = "Медитация успешно удалена",
+}
 
 enum PlatformEnum {
   Android = "android",

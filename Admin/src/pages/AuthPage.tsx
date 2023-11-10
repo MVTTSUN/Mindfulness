@@ -25,7 +25,7 @@ import { CenterContainer } from "../components/CenterContainer";
 import { setUserId } from "../services/storage";
 import { Logo } from "../components/Logo";
 
-export function Auth() {
+export function AuthPage() {
   const [isOpenActivate, setIsOpenActivate] = useState(false);
   const [isVisiblePassword, setIsVisiblePassword] = useState(false);
   const { pathname } = useLocation();

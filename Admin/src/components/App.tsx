@@ -8,7 +8,7 @@ import { EmotionsPage } from "../pages/EmotionsPage";
 import { InformationPage } from "../pages/InformationPage";
 import { HelmetProvider } from "react-helmet-async";
 import { StatisticsPage } from "../pages/StatisticsPage";
-import { Auth } from "../pages/Auth";
+import { AuthPage } from "../pages/AuthPage";
 import { TaskPage } from "../pages/TaskPage";
 import { DisplayResultTips } from "./DisplayResultTips";
 import { FormTextLottieImage } from "./FormTextLottieImage";
@@ -34,7 +34,7 @@ export function App() {
           path={BrowserRoute.Login}
           element={
             <PrivateRoute>
-              <Auth />
+              <AuthPage />
             </PrivateRoute>
           }
         />
@@ -42,7 +42,7 @@ export function App() {
           path={BrowserRoute.Register}
           element={
             <PrivateRoute>
-              <Auth />
+              <AuthPage />
             </PrivateRoute>
           }
         />

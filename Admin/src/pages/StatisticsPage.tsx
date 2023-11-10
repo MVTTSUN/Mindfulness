@@ -6,7 +6,13 @@ import { Helmet } from "react-helmet-async";
 import { Subtitle } from "../components/Subtitle";
 import { FontSizeSubtitle, ResetButton, ResetList } from "../mixins";
 import { useAppSelector } from "../hooks/useAppSelector";
-import { getFilteredStatistics } from "../store/statisticsSelectors";
+import {
+  getFilterMonth,
+  getFilterTitle,
+  getFilterType,
+  getFilterYear,
+  getFilteredStatistics,
+} from "../store/statisticsSelectors";
 import { useAppDispatch } from "../hooks/useAppDispatch";
 import {
   resetTitle,
@@ -15,45 +21,47 @@ import {
   setType,
   setYear,
 } from "../store/statisticsSlice";
-import { useState } from "react";
 import { ContainerTwoSides } from "../components/ContainerTwoSides";
 import { getOptionDonut, getOptionLine } from "../utils/utils";
+import { useEffect } from "react";
 
 export function StatisticsPage() {
-  const [filterYearActive, setFilterYearActive] = useState<number>(
-    FILTER_YEARS.indexOf(new Date().getFullYear())
-  );
-  const [filterMonthActive, setFilterMonthActive] = useState<string>("Все");
-  const [filterTypeActive, setFilterTypeActive] = useState<number>(0);
-  const [filterIsTitleActive, setIsFilterTitleActive] = useState(false);
+  const filterYear = useAppSelector(getFilterYear);
+  const filterMonth = useAppSelector(getFilterMonth);
+  const filterType = useAppSelector(getFilterType);
+  const filterTitle = useAppSelector(getFilterTitle);
   const filteredData = useAppSelector(getFilteredStatistics);
   const dispatch = useAppDispatch();
   useGetStatisticsQuery();
 
-  const setYearHandle = (index: number, year: number) => {
+  const setYearHandle = (year: number) => {
     dispatch(setYear(year));
-    setFilterYearActive(index);
   };
 
-  const setTypeHandle = (index: number, value: string) => {
+  const setTypeHandle = (value: string) => {
     dispatch(setType(value));
-    setFilterTypeActive(index);
   };
 
   const setTitleHandle = (title: string) => {
-    if (filterIsTitleActive) {
+    if (filterTitle) {
       dispatch(resetTitle());
-      setIsFilterTitleActive(false);
     } else {
       dispatch(setTitle(title));
-      setIsFilterTitleActive(true);
     }
   };
 
   const setMonthHandle = (month: string) => {
     dispatch(setMonth(month));
-    setFilterMonthActive(month);
   };
+
+  useEffect(() => {
+    return () => {
+      dispatch(setYear(new Date().getFullYear()));
+      dispatch(setType("all"));
+      dispatch(resetTitle());
+      dispatch(setMonth("Все"));
+    };
+  }, []);
 
   return (
     <>
@@ -67,9 +75,9 @@ export function StatisticsPage() {
             {FILTER_YEARS.map((year, index) => (
               <ButtonSpace key={index}>
                 <ButtonYear
-                  $isActive={filterYearActive === index}
+                  $isActive={filterYear === year}
                   type="button"
-                  onClick={() => setYearHandle(index, year)}
+                  onClick={() => setYearHandle(year)}
                 >
                   {year}
                 </ButtonYear>
@@ -79,7 +87,7 @@ export function StatisticsPage() {
           <FilterContainer>
             <ButtonSpace>
               <ButtonYear
-                $isActive={filterMonthActive === "Все"}
+                $isActive={filterMonth === "Все"}
                 type="button"
                 onClick={() => setMonthHandle("Все")}
               >
@@ -89,7 +97,7 @@ export function StatisticsPage() {
             {FILTER_MONTHS.map((month, index) => (
               <ButtonSpace key={index}>
                 <ButtonYear
-                  $isActive={filterMonthActive === month}
+                  $isActive={filterMonth === month}
                   type="button"
                   onClick={() => setMonthHandle(month)}
                 >
@@ -102,9 +110,9 @@ export function StatisticsPage() {
             {FILTER_TYPE.map((type, index) => (
               <ButtonSpace key={index}>
                 <ButtonType
-                  $isActive={filterTypeActive === index}
+                  $isActive={filterType === type.value}
                   type="button"
-                  onClick={() => setTypeHandle(index, type.value)}
+                  onClick={() => setTypeHandle(type.value)}
                 >
                   {type.name}
                 </ButtonType>

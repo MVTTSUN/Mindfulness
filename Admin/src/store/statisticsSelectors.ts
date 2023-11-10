@@ -6,17 +6,17 @@ import { DataStatistics, TaskAndMeditationStatistics } from "../types/server";
 
 const getStatistics = (state: RootState) =>
   mindfulnessApi.endpoints.getStatistics.select()(state).data;
-const getYear = (state: Pick<RootState, Slice.Statistics>) =>
+const getFilterYear = (state: Pick<RootState, Slice.Statistics>) =>
   state[Slice.Statistics].year;
-const getType = (state: Pick<RootState, Slice.Statistics>) =>
+const getFilterType = (state: Pick<RootState, Slice.Statistics>) =>
   state[Slice.Statistics].type;
-const getTitle = (state: Pick<RootState, Slice.Statistics>) =>
+const getFilterTitle = (state: Pick<RootState, Slice.Statistics>) =>
   state[Slice.Statistics].title;
-const getMonth = (state: Pick<RootState, Slice.Statistics>) =>
+const getFilterMonth = (state: Pick<RootState, Slice.Statistics>) =>
   state[Slice.Statistics].month;
 
 const getFilteredStatistics = createSelector(
-  [getYear, getType, getTitle, getMonth, getStatistics],
+  [getFilterYear, getFilterType, getFilterTitle, getFilterMonth, getStatistics],
   (year, type, title, monthFilter, statistics) => {
     if (statistics) {
       const statisticsCopy = JSON.parse(
@@ -122,4 +122,4 @@ const getFilteredStatistics = createSelector(
   }
 );
 
-export { getFilteredStatistics };
+export { getFilteredStatistics, getFilterMonth, getFilterTitle, getFilterType, getFilterYear };

@@ -284,11 +284,15 @@ const LottieWrapper = styled.div`
   padding: 10px;
   max-width: 150px;
   box-sizing: border-box;
-  height: 150px;
+  height: 100%;
   overflow: hidden;
   border-radius: 25px;
   border: 5px dashed ${Color.Primary};
   background: ${Color.BackgroundMain};
+
+  @media (max-width: 420px) {
+    max-width: 120px;
+  }
 `;
 
 const LottieStyled = styled(Lottie)`

@@ -3,7 +3,7 @@ import { Slice } from "../const";
 
 const initialState = {
   year: new Date().getFullYear() as number,
-  type: null as "meditations" | "tasks" | null,
+  type: "all" as "meditations" | "tasks" | "all",
   title: "",
   month: "Все",
 };
@@ -16,11 +16,7 @@ export const statisticsSlice = createSlice({
       state.year = action.payload;
     },
     setType: (state, action) => {
-      if (action.payload === "all") {
-        state.type = null;
-      } else {
-        state.type = action.payload;
-      }
+      state.type = action.payload;
     },
     setTitle: (state, action) => {
       state.title = action.payload;
@@ -32,7 +28,7 @@ export const statisticsSlice = createSlice({
       state.year = new Date().getFullYear();
     },
     resetType: (state) => {
-      state.type = null;
+      state.type = "all";
     },
     resetTitle: (state) => {
       state.title = "";

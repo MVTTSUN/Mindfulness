@@ -11,6 +11,8 @@ export const useFileSystem = () => {
   const [downloadProgress, setDownloadProgress] = useState(0);
 
   const exportFileJSON = async (data: ExportJSONData) => {
+    let isSuccess = false;
+  
     if (Platform.OS === PlatformEnum.Android) {
       const permissions =
         await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
@@ -26,8 +28,7 @@ export const useFileSystem = () => {
         await FileSystem.writeAsStringAsync(fileUri, JSON.stringify(data), {
           encoding: FileSystem.EncodingType.UTF8,
         });
-      } else {
-        alert("You must allow permission to save.");
+        isSuccess = true;
       }
     }
 
@@ -38,7 +39,10 @@ export const useFileSystem = () => {
       });
       const UTI = NAME_FILE_JSON;
       await shareAsync(fileUri, { UTI });
+      isSuccess = true;
     }
+
+    return isSuccess;
   };
 
   const importFileJSON = async () => {

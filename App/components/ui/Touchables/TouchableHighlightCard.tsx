@@ -29,7 +29,12 @@ export function TouchableHighlightCard(props: TouchableHighlightCardProps) {
       }
     >
       <TextContainer>
-        <TextStyled $color={color} $isAll={isAll}>
+        <TextStyled
+          numberOfLines={5}
+          ellipsizeMode="tail"
+          $color={color}
+          $isAll={isAll}
+        >
           {children}
         </TextStyled>
         {isAll && <MoreIcon />}
@@ -47,7 +52,7 @@ const TouchableHighlightStyled = styled.TouchableHighlight<{
   aspect-ratio: 1 / 1;
   justify-content: center;
   align-items: center;
-  padding: 20px 10px 15px;
+  padding: 10px;
   background-color: ${({ $isAll, $backgroundColor }) =>
     $isAll ? "transparent" : $backgroundColor};
   border-radius: ${normalize(25)}px;

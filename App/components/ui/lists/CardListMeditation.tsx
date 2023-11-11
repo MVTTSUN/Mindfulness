@@ -29,6 +29,8 @@ import {
 import { getIsOffline } from "../../../store/offlineSelectors";
 import { AppRoute, Color, ErrorMessage, NameFolder } from "../../../const";
 import { useToastCustom } from "../../../hooks/useToastCustom";
+import { removeMeditationLike } from '../../../store/likesSlice';
+import { removeDownloadAudio } from '../../../store/downloadAudioSlice';
 
 type CardListMeditationProps = {
   count: number;
@@ -69,6 +71,8 @@ export function CardListMeditation(props: CardListMeditationProps) {
             await deleteFile(NameFolder.Meditations + meditation._id);
             dispatch(deleteDataMeditationsCopy(meditation));
             dispatch(deleteMeditationsInMeditation(meditation));
+            dispatch(removeMeditationLike(meditation._id));
+            dispatch(removeDownloadAudio(meditation._id));
           }
           dispatch(setMeditations(data));
         } catch {

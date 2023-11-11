@@ -92,7 +92,7 @@ export function Service() {
                 loop
               />
               <PulseCircle />
-              <ImageStyled source={{ uri: infos.avatarDevelop }} />
+              {infos && <ImageStyled source={{ uri: infos.avatarDevelop }} />}
             </RoundedImage>
             <TextName>{`${infos.secondNameDevelop} ${infos.firstNameDevelop} ${infos.surnameDevelop}`}</TextName>
           </ViewMargin>

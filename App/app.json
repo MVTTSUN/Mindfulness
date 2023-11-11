@@ -15,16 +15,16 @@
       "**/*"
     ],
     "ios": {
+      "buildNumber": "1.0.0",
       "userInterfaceStyle": "automatic",
       "supportsTablet": true,
       "infoPlist": {
-        "UIBackgroundModes": [
-          "audio"
-        ]
+        "UIBackgroundModes": ["audio"]
       },
-      "bundleIdentifier": "com.anonymous.Mindfulness"
+      "bundleIdentifier": "com.mvtt.mindfulness"
     },
     "android": {
+      "versionCode": 1,
       "userInterfaceStyle": "automatic",
       "permissions": [
         "READ_EXTERNAL_STORAGE",
@@ -37,7 +37,7 @@
         "backgroundColor": "#f5f4fa"
       },
       "softwareKeyboardLayoutMode": "pan",
-      "package": "com.anonymous.Mindfulness"
+      "package": "com.mvtt.mindfulness"
     },
     "extra": {
       "eas": {

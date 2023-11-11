@@ -28,7 +28,7 @@ import { TouchableHighlight } from "./touchables/TouchableHighlight";
 import { useNotifee } from "../../hooks/useNotifee";
 import { normalize } from "../../utils";
 import { useToastCustom } from "../../hooks/useToastCustom";
-import { ErrorMessage } from '../../const';
+import { ErrorMessage } from "../../const";
 
 type TimeNotificationProps = {
   notification: Notification;
@@ -110,9 +110,7 @@ export const TimeNotification = memo((props: TimeNotificationProps) => {
         minutesHandle
       );
     } else {
-      const ids = await getTriggerNotificationIds();
-      !ids.includes(String(id)) &&
-        (await onCreateTriggerNotification(id, hoursHandle, minutesHandle));
+      await onCreateTriggerNotification(id, hoursHandle, minutesHandle);
     }
   };
 
@@ -125,13 +123,13 @@ export const TimeNotification = memo((props: TimeNotificationProps) => {
     if (enable) {
       try {
         await createTriggerNotificationAsync();
-      } catch (error) {
+      } catch {
         onErrorToast(ErrorMessage.CreateNotification);
       }
     } else {
       try {
         await cancelNotificationAsync();
-      } catch (error) {
+      } catch {
         onErrorToast(ErrorMessage.DeleteNotification);
       }
     }

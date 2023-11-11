@@ -95,7 +95,7 @@ export function Contacts() {
                 loop
               />
               <PulseCircle />
-              <ImageStyled source={{ uri: infos.avatarPsycho }} />
+              {infos && <ImageStyled source={{ uri: infos.avatarPsycho }} />}
             </RoundedImage>
             <TextName>{`${infos.secondNamePsycho} ${infos.firstNamePsycho} ${infos.surnamePsycho}`}</TextName>
           </ViewMargin>
@@ -163,10 +163,10 @@ const TextName = styled.Text`
 `;
 
 const TextInfo = styled.Text`
+  margin-bottom: 20px;
   font-family: "Poppins-Regular";
   font-size: ${normalize(16)}px;
   color: ${({ theme }) => theme.color.standard};
-  text-align: justify;
 `;
 
 const ViewSociety = styled.View`

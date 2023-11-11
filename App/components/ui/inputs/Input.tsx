@@ -59,9 +59,15 @@ export function Input(props: InputProps) {
           onChangeText={onChangeText}
           placeholder={placeholder}
           cursorColor={
-            theme === Theme.Light ? Color.TextStandard : Color.TextWhite
+            theme === Theme.Light
+              ? `${Color.TextStandard}70`
+              : `${Color.TextWhite}70`
           }
-          selectionColor={Color.PrimaryPastel}
+          selectionColor={
+            theme === Theme.Light
+              ? `${Color.TextStandard}70`
+              : `${Color.TextWhite}70`
+          }
           placeholderTextColor={
             theme === Theme.Light
               ? Color.PlaceholderLight

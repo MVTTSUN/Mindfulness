@@ -1,4 +1,5 @@
 import notifee, {
+  AndroidBadgeIconType,
   AndroidColor,
   AndroidImportance,
   AndroidVisibility,
@@ -14,6 +15,10 @@ export const useNotifee = () => {
   const trackersTask = useAppSelector(getTrackersTask);
   const daysInShouldNotificationMeditation = useAppSelector(getDaysInShouldNotificationMeditation);
   const daysInShouldNotificationTask = useAppSelector(getDaysInShouldNotificationTask);
+
+  const clearAllBadgeIOS = async () => {
+    await notifee.setBadgeCount(0);
+  };
 
   const onCreateTriggerNotification = async (
     id: number,
@@ -35,6 +40,7 @@ export const useNotifee = () => {
       sound: "default",
       visibility: AndroidVisibility.PUBLIC,
       importance: AndroidImportance.HIGH,
+      badge: true,
     });
 
     let date = new Date();
@@ -85,9 +91,11 @@ export const useNotifee = () => {
           visibility: AndroidVisibility.PUBLIC,
           importance: AndroidImportance.HIGH,
           smallIcon: "notification_icon",
+          badgeIconType: AndroidBadgeIconType.LARGE,
         },
         ios: {
           sound: "default",
+          badgeCount: 1,
         },
       },
       trigger
@@ -159,6 +167,7 @@ export const useNotifee = () => {
     cancelNotification,
     getTriggerNotificationIds,
     onCreateTriggerNotificationForTrackersMeditation,
-    onCreateTriggerNotificationForTrackersTask
+    onCreateTriggerNotificationForTrackersTask,
+    clearAllBadgeIOS,
   };
 }

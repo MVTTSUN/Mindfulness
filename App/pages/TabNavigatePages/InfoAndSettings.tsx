@@ -122,6 +122,7 @@ export function InfoAndSettings() {
 }
 
 const PressableBlur = styled.Pressable`
+  z-index: 10;
   align-items: center;
   justify-content: center;
   position: absolute;
@@ -163,6 +164,7 @@ const TextLine = styled.Text`
 `;
 
 const ViewMade = styled.View`
+  z-index: 1;
   padding-top: ${normalize(10)}px;
   height: ${normalize(122)}px;
   align-items: center;

@@ -38,7 +38,7 @@ const TouchableHighlightStyled = styled.TouchableHighlight<{
   padding: ${({ $isRound }) =>
     $isRound
       ? `${normalize(5)}px`
-      : `${normalize(20)}px ${normalize(40)}px ${normalize(15)}px`};
+      : `${normalize(17)}px ${normalize(40)}px ${normalize(17)}px`};
   background-color: ${({ $backgroundColor, $mainColor }) =>
     $backgroundColor ? $backgroundColor : $mainColor};
   border-radius: ${normalize(42)}px;

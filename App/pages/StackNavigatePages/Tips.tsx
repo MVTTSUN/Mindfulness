@@ -103,31 +103,32 @@ export function Tips() {
         </HeaderWithBack>
         <ScrollView showsVerticalScrollIndicator={false}>
           <Container>
-            {tips.map((node) => {
-              if (node.type === "text") {
-                return <TextNode key={node.id}>{node.payload}</TextNode>;
-              } else if (node.type === "image") {
-                return (
-                  <ImageWrapper key={node.id}>
-                    <ImageNode source={{ uri: node.payload }} />
-                  </ImageWrapper>
-                );
-              } else if (node.type === "lottie") {
-                return (
-                  <LottieWrapper key={node.id}>
-                    <LottieNode
-                      source={
-                        node.payload.charAt(0) === "{" &&
-                        JSON.parse(node.payload)
-                      }
-                      autoPlay
-                      loop
-                      resizeMode="cover"
-                    />
-                  </LottieWrapper>
-                );
-              }
-            })}
+            {tips &&
+              tips?.map((node) => {
+                if (node.type === "text") {
+                  return <TextNode key={node.id}>{node.payload}</TextNode>;
+                } else if (node.type === "image") {
+                  return (
+                    <ImageWrapper key={node.id}>
+                      <ImageNode source={{ uri: node.payload }} />
+                    </ImageWrapper>
+                  );
+                } else if (node.type === "lottie") {
+                  return (
+                    <LottieWrapper key={node.id}>
+                      <LottieNode
+                        source={
+                          node.payload.charAt(0) === "{" &&
+                          JSON.parse(node.payload)
+                        }
+                        autoPlay
+                        loop
+                        resizeMode="cover"
+                      />
+                    </LottieWrapper>
+                  );
+                }
+              })}
           </Container>
         </ScrollView>
       </CenterContainer>
@@ -159,7 +160,6 @@ const LottieNode = styled(LottieView)`
 `;
 
 const TextNode = styled.Text`
-  text-align: justify;
   font-family: "Poppins-Regular";
   font-size: ${normalize(18)}px;
   line-height: ${normalize(24)}px;

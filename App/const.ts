@@ -1,23 +1,135 @@
+enum Color {
+  Primary = '#aef0f6',
+  PrimaryPressed = '#98d3d8',
+  PrimaryPastel = '#d1f9fe',
+  PrimaryPastelPressed = '#badbdf',
+  TextStandard = '#313131',
+  TextWhite = '#edecf5',
+  Dark = '#283957',
+  Meditation = "#469ab2",
+  MeditationPressed = "#377a8c",
+  Task = "#d2f2d0",
+  TaskPressed = "#b9d5b7",
+  PlaceholderLight = "#929292",
+  PlaceholderDark = "#656566",
+  Error = "#ff6868",
+}
+
+enum ApiRoute {
+  Meditations = "/meditations",
+  Tasks = "/tasks",
+  Tips = "/tips",
+  Emotions = "/emotions",
+  Info = "/info",
+  Filename = "/filename",
+}
+
+enum SliceName {
+  Meditations = "meditations",
+  Tasks = "tasks",
+  Tips = "tips",
+  Emotions = "emotions",
+  Infos = 'infos',
+  Likes = 'likes',
+  TrackPlayer = 'trackPlayer',
+  Theme = 'theme',
+  DownloadAudio = 'downloadAudio',
+  Notes = 'notes',
+  Notifications = 'notifications',
+  Offline = 'offline',
+  Tracker = 'tracker',
+}
+
+enum Theme {
+  Dark = "dark",
+  Light = "light",
+}
+
+enum AppRoute {
+  Statistics = "Statistics",
+  Meditations = "Meditations",
+  Tasks = "Tasks",
+  Meditation = "Meditation",
+  Task = "Task",
+  Home = "Home",
+  InfoAndSettings = "InfoAndSettings",
+  InfoAndSettingsStack = "InfoAndSettingsStack",
+  Contacts = "Contacts",
+  Service = "Service",
+  MeditationsStack = "MeditationsStack",
+  TasksStack = "TasksStack",
+  NotesStack = "NotesStack",
+  Text = "Text",
+  Notes = "Notes",
+  Note = "Note",
+  Notification = "Notification",
+  ImportAndExport = "ImportAndExport",
+  Storage = "Storage",
+  Tips = "Tips",
+}
+
+enum NameFolder {
+  Meditations = "meditations",
+  Tasks = "tasks",
+  Infos = "infos",
+  Tips = "tips",
+}
+
+enum ErrorMessage {
+  NoConnect = "Не удалось связаться с сервером. Проверьте связь или включите оффлайн режим.",
+  PositionTrack = "Не удалось получить позицию медитации.",
+  Player = "Плеер сломан",
+  PreviousTrack = "Не удалось перемотать медитацию в начало",
+  SeekTrack = "Не удалось перемотать медитацию",
+  DeleteFile = "Не удалось удалить данные",
+  CreateNotification = "Не удалось создать уведомление",
+  DeleteNotification = "Не удалось удалить уведомление",
+  DownloadFile = "Не удалось сохранить данные с сервера, чтобы обновить данные",
+  DownloadMeditation = "Не удалось сохранить медитацию",
+  DeleteMeditation = "Не удалось удалить медитацию",
+  Export = "Не удалось экспортировать данные",
+  Import = "Не удалось импортировать данные",
+  CapacityAudios = "Не удалось узнать объем медитаций",
+  CapacityWithoutAudios = "Не удалось узнать объем без медитаций",
+  IntializePlayer = "Не удалось инициализировать плеер",
+  HideSplash = "Не удалось скрыть сплэш",
+  PermissionSave = "Необходимо предоставить доступ к хранилищу",
+}
+
+enum SuccessMessage {
+  Export = "Данные успешно экспортированы",
+  Import = "Данные успешно импортированы",
+  DeleteAllMeditations = "Все медитации удалены",
+  DownloadMeditation = "Медитация успешно сохранена",
+  DeleteMeditation = "Медитация успешно удалена",
+}
+
+enum PlatformEnum {
+  Android = "android",
+  IOS = "ios",
+  IPadOS = "ipados",
+};
+
 const MAIN_CARDS = [
   {
     id: 1,
     title: "Медитации",
-    screen: "MeditationStack",
+    screen: AppRoute.MeditationsStack,
   },
   {
     id: 2,
     title: "Осознанность как часть жизни",
-    screen: "TasksStack",
+    screen: AppRoute.TasksStack,
   },
   {
     id: 3,
     title: "Ежедневник",
-    screen: "NotesStack",
+    screen: AppRoute.NotesStack,
   },
   {
     id: 4,
     title: "Информация",
-    screen: "InfoAndSettingsStack",
+    screen: AppRoute.InfoAndSettingsStack,
   },
 ];
 
@@ -200,117 +312,16 @@ const LIGHT_THEME = {
   },
 };
 
-enum Color {
-  Primary = '#aef0f6',
-  PrimaryPressed = '#98d3d8',
-  PrimaryPastel = '#d1f9fe',
-  PrimaryPastelPressed = '#badbdf',
-  TextStandard = '#313131',
-  TextWhite = '#edecf5',
-  Dark = '#283957',
-  Meditation = "#469ab2",
-  MeditationPressed = "#377a8c",
-  Task = "#d2f2d0",
-  TaskPressed = "#b9d5b7",
-  PlaceholderLight = "#929292",
-  PlaceholderDark = "#656566",
-  Error = "#ff6868",
-}
-
-enum ApiRoute {
-  Meditations = "/meditations",
-  Tasks = "/tasks",
-  Tips = "/tips",
-  Emotions = "/emotions",
-  Info = "/info",
-  Filename = "/filename",
-}
-
-enum SliceName {
-  Meditations = "meditations",
-  Tasks = "tasks",
-  Tips = "tips",
-  Emotions = "emotions",
-  Infos = 'infos',
-  Likes = 'likes',
-  TrackPlayer = 'trackPlayer',
-  Theme = 'theme',
-  DownloadAudio = 'downloadAudio',
-  Notes = 'notes',
-  Notifications = 'notifications',
-  Offline = 'offline',
-  Tracker = 'tracker',
-}
-
-enum Theme {
-  Dark = "dark",
-  Light = "light",
-}
-
-enum AppRoute {
-  Statistics = "Statistics",
-  Meditations = "Meditations",
-  Tasks = "Tasks",
-  Meditation = "Meditation",
-  Task = "Task",
-  Home = "Home",
-  InfoAndSettings = "InfoAndSettings",
-  InfoAndSettingsStack = "InfoAndSettingsStack",
-  Contacts = "Contacts",
-  Service = "Service",
-  MeditationsStack = "MeditationsStack",
-  TasksStack = "TasksStack",
-  NotesStack = "NotesStack",
-  Text = "Text",
-  Notes = "Notes",
-  Note = "Note",
-  Notification = "Notification",
-  ImportAndExport = "ImportAndExport",
-  Storage = "Storage",
-  Tips = "Tips",
-}
-
-enum NameFolder {
-  Meditations = "meditations",
-  Tasks = "tasks",
-  Infos = "infos",
-  Tips = "tips",
-}
-
-enum ErrorMessage {
-  NoConnect = "Не удалось связаться с сервером. Проверьте связь или включите оффлайн режим.",
-  PositionTrack = "Не удалось получить позицию медитации.",
-  Player = "Плеер сломан",
-  PreviousTrack = "Не удалось перемотать медитацию в начало",
-  SeekTrack = "Не удалось перемотать медитацию",
-  DeleteFile = "Не удалось удалить данные",
-  CreateNotification = "Не удалось создать уведомление",
-  DeleteNotification = "Не удалось удалить уведомление",
-  DownloadFile = "Не удалось сохранить данные с сервера, чтобы обновить данные",
-  DownloadMeditation = "Не удалось сохранить медитацию",
-  DeleteMeditation = "Не удалось удалить медитацию",
-  Export = "Не удалось экспортировать данные",
-  Import = "Не удалось импортировать данные",
-  CapacityAudios = "Не удалось узнать объем медитаций",
-  CapacityWithoutAudios = "Не удалось узнать объем без медитаций",
-  IntializePlayer = "Не удалось инициализировать плеер",
-  HideSplash = "Не удалось скрыть сплэш",
-}
-
-enum SuccessMessage {
-  Export = "Данные успешно экспортированы",
-  Import = "Данные успешно импортированы",
-  DeleteAllMeditations = "Все медитации удалены",
-  DownloadMeditation = "Медитация успешно сохранена",
-  DeleteMeditation = "Медитация успешно удалена",
-}
-
-enum PlatformEnum {
-  Android = "android",
-  IOS = "ios",
-};
-
 export {
+  ApiRoute,
+  SliceName,
+  Theme,
+  AppRoute,
+  ErrorMessage,
+  SuccessMessage,
+  PlatformEnum,
+  Color,
+  NameFolder,
   DARK_THEME,
   LIGHT_THEME,
   MAIN_CARDS,
@@ -329,13 +340,4 @@ export {
   NOTIFICATIONS,
   NOTIFICATION_MEDITATION,
   NOTIFICATION_TASK,
-  ApiRoute,
-  SliceName,
-  Theme,
-  AppRoute,
-  ErrorMessage,
-  SuccessMessage,
-  PlatformEnum,
-  Color,
-  NameFolder
 };

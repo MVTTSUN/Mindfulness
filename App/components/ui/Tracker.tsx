@@ -293,7 +293,7 @@ const PressableBlur = styled.Pressable`
 `;
 
 const Container = styled(Animated.View)`
-  padding: ${normalize(7)}px 0 ${normalize(7)}px 16%;
+  padding: ${normalize(15)}px 0 ${normalize(15)}px 16%;
   z-index: 10;
   justify-content: space-between;
   flex-direction: row;
@@ -310,7 +310,7 @@ const Container = styled(Animated.View)`
 
 const ContentContainer = styled.View`
   width: 60%;
-  gap: ${normalize(5)}px;
+  justify-content: space-between;
 `;
 
 const ControlContainer = styled.View`

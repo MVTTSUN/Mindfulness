@@ -96,4 +96,16 @@ const bytesFormatTo = (bytes?: number) => {
   }
 };
 
-export { processDataForChart, normalize, getYearsFilterVariants, getFirstFutureThirtyDays, bytesFormatTo };
+const levelAdapter = (level?: string) => {
+  if (level) {
+    if (level.includes('Легк')) {
+      return 'низкая';
+    } else if (level.includes('Средн')) {
+      return 'средняя';
+    } else if (level.includes('Сложн')) {
+      return 'высокая';
+    }
+  } else return '';
+}
+
+export { processDataForChart, normalize, getYearsFilterVariants, getFirstFutureThirtyDays, bytesFormatTo, levelAdapter };

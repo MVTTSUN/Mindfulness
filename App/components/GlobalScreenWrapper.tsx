@@ -1,6 +1,6 @@
 import { styled } from "styled-components/native";
 import { PropsWithChildren, useEffect } from "react";
-import { ScrollView } from "react-native";
+import { Dimensions, ScrollView } from "react-native";
 import { normalize } from "../utils";
 import { getIsOffline } from "../store/offlineSelectors";
 import { useAppSelector } from "../hooks/useAppSelector";

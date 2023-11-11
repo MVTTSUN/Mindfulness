@@ -26,7 +26,7 @@ import Animated, {
   withSequence,
   withSpring,
 } from "react-native-reanimated";
-import { normalize } from "../../utils";
+import { levelAdapter, normalize } from "../../utils";
 import {
   getDataMeditationCopy,
   getMeditationInMeditation,
@@ -213,65 +213,85 @@ export function Meditation() {
   }, []);
 
   return (
-    <>
+    <OverflowContainer>
       <GlobalScreen>
         <CenterContainer>
           <HeaderWithBack>
-            <Pressable
-              onPress={() => navigation.navigate(AppRoute.Text, { meditation })}
-            >
-              <TextIcon />
-            </Pressable>
+            {meditation && (
+              <Pressable
+                onPress={() =>
+                  navigation.navigate(AppRoute.Text, { meditation })
+                }
+              >
+                <TextIcon />
+              </Pressable>
+            )}
           </HeaderWithBack>
-          <PlayerImage source={{ uri: meditation?.artwork }} />
-          <TitleLikeDownloadView>
-            <TextAudio>{meditation?.title}</TextAudio>
-            <LikeDownloadView>
-              <Pressable onPress={toggleLike}>
-                <Animated.View
-                  style={[{ backgroundColor: "transparent" }, likeStyle]}
-                >
-                  <LikeIcon
-                    isActive={isLike}
-                    color={
-                      theme === Theme.Light
-                        ? Color.TextStandard
-                        : Color.TextWhite
-                    }
-                  />
-                </Animated.View>
-              </Pressable>
-              <Pressable onPress={downloadOrDeleteAudio}>
-                <ProgressCircle
-                  progressDownload={downloadProgress}
-                  isDownload={isDownload}
-                />
-              </Pressable>
-            </LikeDownloadView>
-          </TitleLikeDownloadView>
-          <AudioPlayer
-            meditation={meditation}
-            duration={meditation?.duration}
-          />
+          {meditation && (
+            <>
+              <PlayerImage source={{ uri: meditation?.artwork }} />
+              <TextLevel>Сложность: {levelAdapter(meditation?.kind)}</TextLevel>
+              <TitleLikeDownloadView>
+                <TextAudio numberOfLines={2} ellipsizeMode="tail">
+                  {meditation?.title}
+                </TextAudio>
+                <LikeDownloadView>
+                  <Pressable onPress={toggleLike}>
+                    <Animated.View
+                      style={[{ backgroundColor: "transparent" }, likeStyle]}
+                    >
+                      <LikeIcon
+                        isActive={isLike}
+                        color={
+                          theme === Theme.Light
+                            ? Color.TextStandard
+                            : Color.TextWhite
+                        }
+                      />
+                    </Animated.View>
+                  </Pressable>
+                  <Pressable onPress={downloadOrDeleteAudio}>
+                    <ProgressCircle
+                      progressDownload={downloadProgress}
+                      isDownload={isDownload}
+                    />
+                  </Pressable>
+                </LikeDownloadView>
+              </TitleLikeDownloadView>
+              <AudioPlayer
+                meditation={meditation}
+                duration={meditation?.duration}
+              />
+            </>
+          )}
           <SpaceBottom />
         </CenterContainer>
       </GlobalScreen>
-      <Tracker id={meditationId} title={meditation?.title} />
-      <PressableStyled
-        onPress={() =>
-          navigation.navigate(AppRoute.NotesStack, {
-            screen: AppRoute.Notes,
-            params: { screen: AppRoute.Note, meditation },
-          })
-        }
-      >
-        <ViewPlus>
-          <AddIcon />
-        </ViewPlus>
-      </PressableStyled>
-    </>
+      {meditation && (
+        <>
+          <Tracker id={meditationId} title={meditation?.title} />
+          <PressableStyled
+            onPress={() =>
+              navigation.navigate(AppRoute.NotesStack, {
+                screen: AppRoute.Notes,
+                params: { screen: AppRoute.Note, meditation },
+              })
+            }
+          >
+            <ViewPlus>
+              <AddIcon />
+            </ViewPlus>
+          </PressableStyled>
+        </>
+      )}
+    </OverflowContainer>
   );
 }
+
+const OverflowContainer = styled.View`
+  flex: 1;
+  overflow: hidden;
+`;
 
 const PressableStyled = styled.Pressable`
   z-index: 5;
@@ -293,19 +313,27 @@ const PlayerImage = styled.Image`
   width: 100%;
   aspect-ratio: 1 / 1;
   border-radius: ${normalize(20)}px;
-  margin: 25px 0 30px;
+  margin: 10px 0 20px;
+`;
+
+const TextLevel = styled.Text`
+  font-family: "Poppins-Regular";
+  font-size: ${normalize(12)}px;
+  line-height: ${normalize(14)}px;
+  color: ${({ theme }) => theme.color.standard};
 `;
 
 const TextAudio = styled.Text`
+  width: 80%;
   font-family: "Poppins-Medium";
   font-size: ${normalize(18)}px;
   line-height: ${normalize(30)}px;
-  height: ${normalize(31)}px;
+  min-height: ${normalize(31)}px;
   color: ${({ theme }) => theme.color.standard};
 `;
 
 const TitleLikeDownloadView = styled.View`
-  margin-bottom: 10px;
+  margin-bottom: 5px;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;

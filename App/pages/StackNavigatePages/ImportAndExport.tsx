@@ -48,8 +48,8 @@ export function ImportAndExport() {
     try {
       const data = { likes, notes, trackers };
 
-      await exportFileJSON(data);
-      onSuccessToast(SuccessMessage.Export);
+      const isSuccess = await exportFileJSON(data);
+      isSuccess && onSuccessToast(SuccessMessage.Export);
     } catch {
       onErrorToast(ErrorMessage.Export);
     }
@@ -67,8 +67,8 @@ export function ImportAndExport() {
         dispatch(setLikes(parsedData.likes));
         dispatch(setNotes(parsedData.notes));
         dispatch(setTrackers(parsedData.trackers));
+        onSuccessToast(SuccessMessage.Import);
       }
-      onSuccessToast(SuccessMessage.Import);
     } catch {
       onErrorToast(ErrorMessage.Import);
     }
@@ -134,7 +134,6 @@ const TextTitle = styled.Text`
 
 const TextInfo = styled.Text`
   margin-bottom: 20px;
-  text-align: justify;
   font-family: "Poppins-Regular";
   font-size: ${normalize(16)}px;
   line-height: ${normalize(20)}px;

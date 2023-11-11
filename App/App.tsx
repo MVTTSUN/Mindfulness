@@ -18,10 +18,14 @@ import { ToastProvider } from "react-native-toast-notifications";
 import { normalize } from "./utils";
 import { getValueTheme } from "./store/themeSelectors";
 import { useToastCustom } from "./hooks/useToastCustom";
+import { getNotifications } from "./store/notificationsSelectors";
+import { useNotifee } from "./hooks/useNotifee";
+import { AppState } from "react-native";
 
 SplashScreen.preventAutoHideAsync();
 
 export const App = memo(() => {
+  const notifications = useAppSelector(getNotifications);
   const isInitializedPlayer = useAppSelector(getIsInitializedPlayer);
   const theme = useAppSelector(getValueTheme);
   const dispatch = useAppDispatch();
@@ -30,15 +34,16 @@ export const App = memo(() => {
     "Poppins-Medium": require("./assets/fonts/Poppins-Medium.ttf"),
     "Poppins-SemiBold": require("./assets/fonts/Poppins-SemiBold.ttf"),
   });
+  const {
+    onCreateTriggerNotification,
+    getTriggerNotificationIds,
+    clearAllBadgeIOS,
+  } = useNotifee();
   const { onErrorToast } = useToastCustom();
 
   const onLayoutRootView = useCallback(async () => {
     if (fontsLoaded) {
-      try {
-        await SplashScreen.hideAsync();
-      } catch {
-        onErrorToast(ErrorMessage.HideSplash);
-      }
+      await SplashScreen.hideAsync();
     }
   }, [fontsLoaded]);
 
@@ -60,6 +65,9 @@ export const App = memo(() => {
           Capability.Pause,
           Capability.SkipToPrevious,
         ],
+        playIcon: require("./assets/images/play-icon.png"),
+        pauseIcon: require("./assets/images/pause-icon.png"),
+        previousIcon: require("./assets/images/previous-icon.png"),
       });
       dispatch(setIsInitializedPlayer(true));
     } catch {
@@ -67,10 +75,38 @@ export const App = memo(() => {
     }
   };
 
+  const setNotificationFirstLaunchApp = async () => {
+    try {
+      const ids = await getTriggerNotificationIds();
+      notifications[0].enable &&
+        !ids.includes(String(notifications[0].id)) &&
+        (await onCreateTriggerNotification(
+          notifications[0].id,
+          notifications[0].hours,
+          notifications[0].minutes
+        ));
+    } catch {
+      onErrorToast(ErrorMessage.CreateNotification);
+    }
+  };
+
   useEffect(() => {
+    setNotificationFirstLaunchApp();
+    clearAllBadgeIOS();
+
     if (!isInitializedPlayer) {
       setup();
     }
+
+    const subscription = AppState.addEventListener("change", (nextAppState) => {
+      if (nextAppState === "active") {
+        clearAllBadgeIOS();
+      }
+    });
+
+    return () => {
+      subscription.remove();
+    };
   }, []);
 
   if (!fontsLoaded) {

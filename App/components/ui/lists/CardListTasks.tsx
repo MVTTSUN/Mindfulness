@@ -22,6 +22,7 @@ import { useFileSystem } from "../../../hooks/useFileSystem";
 import { getIsOffline } from "../../../store/offlineSelectors";
 import { AppRoute, Color, ErrorMessage, NameFolder } from "../../../const";
 import { useToastCustom } from "../../../hooks/useToastCustom";
+import { removeTaskLike } from "../../../store/likesSlice";
 
 type CardListTasksProps = {
   count: number;
@@ -55,6 +56,7 @@ export function CardListTasks(props: CardListTasksProps) {
             await deleteFile(NameFolder.Tasks + task._id);
             dispatch(deleteDataTasksCopy(task));
             dispatch(deleteTasksInTask(task));
+            dispatch(removeTaskLike(task._id));
           }
           dispatch(setTasks(data));
         } catch {

@@ -46,12 +46,12 @@ export const AudioPlayer = memo((props: AudioPlayerProps) => {
   const playbackState = usePlaybackState();
   const { onErrorToast } = useToastCustom();
   const { startAnimating, stopAnimating } = useFrameInterval(100, async () => {
-    try {
-      const position = await TrackPlayer.getPosition();
-      setPosition(position);
-    } catch {
-      onErrorToast(ErrorMessage.PositionTrack);
-    }
+    // try {
+    //   const position = await TrackPlayer.getPosition();
+    //   setPosition(position);
+    // } catch {
+    //   onErrorToast(ErrorMessage.PositionTrack);
+    // }
   });
   const rotate = useSharedValue(0);
   const rotatePlayButton = useSharedValue(0);

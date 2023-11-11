@@ -35,9 +35,9 @@ import { useLazyGetTaskLottieQuery, useLazyGetTaskQuery } from "../../api/api";
 import deepEqual from "deep-equal";
 import { getDataTaskCopy, getTaskInTask } from "../../store/tasksSelectors";
 import { useFileSystem } from "../../hooks/useFileSystem";
-import { normalize } from "../../utils";
+import { levelAdapter, normalize } from "../../utils";
 import { setTasksInTask, setDataTasksCopy } from "../../store/tasksSlice";
-import { getIsLikeTask} from "../../store/likesSelectors";
+import { getIsLikeTask } from "../../store/likesSelectors";
 import { getIsOffline } from "../../store/offlineSelectors";
 import { Tracker } from "../../components/ui/Tracker";
 import { useToastCustom } from "../../hooks/useToastCustom";
@@ -154,20 +154,27 @@ export function Task() {
       <GlobalScreen withoutScrollView>
         <CenterContainer>
           <HeaderWithBack>
-            <TextTitle>{task && task.title}</TextTitle>
-            <Pressable onPress={toggleLike}>
-              <Animated.View
-                style={[{ backgroundColor: "transparent" }, likeStyle]}
-              >
-                <LikeIcon
-                  color={
-                    theme === Theme.Light ? Color.TextStandard : Color.TextWhite
-                  }
-                  isActive={isLike}
-                />
-              </Animated.View>
-            </Pressable>
+            <TextTitle numberOfLines={2} ellipsizeMode="tail">
+              {task && task.title}
+            </TextTitle>
+            {task && (
+              <Pressable onPress={toggleLike}>
+                <Animated.View
+                  style={[{ backgroundColor: "transparent" }, likeStyle]}
+                >
+                  <LikeIcon
+                    color={
+                      theme === Theme.Light
+                        ? Color.TextStandard
+                        : Color.TextWhite
+                    }
+                    isActive={isLike}
+                  />
+                </Animated.View>
+              </Pressable>
+            )}
           </HeaderWithBack>
+          {task && <TextLevel>Сложность: {levelAdapter(task?.kind)}</TextLevel>}
           <ScrollView showsVerticalScrollIndicator={false}>
             <Container>
               {task &&
@@ -200,19 +207,23 @@ export function Task() {
           </ScrollView>
         </CenterContainer>
       </GlobalScreen>
-      <Tracker id={taskId} title={task?.title} />
-      <PressableStyled
-        onPress={() =>
-          navigation.navigate(AppRoute.NotesStack, {
-            screen: AppRoute.Notes,
-            params: { screen: AppRoute.Note, task },
-          })
-        }
-      >
-        <ViewPlus>
-          <AddIcon />
-        </ViewPlus>
-      </PressableStyled>
+      {task && (
+        <>
+          <Tracker id={taskId} title={task?.title} />
+          <PressableStyled
+            onPress={() =>
+              navigation.navigate(AppRoute.NotesStack, {
+                screen: AppRoute.Notes,
+                params: { screen: AppRoute.Note, task },
+              })
+            }
+          >
+            <ViewPlus>
+              <AddIcon />
+            </ViewPlus>
+          </PressableStyled>
+        </>
+      )}
     </>
   );
 }
@@ -238,9 +249,17 @@ const TextTitle = styled.Text`
   color: ${({ theme }) => theme.color.standard};
 `;
 
+const TextLevel = styled.Text`
+  margin-bottom: 10px;
+  font-family: "Poppins-Regular";
+  font-size: ${normalize(12)}px;
+  line-height: ${normalize(14)}px;
+  color: ${({ theme }) => theme.color.standard};
+`;
+
 const Container = styled.View`
   gap: 20px;
-  margin-bottom: ${normalize(270)}px;
+  margin-bottom: ${normalize(370)}px;
 `;
 
 const LottieWrapper = styled.View`
@@ -256,7 +275,6 @@ const LottieNode = styled(LottieView)`
 `;
 
 const TextNode = styled.Text`
-  text-align: justify;
   font-family: "Poppins-Regular";
   font-size: ${normalize(18)}px;
   line-height: ${normalize(24)}px;

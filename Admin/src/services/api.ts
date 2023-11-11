@@ -199,10 +199,13 @@ export const mindfulnessApi = createApi({
     }),
     validateAddTask: builder.mutation<DataValidate, FormTextLottieImage>({
       query: (data) => {
+        const dataCopy = JSON.parse(JSON.stringify(data)) as FormTextLottieImage;
+        delete dataCopy.fields;
+
         return {
           url: ApiRoute.Tasks + ApiRoute.Validate,
           method: "POST",
-          body: addTaskAdapter(data),
+          body: dataCopy,
         };
       },
     }),
@@ -248,10 +251,13 @@ export const mindfulnessApi = createApi({
       { id: string; data: FormTextLottieImage }
     >({
       query: ({ id, data }) => {
+        const dataCopy = JSON.parse(JSON.stringify(data)) as FormTextLottieImage;
+        delete dataCopy.fields;
+
         return {
           url: ApiRoute.Tasks + ApiRoute.Validate + `/${id}`,
           method: "PATCH",
-          body: addTaskAdapter(data),
+          body: dataCopy,
         };
       },
     }),
@@ -279,10 +285,14 @@ export const mindfulnessApi = createApi({
     }),
     validateAddMeditation: builder.mutation<DataValidate, FormMeditation>({
       query: (data) => {
+        const dataCopy = JSON.parse(JSON.stringify(data)) as FormMeditation;
+        delete dataCopy.audio;
+        delete dataCopy.image;
+
         return {
           url: ApiRoute.Meditations + ApiRoute.Validate,
           method: "POST",
-          body: addMeditationAdapter(data),
+          body: dataCopy,
         };
       },
     }),
@@ -328,10 +338,14 @@ export const mindfulnessApi = createApi({
       { id: string; data: FormMeditation }
     >({
       query: ({ id, data }) => {
+        const dataCopy = JSON.parse(JSON.stringify(data)) as FormMeditation;
+        delete dataCopy.audio;
+        delete dataCopy.image;
+
         return {
           url: ApiRoute.Meditations + ApiRoute.Validate + `/${id}`,
           method: "PATCH",
-          body: addMeditationAdapter(data),
+          body: dataCopy,
         };
       },
     }),

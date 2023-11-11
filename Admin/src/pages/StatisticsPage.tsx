@@ -308,6 +308,7 @@ const Card = styled.article<{ $isMeditation: boolean }>`
   }
 
   @media (max-width: 550px) {
+    padding: 5px;
     width: 85px;
     height: 85px;
   }
@@ -319,6 +320,14 @@ const TitleCard = styled.h3<{ $isMeditation: boolean }>`
   color: ${({ $isMeditation }) =>
     $isMeditation ? Color.TextWhite : Color.TextStandard};
   text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -moz-box;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -moz-box-orient: vertical;
+  line-clamp: 4;
+  -webkit-line-clamp: 4;
 
   @media (max-width: 550px) {
     font-size: 10px;

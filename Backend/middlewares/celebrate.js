@@ -82,10 +82,6 @@ const postTaskCelebrate = celebrate({
   body: Joi.object().keys({
     title: Joi.string().required(),
     kind: Joi.string().required(),
-    type: Joi.alternatives()
-      .try(Joi.string().required(), Joi.array().items(Joi.string()).required())
-      .required(),
-    text: Joi.alternatives().try(Joi.string(), Joi.array().items(Joi.string())),
   }),
 });
 
@@ -102,10 +98,6 @@ const patchTaskCelebrate = celebrate({
   body: Joi.object().keys({
     title: Joi.string().required(),
     kind: Joi.string().required(),
-    type: Joi.alternatives()
-      .try(Joi.string().required(), Joi.array().items(Joi.string()).required())
-      .required(),
-    text: Joi.alternatives().try(Joi.string(), Joi.array().items(Joi.string())),
   }),
 });
 
@@ -113,7 +105,7 @@ const postMeditationCelebrate = celebrate({
   body: Joi.object().keys({
     title: Joi.string().required(),
     kind: Joi.string().required(),
-    textLines: Joi.string(),
+    textLines: Joi.array(),
   }),
 });
 
@@ -130,7 +122,7 @@ const patchMeditationCelebrate = celebrate({
   body: Joi.object().keys({
     title: Joi.string().required(),
     kind: Joi.string().required(),
-    textLines: Joi.string(),
+    textLines: Joi.array(),
   }),
 });
 

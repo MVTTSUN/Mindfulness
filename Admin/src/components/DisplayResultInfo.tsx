@@ -101,7 +101,7 @@ const Text = styled.p`
   ${FontSizeStandard}
   width: 100%;
   color: ${Color.TextStandard};
-  text-align: justify;
+  white-space: break-spaces;
 `;
 
 const TextStrong = styled.span`

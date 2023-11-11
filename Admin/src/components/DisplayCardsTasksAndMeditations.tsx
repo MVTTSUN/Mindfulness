@@ -99,9 +99,17 @@ const TitleCard = styled.h3<{ $isMeditation: boolean }>`
   color: ${({ $isMeditation }) =>
     $isMeditation ? Color.TextWhite : Color.TextStandard};
   text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -moz-box;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -moz-box-orient: vertical;
+  line-clamp: 5;
+  -webkit-line-clamp: 5;
 
   @media (max-width: 550px) {
-    font-size: 12px;
+    font-size: 10px;
   }
 `;
 

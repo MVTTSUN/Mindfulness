@@ -21,22 +21,10 @@ const authMiddleware = require('../middlewares/auth');
 router.get('/', getMeditations);
 router.get('/:id', statisticsMiddleware, getMeditation);
 router.get('/filename/:filename', getMeditationFile);
-router.post(
-  '/validate',
-  authMiddleware,
-  uploadMeditations.any(),
-  postMeditationCelebrate,
-  postMeditationUnique
-);
+router.post('/validate', authMiddleware, postMeditationCelebrate, postMeditationUnique);
 router.post('/', authMiddleware, uploadMeditations.array('file'), postMeditation);
 router.delete('/:id', authMiddleware, deleteMeditationCelebrate, deleteMeditation);
-router.patch(
-  '/validate/:id',
-  authMiddleware,
-  uploadMeditations.any(),
-  patchMeditationCelebrate,
-  patchMeditationUnique
-);
+router.patch('/validate/:id', authMiddleware, patchMeditationCelebrate, patchMeditationUnique);
 router.patch('/:id', authMiddleware, uploadMeditations.array('file'), patchMeditation);
 
 module.exports = router;

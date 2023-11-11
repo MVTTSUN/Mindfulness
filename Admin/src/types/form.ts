@@ -6,7 +6,7 @@ type FieldTextLottieImage = {
 type FormTextLottieImage = {
   title?: string;
   kind?: string;
-  fields: FieldTextLottieImage[];
+  fields?: FieldTextLottieImage[];
 };
 
 type FieldEmotion = {
@@ -42,8 +42,8 @@ type TextLine = {
 
 type FormMeditation = {
   title: string;
-  image: File | string;
-  audio: File | string;
+  image?: File | string;
+  audio?: File | string;
   textLines: TextLine[];
   kind: string;
 };

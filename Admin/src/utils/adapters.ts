@@ -8,15 +8,17 @@ import {
 const addTipsAdapter = (data: FormTextLottieImage) => {
   const formData = new FormData();
 
-  for (const field of data.fields) {
-    if (field.type === "lottie" || field.type === "image") {
-      formData.append("file", field.payload);
-      formData.append("type", field.type);
-    } else {
-      const text = field.payload as string;
-
-      formData.append("text", text.trim());
-      formData.append("type", field.type);
+  if (data.fields) {
+    for (const field of data.fields) {
+      if (field.type === "lottie" || field.type === "image") {
+        formData.append("file", field.payload);
+        formData.append("type", field.type);
+      } else {
+        const text = field.payload as string;
+  
+        formData.append("text", text.trim());
+        formData.append("type", field.type);
+      }
     }
   }
 
@@ -108,8 +110,8 @@ const addMeditationAdapter = (data: FormMeditation) => {
 
   formData.append("title", data.title.trim());
   formData.append("kind", data.kind);
-  formData.append("file", data.image);
-  formData.append("file", data.audio);
+  data.image && formData.append("file", data.image);
+  data.audio && formData.append("file", data.audio);
   formData.append("textLines", JSON.stringify(data.textLines));
 
   return formData;

@@ -173,7 +173,7 @@ const BurgerMenu = styled.div<{ $isOpen: boolean }>`
   @media (max-width: 900px) {
     padding: 20px 100px;
     position: fixed;
-    top: 80px;
+    top: 75px;
     right: 0;
     height: 100vh;
     transform: ${({ $isOpen }) =>

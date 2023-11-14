@@ -23,6 +23,8 @@ import { useLazyGetEmotionsQuery } from "../../api/api";
 import { setDataEmotionsCopy, setEmotions } from "../../store/emotionsSlice";
 import deepEqual from "deep-equal";
 import { getFilteredNotes } from "../../store/notesSelectors";
+import { Preloader } from "../../components/ui/animate-elements/Preloader";
+import { getIsOffline } from "../../store/offlineSelectors";
 
 export function Statistics() {
   const [isOpenTypesPopup, setIsOpenTypesPopup] = useState(false);
@@ -31,6 +33,7 @@ export function Statistics() {
   const notesFiltered = useAppSelector(getFilteredNotes);
   const emotions = useAppSelector(getEmotions);
   const emotionsDataCopy = useAppSelector(getDataEmotionsCopy);
+  const isOffline = useAppSelector(getIsOffline);
   const dispatch = useAppDispatch();
   const [getEmotionsQuery] = useLazyGetEmotionsQuery();
   const emotionsAfter = processDataForChart(emotions, notesFiltered, "after");
@@ -66,7 +69,9 @@ export function Statistics() {
   );
 
   useEffect(() => {
-    loadingData();
+    if (!isOffline) {
+      loadingData();
+    }
   }, []);
 
   return (
@@ -76,32 +81,37 @@ export function Statistics() {
           <HeaderWithBack>
             <TextTitle>Статистика</TextTitle>
           </HeaderWithBack>
-          <NotesFilter
-            setIsOpenTypesPopup={setIsOpenTypesPopup}
-            setIsOpenMonthsPopup={setIsOpenMonthsPopup}
-            setIsOpenYearsPopup={setIsOpenYearsPopup}
-            isHideButtonStatistics
-          />
-          <TitleChart>До</TitleChart>
-          <ScrollViewStyled
-            showsVerticalScrollIndicator={false}
-            nestedScrollEnabled
-          >
-            <HorizontalChartBar
-              emotions={emotionsBefore}
-              maxCountBar={maxCountBar}
-            />
-          </ScrollViewStyled>
-          <TitleChart>После</TitleChart>
-          <ScrollViewStyled
-            showsVerticalScrollIndicator={false}
-            nestedScrollEnabled
-          >
-            <HorizontalChartBar
-              emotions={emotionsAfter}
-              maxCountBar={maxCountBar}
-            />
-          </ScrollViewStyled>
+          {!emotions.length && <Preloader />}
+          {!!emotions.length && (
+            <>
+              <NotesFilter
+                setIsOpenTypesPopup={setIsOpenTypesPopup}
+                setIsOpenMonthsPopup={setIsOpenMonthsPopup}
+                setIsOpenYearsPopup={setIsOpenYearsPopup}
+                isHideButtonStatistics
+              />
+              <TitleChart>До</TitleChart>
+              <ScrollViewStyled
+                showsVerticalScrollIndicator={false}
+                nestedScrollEnabled
+              >
+                <HorizontalChartBar
+                  emotions={emotionsBefore}
+                  maxCountBar={maxCountBar}
+                />
+              </ScrollViewStyled>
+              <TitleChart>После</TitleChart>
+              <ScrollViewStyled
+                showsVerticalScrollIndicator={false}
+                nestedScrollEnabled
+              >
+                <HorizontalChartBar
+                  emotions={emotionsAfter}
+                  maxCountBar={maxCountBar}
+                />
+              </ScrollViewStyled>
+            </>
+          )}
         </CenterContainer>
       </GlobalScreen>
       {isOpenTypesPopup && (

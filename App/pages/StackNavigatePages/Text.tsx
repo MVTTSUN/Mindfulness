@@ -21,7 +21,7 @@ export function Text() {
   const { onErrorToast } = useToastCustom();
   const { startAnimating, stopAnimating } = useFrameInterval(100, async () => {
     try {
-      const position = await TrackPlayer.getPosition();
+      const { position } = await TrackPlayer.getProgress();
       setPosition(position);
     } catch {
       onErrorToast(ErrorMessage.PositionTrack);
@@ -57,7 +57,7 @@ export function Text() {
       return () => {
         stopAnimating();
       };
-    }, [playbackState, isCurrentAudio])
+    }, [playbackState.state, isCurrentAudio])
   );
 
   useEffect(() => {
@@ -68,7 +68,9 @@ export function Text() {
     <GlobalScreen withoutScrollView>
       <CenterContainer>
         <HeaderWithBack>
-          <TextAudio>{meditation.title}</TextAudio>
+          <TextAudio numberOfLines={2} ellipsizeMode="tail">
+            {meditation.title}
+          </TextAudio>
         </HeaderWithBack>
         <ScrollView showsVerticalScrollIndicator={false}>
           {meditation.textLines?.map(({ timeTo, timeAt, text }, id) => (
@@ -84,6 +86,7 @@ export function Text() {
               </TextLine>
             </Pressable>
           ))}
+          <SpaceBottom />
         </ScrollView>
       </CenterContainer>
     </GlobalScreen>
@@ -91,6 +94,8 @@ export function Text() {
 }
 
 const TextAudio = styled.Text`
+  width: 90%;
+  text-align: right;
   font-family: "Poppins-Medium";
   font-size: ${normalize(18)}px;
   color: ${({ theme }) => theme.color.standard};
@@ -102,4 +107,8 @@ const TextLine = styled.Text<{ $isOpacity: boolean }>`
   font-size: ${normalize(24)}px;
   line-height: ${normalize(38)}px;
   color: ${({ theme }) => theme.color.standard};
+`;
+
+const SpaceBottom = styled.View`
+  height: ${normalize(300)}px;
 `;

@@ -1,5 +1,5 @@
 import { styled } from "styled-components/native";
-import { MeditationScreenProp } from "../../../types";
+import { DataMeditation, MeditationScreenProp } from "../../../types";
 import { TouchableHighlightCard } from "../touchables/TouchableHighlightCard";
 import {
   useFocusEffect,
@@ -29,8 +29,10 @@ import {
 import { getIsOffline } from "../../../store/offlineSelectors";
 import { AppRoute, Color, ErrorMessage, NameFolder } from "../../../const";
 import { useToastCustom } from "../../../hooks/useToastCustom";
-import { removeMeditationLike } from '../../../store/likesSlice';
-import { removeDownloadAudio } from '../../../store/downloadAudioSlice';
+import { removeMeditationLike } from "../../../store/likesSlice";
+import { removeDownloadAudio } from "../../../store/downloadAudioSlice";
+import { Preloader } from "../animate-elements/Preloader";
+import { setIsUpdatePlayer } from "../../../store/trackPlayerSlice";
 
 type CardListMeditationProps = {
   count: number;
@@ -57,10 +59,19 @@ export function CardListMeditation(props: CardListMeditationProps) {
 
   const loadingData = async () => {
     const { data } = await getMeditationsQuery();
+    const dataCopy = JSON.parse(JSON.stringify(data)) as DataMeditation[];
 
     if (data) {
-      if (!deepEqual(meditations, data)) {
+      if (
+        !deepEqual(
+          meditations,
+          dataCopy.sort((a, b) =>
+            a.title && b.title ? a.title.localeCompare(b.title) : -1
+          )
+        )
+      ) {
         try {
+          dispatch(setIsUpdatePlayer(true));
           const MeditationsForDeleting = meditations.filter(
             (oldMeditation) =>
               !data.some(
@@ -101,52 +112,56 @@ export function CardListMeditation(props: CardListMeditationProps) {
   }, []);
 
   return (
-    <ViewContainer>
-      {countFilteredMeditations.map((meditation, index) => {
-        if (
-          index + 1 === count &&
-          count % 3 === 0 &&
-          countFilteredMeditations.length <= count
-        ) {
+    <>
+      {!meditations.length && <Preloader />}
+      <ViewContainer>
+        {countFilteredMeditations.map((meditation, index) => {
+          if (
+            index + 1 === count &&
+            count % 3 === 0 &&
+            countFilteredMeditations.length <= count &&
+            meditations.length > count
+          ) {
+            return (
+              <TouchableHighlightCard
+                isAll
+                key={meditation._id}
+                onPress={
+                  route.name === AppRoute.Home ? navigateMeditation : seeAll
+                }
+              >
+                Смотреть все
+              </TouchableHighlightCard>
+            );
+          }
           return (
             <TouchableHighlightCard
-              isAll
+              color={Color.TextWhite}
+              backgroundColor={Color.Meditation}
+              underlayColor={Color.MeditationPressed}
               key={meditation._id}
-              onPress={
-                route.name === AppRoute.Home ? navigateMeditation : seeAll
-              }
+              onPress={() => {
+                if (route.name === AppRoute.Home) {
+                  navigation.navigate(AppRoute.MeditationsStack, {
+                    screen: AppRoute.Meditations,
+                    params: {
+                      screen: AppRoute.Meditation,
+                      meditationId: meditation._id,
+                    },
+                  });
+                } else {
+                  navigation.navigate(AppRoute.Meditation, {
+                    meditationId: meditation._id,
+                  });
+                }
+              }}
             >
-              Смотреть все
+              {meditation.title}
             </TouchableHighlightCard>
           );
-        }
-        return (
-          <TouchableHighlightCard
-            color={Color.TextWhite}
-            backgroundColor={Color.Meditation}
-            underlayColor={Color.MeditationPressed}
-            key={meditation._id}
-            onPress={() => {
-              if (route.name === AppRoute.Home) {
-                navigation.navigate(AppRoute.MeditationsStack, {
-                  screen: AppRoute.Meditations,
-                  params: {
-                    screen: AppRoute.Meditation,
-                    meditationId: meditation._id,
-                  },
-                });
-              } else {
-                navigation.navigate(AppRoute.Meditation, {
-                  meditationId: meditation._id,
-                });
-              }
-            }}
-          >
-            {meditation.title}
-          </TouchableHighlightCard>
-        );
-      })}
-    </ViewContainer>
+        })}
+      </ViewContainer>
+    </>
   );
 }
 

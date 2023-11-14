@@ -4,12 +4,14 @@
     "slug": "Mindfulness",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/mindfulness-icon.jpg",
+    "icon": "./assets/images/mindfulness-icon.png",
     "userInterfaceStyle": "automatic",
+    "backgroundColor": "#aef0f6",
+    "primaryColor": "#aef0f6",
     "splash": {
-      "image": "./assets/images/mindfulness-splash.jpg",
+      "image": "./assets/images/mindfulness-splash.png",
       "resizeMode": "cover",
-      "backgroundColor": "#f5f4fa"
+      "backgroundColor": "#aef0f6"
     },
     "assetBundlePatterns": [
       "**/*"
@@ -33,11 +35,19 @@
         "MEDIA_LIBRARY"
       ],
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/mindfulness-adaptive-icon.jpg",
-        "backgroundColor": "#f5f4fa"
+        "foregroundImage": "./assets/images/mindfulness-adaptive-icon.png",
+        "backgroundColor": "#aef0f6"
       },
       "softwareKeyboardLayoutMode": "pan",
       "package": "com.mvtt.mindfulness"
+    },
+    "androidStatusBar": {
+      "barStyle": "light-content",
+      "backgroundColor": "#000000"
+    },
+    "androidNavigationBar": {
+      "barStyle": "light-content",
+      "backgroundColor": "#000000"
     },
     "extra": {
       "eas": {
@@ -49,7 +59,8 @@
       "color": "#aef0f6"
     },
     "plugins": [
-      "@notifee/react-native"
+      "@notifee/react-native",
+      "./plugins/withDisableForcedDarkModeAndroid.js"
     ]
   }
 }

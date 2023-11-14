@@ -1,5 +1,5 @@
 import { styled } from "styled-components/native";
-import { TasksScreenProp } from "../../../types";
+import { DataTextLottieImage, TasksScreenProp } from "../../../types";
 import { TouchableHighlightCard } from "../touchables/TouchableHighlightCard";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { useEffect, useCallback } from "react";
@@ -23,6 +23,7 @@ import { getIsOffline } from "../../../store/offlineSelectors";
 import { AppRoute, Color, ErrorMessage, NameFolder } from "../../../const";
 import { useToastCustom } from "../../../hooks/useToastCustom";
 import { removeTaskLike } from "../../../store/likesSlice";
+import { Preloader } from "../animate-elements/Preloader";
 
 type CardListTasksProps = {
   count: number;
@@ -45,9 +46,17 @@ export function CardListTasks(props: CardListTasksProps) {
 
   const loadingData = async () => {
     const { data } = await getTasksQuery();
+    const dataCopy = JSON.parse(JSON.stringify(data)) as DataTextLottieImage[];
 
     if (data) {
-      if (!deepEqual(tasks, data)) {
+      if (
+        !deepEqual(
+          tasks,
+          dataCopy.sort((a, b) =>
+            a.title && b.title ? a.title.localeCompare(b.title) : -1
+          )
+        )
+      ) {
         try {
           const TasksForDeleting = tasks.filter(
             (oldTask) => !data.some((newTask) => oldTask._id === newTask._id)
@@ -85,34 +94,38 @@ export function CardListTasks(props: CardListTasksProps) {
   }, []);
 
   return (
-    <ViewContainer>
-      {countFilteredTasks.map((task, index) => {
-        if (
-          index + 1 === count &&
-          count % 3 === 0 &&
-          countFilteredTasks.length <= count
-        ) {
+    <>
+      {!tasks.length && <Preloader />}
+      <ViewContainer>
+        {countFilteredTasks.map((task, index) => {
+          if (
+            index + 1 === count &&
+            count % 3 === 0 &&
+            countFilteredTasks.length <= count &&
+            tasks.length > count
+          ) {
+            return (
+              <TouchableHighlightCard isAll key={task._id} onPress={seeAll}>
+                Смотреть все
+              </TouchableHighlightCard>
+            );
+          }
           return (
-            <TouchableHighlightCard isAll key={task._id} onPress={seeAll}>
-              Смотреть все
+            <TouchableHighlightCard
+              color={Color.TextStandard}
+              backgroundColor={Color.Task}
+              underlayColor={Color.TaskPressed}
+              key={task._id}
+              onPress={() =>
+                navigation.navigate(AppRoute.Task, { taskId: task._id })
+              }
+            >
+              {task.title}
             </TouchableHighlightCard>
           );
-        }
-        return (
-          <TouchableHighlightCard
-            color={Color.TextStandard}
-            backgroundColor={Color.Task}
-            underlayColor={Color.TaskPressed}
-            key={task._id}
-            onPress={() =>
-              navigation.navigate(AppRoute.Task, { taskId: task._id })
-            }
-          >
-            {task.title}
-          </TouchableHighlightCard>
-        );
-      })}
-    </ViewContainer>
+        })}
+      </ViewContainer>
+    </>
   );
 }
 

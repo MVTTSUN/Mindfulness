@@ -3,7 +3,7 @@ import { SliceName, Theme } from '../const';
 
 const initialState = {
   value: Theme.Light,
-  idRadioButton: 2,
+  idRadioButton: 0,
 };
 
 export const themeSlice = createSlice({

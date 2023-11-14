@@ -3,6 +3,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { memo, useCallback, useEffect } from "react";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
+import * as NavigationBar from "expo-navigation-bar";
 import { ThemeProvider, styled } from "styled-components/native";
 import { Color, DARK_THEME, ErrorMessage, LIGHT_THEME, Theme } from "./const";
 import { useAppSelector } from "./hooks/useAppSelector";
@@ -11,22 +12,22 @@ import TrackPlayer, {
   AppKilledPlaybackBehavior,
   Capability,
 } from "react-native-track-player";
-import { getIsInitializedPlayer } from "./store/trackPlayerSelectors";
-import { useAppDispatch } from "./hooks/useAppDispatch";
-import { setIsInitializedPlayer } from "./store/trackPlayerSlice";
 import { ToastProvider } from "react-native-toast-notifications";
 import { normalize } from "./utils";
-import { getValueTheme } from "./store/themeSelectors";
+import { getIdRadioButtonTheme, getValueTheme } from "./store/themeSelectors";
 import { useToastCustom } from "./hooks/useToastCustom";
 import { getNotifications } from "./store/notificationsSelectors";
 import { useNotifee } from "./hooks/useNotifee";
-import { AppState } from "react-native";
+import { AppState, useColorScheme } from "react-native";
+import { changeTheme } from "./store/themeSlice";
+import { useAppDispatch } from "./hooks/useAppDispatch";
 
 SplashScreen.preventAutoHideAsync();
 
 export const App = memo(() => {
+  const colorScheme = useColorScheme();
+  const idRadioButton = useAppSelector(getIdRadioButtonTheme);
   const notifications = useAppSelector(getNotifications);
-  const isInitializedPlayer = useAppSelector(getIsInitializedPlayer);
   const theme = useAppSelector(getValueTheme);
   const dispatch = useAppDispatch();
   const [fontsLoaded] = useFonts({
@@ -56,20 +57,18 @@ export const App = memo(() => {
             AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification,
         },
         capabilities: [
+          Capability.SeekTo,
           Capability.Play,
           Capability.Pause,
           Capability.SkipToPrevious,
         ],
         compactCapabilities: [
+          Capability.SeekTo,
           Capability.Play,
           Capability.Pause,
           Capability.SkipToPrevious,
         ],
-        playIcon: require("./assets/images/play-icon.png"),
-        pauseIcon: require("./assets/images/pause-icon.png"),
-        previousIcon: require("./assets/images/previous-icon.png"),
       });
-      dispatch(setIsInitializedPlayer(true));
     } catch {
       onErrorToast(ErrorMessage.IntializePlayer);
     }
@@ -91,12 +90,28 @@ export const App = memo(() => {
   };
 
   useEffect(() => {
+    if (colorScheme && idRadioButton === 0) {
+      dispatch(changeTheme(colorScheme));
+    }
+  }, [colorScheme]);
+
+  useEffect(() => {
+    if (theme) {
+      if (theme === Theme.Light) {
+        NavigationBar.setBackgroundColorAsync(Color.TextStandard);
+        NavigationBar.setButtonStyleAsync("light");
+      } else {
+        NavigationBar.setBackgroundColorAsync("#101010");
+        NavigationBar.setButtonStyleAsync("light");
+      }
+    }
+  }, [theme]);
+
+  useEffect(() => {
     setNotificationFirstLaunchApp();
     clearAllBadgeIOS();
 
-    if (!isInitializedPlayer) {
-      setup();
-    }
+    setup();
 
     const subscription = AppState.addEventListener("change", (nextAppState) => {
       if (nextAppState === "active") {

@@ -1,10 +1,8 @@
 import { styled } from "styled-components/native";
 import { PlayIcon } from "../svg/icons/other-icons/PlayIcon";
 import TrackPlayer, {
-  Event,
   State,
   usePlaybackState,
-  useTrackPlayerEvents,
 } from "react-native-track-player";
 import { Slider } from "@miblanchard/react-native-slider";
 import { useAppSelector } from "../../hooks/useAppSelector";
@@ -27,10 +25,14 @@ import { normalize } from "../../utils";
 import { useFrameInterval } from "../../hooks/useFrameInterval";
 import { useFocusEffect } from "@react-navigation/native";
 import { MeditationPlayer } from "../../types";
-import { setLastMeditation } from "../../store/trackPlayerSlice";
+import {
+  setIsUpdatePlayer,
+  setLastMeditation,
+} from "../../store/trackPlayerSlice";
 import { getValueTheme } from "../../store/themeSelectors";
 import { useToastCustom } from "../../hooks/useToastCustom";
 import { Color, ErrorMessage, Theme } from "../../const";
+import { getIsUpdatePlayer } from "../../store/trackPlayerSelectors";
 
 type AudioPlayerProps = {
   meditation: MeditationPlayer;
@@ -42,16 +44,17 @@ export const AudioPlayer = memo((props: AudioPlayerProps) => {
   const [isCurrentAudio, setIsCurrentAudio] = useState(false);
   const [position, setPosition] = useState(0);
   const theme = useAppSelector(getValueTheme);
+  const isUpdatePlayer = useAppSelector(getIsUpdatePlayer);
   const dispatch = useAppDispatch();
   const playbackState = usePlaybackState();
   const { onErrorToast } = useToastCustom();
-  const { startAnimating, stopAnimating } = useFrameInterval(100, async () => {
-    // try {
-    //   const position = await TrackPlayer.getPosition();
-    //   setPosition(position);
-    // } catch {
-    //   onErrorToast(ErrorMessage.PositionTrack);
-    // }
+  const { startAnimating, stopAnimating } = useFrameInterval(1000, async () => {
+    try {
+      const { position } = await TrackPlayer.getProgress();
+      setPosition(position);
+    } catch {
+      onErrorToast(ErrorMessage.PositionTrack);
+    }
   });
   const rotate = useSharedValue(0);
   const rotatePlayButton = useSharedValue(0);
@@ -77,7 +80,7 @@ export const AudioPlayer = memo((props: AudioPlayerProps) => {
 
       if (
         currentAudio?.id !== meditation.id ||
-        playbackState === State.Stopped
+        playbackState.state === State.Stopped
       ) {
         setPosition(0);
         await TrackPlayer.reset();
@@ -88,12 +91,18 @@ export const AudioPlayer = memo((props: AudioPlayerProps) => {
       }
 
       if (currentAudio?.id === meditation.id && currentAudio?.id !== null) {
-        if (playbackState === State.Paused || playbackState === State.Ready) {
+        if (
+          playbackState.state === State.Paused ||
+          playbackState.state === State.Ready ||
+          playbackState.state === State.Error
+        ) {
           await TrackPlayer.play();
           setIsCurrentAudio(true);
           dispatch(setLastMeditation(meditation));
-        } else if (playbackState === State.Playing) {
+        } else if (playbackState.state === State.Playing) {
           await TrackPlayer.pause();
+        } else if (playbackState.state === State.Ended) {
+          await TrackPlayer.skipToPrevious(0);
         }
       }
     } catch {
@@ -108,7 +117,7 @@ export const AudioPlayer = memo((props: AudioPlayerProps) => {
         withSpring(1.3),
         withSpring(1)
       );
-      await TrackPlayer.skipToPrevious();
+      await TrackPlayer.skipToPrevious(0);
     } catch {
       onErrorToast(ErrorMessage.Player);
     }
@@ -129,7 +138,7 @@ export const AudioPlayer = memo((props: AudioPlayerProps) => {
 
       if (currentAudio?.id === meditation.id) {
         setIsCurrentAudio(true);
-        const position = await TrackPlayer.getPosition();
+        const { position } = await TrackPlayer.getProgress();
         setPosition(position);
       } else {
         setIsCurrentAudio(false);
@@ -139,15 +148,6 @@ export const AudioPlayer = memo((props: AudioPlayerProps) => {
     }
   };
 
-  useTrackPlayerEvents([Event.PlaybackQueueEnded], async () => {
-    try {
-      await TrackPlayer.reset();
-      await TrackPlayer.add([meditation]);
-    } catch {
-      onErrorToast(ErrorMessage.Player);
-    }
-  });
-
   useFocusEffect(
     useCallback(() => {
       startAnimating();
@@ -155,12 +155,13 @@ export const AudioPlayer = memo((props: AudioPlayerProps) => {
       return () => {
         stopAnimating();
       };
-    }, [playbackState, isCurrentAudio])
+    }, [playbackState.state, isCurrentAudio])
   );
 
   useEffect(() => {
     if (
-      (playbackState === State.Playing || playbackState === State.Buffering) &&
+      (playbackState.state === State.Playing ||
+        playbackState.state === State.Buffering) &&
       isCurrentAudio
     ) {
       rotatePlayButton.value = withTiming(1, {
@@ -175,7 +176,19 @@ export const AudioPlayer = memo((props: AudioPlayerProps) => {
         easing: Easing.bezier(0.25, -0.5, 0.25, 1),
       });
     }
-  }, [playbackState, isCurrentAudio]);
+  }, [playbackState.state, isCurrentAudio]);
+
+  useEffect(() => {
+    if (isUpdatePlayer && meditation) {
+      TrackPlayer.reset();
+      TrackPlayer.add([meditation]);
+      dispatch(setIsUpdatePlayer(false));
+    }
+
+    if (!meditation) {
+      dispatch(setIsUpdatePlayer(false));
+    }
+  }, [isUpdatePlayer]);
 
   useEffect(() => {
     rotate.value = withRepeat(
@@ -192,6 +205,10 @@ export const AudioPlayer = memo((props: AudioPlayerProps) => {
         value={isCurrentAudio ? position : 0}
         onSlidingComplete={changeValue}
         maximumValue={duration}
+        containerStyle={{
+          height: normalize(20),
+          marginBottom: 5,
+        }}
         thumbStyle={{
           width: normalize(13),
           height: normalize(13),
@@ -235,8 +252,8 @@ export const AudioPlayer = memo((props: AudioPlayerProps) => {
           <PressableStyled
             onPress={
               isCurrentAudio &&
-              (playbackState === State.Buffering ||
-                playbackState === State.Connecting)
+              (playbackState.state === State.Buffering ||
+                playbackState.state === State.Loading)
                 ? () => {}
                 : togglePlayAudio
             }
@@ -244,22 +261,29 @@ export const AudioPlayer = memo((props: AudioPlayerProps) => {
               {
                 backgroundColor: pressed
                   ? isCurrentAudio &&
-                    (playbackState === State.Buffering ||
-                      playbackState === State.Connecting)
+                    (playbackState.state === State.Buffering ||
+                      playbackState.state === State.Loading)
                     ? ""
                     : Color.PrimaryPressed
                   : Color.Primary,
               },
             ]}
           >
-            {isCurrentAudio && playbackState === State.Playing && <PauseIcon />}
-            {(playbackState === State.Paused ||
-              playbackState === State.Ready ||
-              playbackState === State.Stopped ||
-              !isCurrentAudio) && <PlayIcon size={32} />}
+            {isCurrentAudio && playbackState.state === State.Playing && (
+              <PauseIcon />
+            )}
+            {(playbackState.state === State.Paused ||
+              playbackState.state === State.Ready ||
+              playbackState.state === State.Stopped ||
+              playbackState.state === State.Error ||
+              playbackState.state === State.Ended ||
+              !isCurrentAudio ||
+              (isCurrentAudio && playbackState.state === State.None)) && (
+              <PlayIcon size={32} />
+            )}
             {isCurrentAudio &&
-              (playbackState === State.Buffering ||
-                playbackState === State.Connecting) && (
+              (playbackState.state === State.Buffering ||
+                playbackState.state === State.Loading) && (
                 <Animated.View style={rotateStyle}>
                   <LoaderIcon />
                 </Animated.View>
@@ -274,13 +298,14 @@ export const AudioPlayer = memo((props: AudioPlayerProps) => {
 const ViewContainer = styled.View``;
 
 const ContainerTime = styled.View`
-  margin-bottom: 40px;
+  margin-bottom: 10px;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
 `;
 
 const InfoTime = styled.Text`
+  margin-bottom: 10px;
   font-family: "Poppins-Regular";
   font-size: ${normalize(12)}px;
   height: ${normalize(20)}px;

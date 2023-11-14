@@ -4,7 +4,7 @@ import { MeditationPlayer } from '../types';
 
 const initialState = {
   lastMeditation: null as MeditationPlayer | null,
-  isInitializedPlayer: false,
+  isUpdatePlayer: false,
 };
 
 export const trackPlayerSlice = createSlice({
@@ -14,12 +14,12 @@ export const trackPlayerSlice = createSlice({
     setLastMeditation(state, action) {
       state.lastMeditation = action.payload;
     },
-    setIsInitializedPlayer(state, action) {
-      state.isInitializedPlayer = action.payload;
-    }
+    setIsUpdatePlayer(state, action) {
+      state.isUpdatePlayer = action.payload;
+    },
   },
 });
 
-export const { setLastMeditation, setIsInitializedPlayer } = trackPlayerSlice.actions;
+export const { setLastMeditation, setIsUpdatePlayer } = trackPlayerSlice.actions;
 
 export default trackPlayerSlice.reducer;

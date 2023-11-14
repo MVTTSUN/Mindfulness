@@ -25,6 +25,8 @@ import { LikeIcon } from "../../components/svg/icons/other-icons/LikeIcon";
 import { useAppSelector } from "../../hooks/useAppSelector";
 import { useAppDispatch } from "../../hooks/useAppDispatch";
 import Animated, {
+  FadeIn,
+  FadeOut,
   useAnimatedStyle,
   useSharedValue,
   withSequence,
@@ -41,6 +43,9 @@ import { getIsLikeTask } from "../../store/likesSelectors";
 import { getIsOffline } from "../../store/offlineSelectors";
 import { Tracker } from "../../components/ui/Tracker";
 import { useToastCustom } from "../../hooks/useToastCustom";
+import { Preloader } from "../../components/ui/animate-elements/Preloader";
+import { LevelAndConcentration } from "../../components/ui/LevelAndConcentration";
+import { getIsConcentration } from "../../store/concentrationSelectors";
 
 export function Task() {
   const route = useRoute();
@@ -51,6 +56,7 @@ export function Task() {
   const dataTaskCopy = useAppSelector(getDataTaskCopy(taskId));
   const task = useAppSelector(getTaskInTask(taskId));
   const isOffline = useAppSelector(getIsOffline);
+  const isConcentration = useAppSelector(getIsConcentration);
   const dispatch = useAppDispatch();
   const [getTaskQuery] = useLazyGetTaskQuery();
   const [getTaskLottieQuery] = useLazyGetTaskLottieQuery();
@@ -174,13 +180,22 @@ export function Task() {
               </Pressable>
             )}
           </HeaderWithBack>
-          {task && <TextLevel>Сложность: {levelAdapter(task?.kind)}</TextLevel>}
+          {!task && <Preloader />}
+          {task && <LevelAndConcentration kind={task?.kind} />}
           <ScrollView showsVerticalScrollIndicator={false}>
             <Container>
               {task &&
                 task.data.map((node) => {
                   if (node.type === "text") {
-                    return <TextNode key={node._id}>{node.payload}</TextNode>;
+                    return (
+                      <TextNodes key={node._id}>
+                        {node.payload.split("\n").map((text, index) => (
+                          <TextNode key={`${node._id}-${index}`}>
+                            {text}
+                          </TextNode>
+                        ))}
+                      </TextNodes>
+                    );
                   } else if (node.type === "image") {
                     return (
                       <ImageWrapper key={node._id}>
@@ -207,21 +222,24 @@ export function Task() {
           </ScrollView>
         </CenterContainer>
       </GlobalScreen>
-      {task && (
+      {task && !isConcentration && (
         <>
           <Tracker id={taskId} title={task?.title} />
-          <PressableStyled
-            onPress={() =>
-              navigation.navigate(AppRoute.NotesStack, {
-                screen: AppRoute.Notes,
-                params: { screen: AppRoute.Note, task },
-              })
-            }
+          <Animated.View
+            entering={FadeIn.duration(100)}
+            exiting={FadeOut.duration(100)}
           >
-            <ViewPlus>
+            <PressableStyled
+              onPress={() =>
+                navigation.navigate(AppRoute.NotesStack, {
+                  screen: AppRoute.Notes,
+                  params: { screen: AppRoute.Note, task },
+                })
+              }
+            >
               <AddIcon />
-            </ViewPlus>
-          </PressableStyled>
+            </PressableStyled>
+          </Animated.View>
         </>
       )}
     </>
@@ -230,36 +248,21 @@ export function Task() {
 
 const PressableStyled = styled.Pressable`
   position: absolute;
-  right: ${normalize(40)}px;
-  bottom: ${normalize(100)}px;
-`;
-
-const ViewPlus = styled.View`
-  align-items: center;
-  justify-content: center;
-  width: ${normalize(50)}px;
-  height: ${normalize(50)}px;
-  border-radius: ${normalize(25)}px;
-  background-color: ${Color.TextStandard};
+  right: ${normalize(30)}px;
+  bottom: ${normalize(90)}px;
 `;
 
 const TextTitle = styled.Text`
+  text-align: center;
+  width: 80%;
   font-family: "Poppins-Medium";
   font-size: ${normalize(18)}px;
   color: ${({ theme }) => theme.color.standard};
 `;
 
-const TextLevel = styled.Text`
-  margin-bottom: 10px;
-  font-family: "Poppins-Regular";
-  font-size: ${normalize(12)}px;
-  line-height: ${normalize(14)}px;
-  color: ${({ theme }) => theme.color.standard};
-`;
-
 const Container = styled.View`
   gap: 20px;
-  margin-bottom: ${normalize(370)}px;
+  margin-bottom: ${normalize(390)}px;
 `;
 
 const LottieWrapper = styled.View`
@@ -274,10 +277,14 @@ const LottieNode = styled(LottieView)`
   flex: 1;
 `;
 
+const TextNodes = styled.View`
+  gap: 15px;
+`;
+
 const TextNode = styled.Text`
   font-family: "Poppins-Regular";
   font-size: ${normalize(18)}px;
-  line-height: ${normalize(24)}px;
+  line-height: ${normalize(22)}px;
   color: ${({ theme }) => theme.color.standard};
 `;
 

@@ -18,8 +18,9 @@ import { DataInformation } from "../../types";
 import { setDataInfosCopy, setInfos } from "../../store/infosSlice";
 import { normalize } from "../../utils";
 import { getIsOffline } from "../../store/offlineSelectors";
-import { PulseCircle } from "../../components/ui/PulseCircle";
+import { PulseCircle } from "../../components/ui/animate-elements/PulseCircle";
 import { useToastCustom } from "../../hooks/useToastCustom";
+import { Preloader } from "../../components/ui/animate-elements/Preloader";
 
 export function Service() {
   const infos = useAppSelector(getInfos);
@@ -82,27 +83,30 @@ export function Service() {
         <HeaderWithBack>
           <TextTitle>Поддержка</TextTitle>
         </HeaderWithBack>
-        <ScrollView showsVerticalScrollIndicator={false}>
-          <ViewMargin>
-            <Subtitle>Разработчик приложения</Subtitle>
-            <RoundedImage>
-              <LottieViewStyled
-                source={require("../../assets/lottie/animaRound.json")}
-                autoPlay
-                loop
-              />
-              <PulseCircle />
-              {infos && <ImageStyled source={{ uri: infos.avatarDevelop }} />}
-            </RoundedImage>
-            <TextName>{`${infos.secondNameDevelop} ${infos.firstNameDevelop} ${infos.surnameDevelop}`}</TextName>
-          </ViewMargin>
-          <Subtitle>Нашли баги или есть предложения по улучшению?</Subtitle>
-          <TouchableHighlight
-            onPress={() => Linking.openURL(`mailto:${infos.emailDevelop}`)}
-          >
-            {infos.emailDevelop}
-          </TouchableHighlight>
-        </ScrollView>
+        {!Object.keys(infos).length && <Preloader />}
+        {!!Object.keys(infos).length && (
+          <ScrollView showsVerticalScrollIndicator={false}>
+            <ViewMargin>
+              <Subtitle>Разработчик приложения</Subtitle>
+              <RoundedImage>
+                <LottieViewStyled
+                  source={require("../../assets/lottie/animaRound.json")}
+                  autoPlay
+                  loop
+                />
+                <PulseCircle />
+                {infos && <ImageStyled source={{ uri: infos.avatarDevelop }} />}
+              </RoundedImage>
+              <TextName>{`${infos.secondNameDevelop} ${infos.firstNameDevelop} ${infos.surnameDevelop}`}</TextName>
+            </ViewMargin>
+            <Subtitle>Нашли баги или есть предложения по улучшению?</Subtitle>
+            <TouchableHighlight
+              onPress={() => Linking.openURL(`mailto:${infos.emailDevelop}`)}
+            >
+              {infos.emailDevelop}
+            </TouchableHighlight>
+          </ScrollView>
+        )}
       </CenterContainer>
     </GlobalScreen>
   );

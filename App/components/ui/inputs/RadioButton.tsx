@@ -1,6 +1,7 @@
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import styled from "styled-components/native";
 import { normalize } from "../../../utils";
+import { View } from "react-native";
 
 type RadioButtonProps = {
   color: string;
@@ -23,7 +24,9 @@ export function RadioButton(props: RadioButtonProps) {
           </Animated.View>
         )}
       </RadioButtonStyled>
-      <TextStyled>{text}</TextStyled>
+      <View>
+        <TextStyled>{text}</TextStyled>
+      </View>
     </Container>
   );
 }
@@ -52,6 +55,7 @@ const Container = styled.View`
 `;
 
 const TextStyled = styled.Text`
+  max-width: ${normalize(190)}px;
   font-family: "Poppins-Regular";
   font-size: ${normalize(18)}px;
   color: ${({ theme }) => theme.color.standard};

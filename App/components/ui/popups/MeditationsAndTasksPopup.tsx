@@ -27,6 +27,8 @@ import {
 import { getIsOffline } from "../../../store/offlineSelectors";
 import { Color, ErrorMessage, NameFolder } from "../../../const";
 import { useToastCustom } from "../../../hooks/useToastCustom";
+import { Preloader } from "../animate-elements/Preloader";
+import { DataMeditation, DataTextLottieImage } from "../../../types";
 
 type MeditationsAndTasksPopupProps = {
   nameNote: string;
@@ -55,9 +57,19 @@ export function MeditationsAndTasksPopup(props: MeditationsAndTasksPopupProps) {
 
   const loadingData = async () => {
     const { data: dataMeditations } = await getMeditationsQuery();
+    const dataMeditationsCopy = JSON.parse(
+      JSON.stringify(dataMeditations)
+    ) as DataMeditation[];
 
     if (dataMeditations) {
-      if (!deepEqual(meditations, dataMeditations)) {
+      if (
+        !deepEqual(
+          meditations,
+          dataMeditationsCopy.sort((a, b) =>
+            a.title && b.title ? a.title.localeCompare(b.title) : -1
+          )
+        )
+      ) {
         try {
           const MeditationsForDeleting = meditations.filter(
             (oldMeditation) =>
@@ -71,6 +83,14 @@ export function MeditationsAndTasksPopup(props: MeditationsAndTasksPopupProps) {
             dispatch(deleteMeditationsInMeditation(meditation));
           }
           dispatch(setMeditations(dataMeditations));
+          const dataMeditationsCopy = JSON.parse(
+            JSON.stringify(dataMeditations)
+          ) as DataMeditation[];
+          setMeditationsState(
+            dataMeditationsCopy.sort((a, b) =>
+              a.title && b.title ? a.title.localeCompare(b.title) : -1
+            )
+          );
         } catch {
           onErrorToast(ErrorMessage.DeleteFile);
         }
@@ -78,12 +98,23 @@ export function MeditationsAndTasksPopup(props: MeditationsAndTasksPopupProps) {
     }
 
     const { data: dataTasks } = await getTasksQuery();
+    const dataTasksCopy = JSON.parse(
+      JSON.stringify(dataTasks)
+    ) as DataTextLottieImage[];
 
     if (dataTasks) {
-      if (!deepEqual(tasks, dataTasks)) {
+      if (
+        !deepEqual(
+          tasks,
+          dataTasksCopy.sort((a, b) =>
+            a.title && b.title ? a.title.localeCompare(b.title) : -1
+          )
+        )
+      ) {
         try {
           const TasksForDeleting = tasks.filter(
-            (oldTask) => !dataTasks.some((newTask) => oldTask._id === newTask._id)
+            (oldTask) =>
+              !dataTasks.some((newTask) => oldTask._id === newTask._id)
           );
           for (const task of TasksForDeleting) {
             await deleteFile(NameFolder.Tasks + `/${task._id}`);
@@ -91,6 +122,14 @@ export function MeditationsAndTasksPopup(props: MeditationsAndTasksPopupProps) {
             dispatch(deleteTasksInTask(task));
           }
           dispatch(setTasks(dataTasks));
+          const dataTasksCopy = JSON.parse(
+            JSON.stringify(dataTasks)
+          ) as DataTextLottieImage[];
+          setTasksState(
+            dataTasksCopy.sort((a, b) =>
+              a.title && b.title ? a.title.localeCompare(b.title) : -1
+            )
+          );
         } catch {
           onErrorToast(ErrorMessage.DeleteFile);
         }
@@ -128,72 +167,93 @@ export function MeditationsAndTasksPopup(props: MeditationsAndTasksPopupProps) {
       exiting={FadeOut.duration(200)}
     >
       <Container>
-        <FilterContainer>
-          <PressableButton
-            onPress={() => setIsSelectMeditations(!isSelectMeditations)}
-          >
-            <FilterButton
-              $backgroundColor={
-                isSelectMeditations ? Color.MeditationPressed : Color.Meditation
-              }
-            >
-              <TextFilter $color={Color.TextWhite}>Медитации</TextFilter>
-            </FilterButton>
-          </PressableButton>
-          <PressableButton onPress={() => setIsSelectTasks(!isSelectTasks)}>
-            <FilterButton
-              $backgroundColor={isSelectTasks ? Color.TaskPressed : Color.Task}
-            >
-              <TextFilter $color={Color.TextStandard}>Задания</TextFilter>
-            </FilterButton>
-          </PressableButton>
-        </FilterContainer>
-        <ScrollView showsVerticalScrollIndicator={false}>
-          <MeditationsAndTasksContainer>
-            {meditationsState.map((meditation) => (
-              <Pressable
-                key={`meditation-${meditation._id}`}
-                onPress={() =>
-                  nameNote.split(": ")[1] === meditation.title
-                    ? () => {}
-                    : setNameNote(
-                        `Медитация: ${meditation.title}`,
-                        Color.Meditation,
-                        Color.MeditationPressed,
-                        Color.TextWhite
-                      )
-                }
+        {!meditationsState.length && !tasksState.length && <Preloader />}
+        {(!!meditationsState.length || !!tasksState.length) && (
+          <>
+            <FilterContainer>
+              <PressableButton
+                onPress={() => setIsSelectMeditations(!isSelectMeditations)}
               >
-                <RadioButton
-                  color={Color.Meditation}
-                  text={meditation.title}
-                  isActive={nameNote.split(": ")[1] === meditation.title}
-                />
-              </Pressable>
-            ))}
-            {tasksState.map((task) => (
-              <Pressable
-                key={`task-${task._id}`}
-                onPress={() =>
-                  nameNote.split(": ")[1] === task.title
-                    ? () => {}
-                    : setNameNote(
-                        `Задание: ${task.title}`,
-                        Color.Task,
-                        Color.TaskPressed,
-                        Color.TextStandard
-                      )
-                }
-              >
-                <RadioButton
-                  color={Color.Task}
-                  text={task.title}
-                  isActive={nameNote.split(": ")[1] === task.title}
-                />
-              </Pressable>
-            ))}
-          </MeditationsAndTasksContainer>
-        </ScrollView>
+                <FilterButton
+                  $backgroundColor={
+                    isSelectMeditations
+                      ? Color.MeditationPressed
+                      : Color.Meditation
+                  }
+                >
+                  <TextFilter
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                    $color={Color.TextWhite}
+                  >
+                    Медитации
+                  </TextFilter>
+                </FilterButton>
+              </PressableButton>
+              <PressableButton onPress={() => setIsSelectTasks(!isSelectTasks)}>
+                <FilterButton
+                  $backgroundColor={
+                    isSelectTasks ? Color.TaskPressed : Color.Task
+                  }
+                >
+                  <TextFilter
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                    $color={Color.TextStandard}
+                  >
+                    Задания
+                  </TextFilter>
+                </FilterButton>
+              </PressableButton>
+            </FilterContainer>
+            <ScrollView showsVerticalScrollIndicator={false}>
+              <MeditationsAndTasksContainer>
+                {meditationsState.map((meditation) => (
+                  <Pressable
+                    key={`meditation-${meditation._id}`}
+                    onPress={() =>
+                      nameNote.split(": ")[1] === meditation.title
+                        ? () => {}
+                        : setNameNote(
+                            `Медитация: ${meditation.title}`,
+                            Color.Meditation,
+                            Color.MeditationPressed,
+                            Color.TextWhite
+                          )
+                    }
+                  >
+                    <RadioButton
+                      color={Color.Meditation}
+                      text={meditation.title}
+                      isActive={nameNote.split(": ")[1] === meditation.title}
+                    />
+                  </Pressable>
+                ))}
+                {tasksState.map((task) => (
+                  <Pressable
+                    key={`task-${task._id}`}
+                    onPress={() =>
+                      nameNote.split(": ")[1] === task.title
+                        ? () => {}
+                        : setNameNote(
+                            `Задание: ${task.title}`,
+                            Color.Task,
+                            Color.TaskPressed,
+                            Color.TextStandard
+                          )
+                    }
+                  >
+                    <RadioButton
+                      color={Color.Task}
+                      text={task.title}
+                      isActive={nameNote.split(": ")[1] === task.title}
+                    />
+                  </Pressable>
+                ))}
+              </MeditationsAndTasksContainer>
+            </ScrollView>
+          </>
+        )}
       </Container>
     </Animated.View>
   );

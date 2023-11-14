@@ -11,6 +11,7 @@ import {
   getTrackerMeditationNotifications,
   getTrackerTaskNotifications,
 } from "../../store/notificationsSelectors";
+import { ScrollView } from "react-native";
 
 export function Notification() {
   const notifications = useAppSelector(getNotifications);
@@ -20,25 +21,31 @@ export function Notification() {
   const trackerTaskNotification = useAppSelector(getTrackerTaskNotifications);
 
   return (
-    <GlobalScreen>
+    <GlobalScreen withoutScrollView>
       <CenterContainer>
         <HeaderWithBack>
           <TextTitle>Уведомления</TextTitle>
         </HeaderWithBack>
-        <Subtitle>Для трекеров медитаций</Subtitle>
-        <TimeNotification
-          notification={trackerMeditationNotification}
-          typeTracker="meditation"
-        />
-        <Subtitle>Для трекеров заданий</Subtitle>
-        <TimeNotification
-          notification={trackerTaskNotification}
-          typeTracker="task"
-        />
-        <Subtitle>Оповещение о медитации или задании</Subtitle>
-        {notifications.map((notification) => (
-          <TimeNotification key={notification.id} notification={notification} />
-        ))}
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <Subtitle>Для трекеров медитаций</Subtitle>
+          <TimeNotification
+            notification={trackerMeditationNotification}
+            typeTracker="meditation"
+          />
+          <Subtitle>Для трекеров заданий</Subtitle>
+          <TimeNotification
+            notification={trackerTaskNotification}
+            typeTracker="task"
+          />
+          <Subtitle>Оповещение о медитации или задании</Subtitle>
+          {notifications.map((notification) => (
+            <TimeNotification
+              key={notification.id}
+              notification={notification}
+            />
+          ))}
+          <BottomSpace />
+        </ScrollView>
       </CenterContainer>
     </GlobalScreen>
   );
@@ -48,4 +55,8 @@ const TextTitle = styled.Text`
   font-family: "Poppins-Medium";
   font-size: ${normalize(18)}px;
   color: ${({ theme }) => theme.color.standard};
+`;
+
+const BottomSpace = styled.View`
+  height: ${normalize(250)}px;
 `;

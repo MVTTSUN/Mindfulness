@@ -21,8 +21,9 @@ import { DataInformation } from "../../types";
 import { ApiRoute, BASE_URL, ErrorMessage, NameFolder } from "../../const";
 import { normalize } from "../../utils";
 import { getIsOffline } from "../../store/offlineSelectors";
-import { PulseCircle } from "../../components/ui/PulseCircle";
+import { PulseCircle } from "../../components/ui/animate-elements/PulseCircle";
 import { useToastCustom } from "../../hooks/useToastCustom";
+import { Preloader } from "../../components/ui/animate-elements/Preloader";
 
 export function Contacts() {
   const infos = useAppSelector(getInfos);
@@ -85,65 +86,72 @@ export function Contacts() {
         <HeaderWithBack>
           <TextTitle>Контакты</TextTitle>
         </HeaderWithBack>
-        <ScrollView showsVerticalScrollIndicator={false}>
-          <ViewMargin>
-            <Subtitle>Психотерапевт</Subtitle>
-            <RoundedImage>
-              <LottieViewStyled
-                source={require("../../assets/lottie/animaRound.json")}
-                autoPlay
-                loop
-              />
-              <PulseCircle />
-              {infos && <ImageStyled source={{ uri: infos.avatarPsycho }} />}
-            </RoundedImage>
-            <TextName>{`${infos.secondNamePsycho} ${infos.firstNamePsycho} ${infos.surnamePsycho}`}</TextName>
-          </ViewMargin>
-          <Subtitle>Краткая информация</Subtitle>
-          <TextInfo>{infos.info}</TextInfo>
-          <Subtitle>Мои соцсети</Subtitle>
-          <ViewSociety>
-            <TouchableHighlight
-              isRound
-              onPress={() =>
-                Linking.openURL(
-                  `instagram://user?username=${infos.nicknameInstagram}`
-                ).catch(() => {
+        {!Object.keys(infos).length && <Preloader />}
+        {!!Object.keys(infos).length && (
+          <ScrollView showsVerticalScrollIndicator={false}>
+            <ViewMargin>
+              <Subtitle>Психотерапевт</Subtitle>
+              <RoundedImage>
+                <LottieViewStyled
+                  source={require("../../assets/lottie/animaRound.json")}
+                  autoPlay
+                  loop
+                />
+                <PulseCircle />
+                <ImageStyled source={{ uri: infos.avatarPsycho }} />
+              </RoundedImage>
+              <TextName>{`${infos.secondNamePsycho} ${infos.firstNamePsycho} ${infos.surnamePsycho}`}</TextName>
+            </ViewMargin>
+            <Subtitle>Краткая информация</Subtitle>
+            <TextInfo>
+              {infos.info.split("\n").map((text, index) => (
+                <TextNode key={index}>{text}</TextNode>
+              ))}
+            </TextInfo>
+            <Subtitle>Мои соцсети</Subtitle>
+            <ViewSociety>
+              <TouchableHighlight
+                isRound
+                onPress={() =>
                   Linking.openURL(
-                    `https://www.instagram.com/${infos.nicknameInstagram}`
-                  );
-                })
-              }
-            >
-              <InstagramIcon />
-            </TouchableHighlight>
-            <TouchableHighlight
-              isRound
-              onPress={() =>
-                Linking.openURL(`https://t.me/${infos.nicknameTelegram}`)
-              }
-            >
-              <TelegramIcon />
-            </TouchableHighlight>
-            <TouchableHighlight
-              isRound
-              onPress={() =>
-                Linking.openURL(`https://vk.com/${infos.nicknameVK}`)
-              }
-            >
-              <VKIcon />
-            </TouchableHighlight>
-          </ViewSociety>
-          <ViewMargin>
-            <Subtitle>Моя почта</Subtitle>
-            <TouchableHighlight
-              onPress={() => Linking.openURL(`mailto:${infos.emailPsycho}`)}
-            >
-              {infos.emailPsycho}
-            </TouchableHighlight>
-          </ViewMargin>
-          <SpaceBottom />
-        </ScrollView>
+                    `instagram://user?username=${infos.nicknameInstagram}`
+                  ).catch(() => {
+                    Linking.openURL(
+                      `https://www.instagram.com/${infos.nicknameInstagram}`
+                    );
+                  })
+                }
+              >
+                <InstagramIcon />
+              </TouchableHighlight>
+              <TouchableHighlight
+                isRound
+                onPress={() =>
+                  Linking.openURL(`https://t.me/${infos.nicknameTelegram}`)
+                }
+              >
+                <TelegramIcon />
+              </TouchableHighlight>
+              <TouchableHighlight
+                isRound
+                onPress={() =>
+                  Linking.openURL(`https://vk.com/${infos.nicknameVK}`)
+                }
+              >
+                <VKIcon />
+              </TouchableHighlight>
+            </ViewSociety>
+            <ViewMargin>
+              <Subtitle>Моя почта</Subtitle>
+              <TouchableHighlight
+                onPress={() => Linking.openURL(`mailto:${infos.emailPsycho}`)}
+              >
+                {infos.emailPsycho}
+              </TouchableHighlight>
+            </ViewMargin>
+            <SpaceBottom />
+          </ScrollView>
+        )}
       </CenterContainer>
     </GlobalScreen>
   );
@@ -162,8 +170,12 @@ const TextName = styled.Text`
   color: ${({ theme }) => theme.color.standard};
 `;
 
-const TextInfo = styled.Text`
+const TextInfo = styled.View`
   margin-bottom: 20px;
+  gap: 5px;
+`;
+
+const TextNode = styled.Text`
   font-family: "Poppins-Regular";
   font-size: ${normalize(16)}px;
   color: ${({ theme }) => theme.color.standard};
@@ -203,5 +215,5 @@ const LottieViewStyled = styled(LottieView)`
 `;
 
 const SpaceBottom = styled.View`
-  height: ${normalize(140)}px;
+  height: ${normalize(180)}px;
 `;

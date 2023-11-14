@@ -8,22 +8,27 @@ import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { normalize } from "../../../utils";
 import { getIdRadioButtonTheme } from "../../../store/themeSelectors";
 import { Color, THEME_OPTIONS, Theme } from "../../../const";
+import * as NavigationBar from "expo-navigation-bar";
 
 export function ThemePopup() {
   const idRadioButton = useAppSelector(getIdRadioButtonTheme);
   const dispatch = useAppDispatch();
   const colorScheme = useColorScheme();
 
-  const changeThemeHandle = (index: number) => {
+  const changeThemeHandle = async (index: number) => {
     switch (index) {
       case 0:
         dispatch(changeTheme(colorScheme));
         break;
       case 1:
         dispatch(changeTheme(Theme.Dark));
+        await NavigationBar.setBackgroundColorAsync("#101010");
+        await NavigationBar.setButtonStyleAsync("light");
         break;
       case 2:
         dispatch(changeTheme(Theme.Light));
+        await NavigationBar.setBackgroundColorAsync(Color.TextStandard);
+        await NavigationBar.setButtonStyleAsync("light");
         break;
     }
     dispatch(setIdRadioButton(index));

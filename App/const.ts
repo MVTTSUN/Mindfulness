@@ -38,6 +38,7 @@ enum SliceName {
   Notifications = 'notifications',
   Offline = 'offline',
   Tracker = 'tracker',
+  Concentration = 'concentration',
 }
 
 enum Theme {

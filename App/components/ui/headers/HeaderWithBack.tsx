@@ -3,6 +3,7 @@ import { styled } from "styled-components/native";
 import { BackIcon } from "../../svg/icons/other-icons/BackIcon";
 import { PropsWithChildren } from "react";
 import { useNavigation } from "@react-navigation/native";
+import { normalize } from "../../../utils";
 
 type HeaderWithBackProps = PropsWithChildren<{
   onPress?: () => void;
@@ -15,9 +16,11 @@ export function HeaderWithBack(props: HeaderWithBackProps) {
 
   return (
     <TopView>
-      <Pressable onPress={isCustomPress ? onPress : () => navigation.goBack()}>
+      <PressableStyled
+        onPress={isCustomPress ? onPress : () => navigation.goBack()}
+      >
         <BackIcon />
-      </Pressable>
+      </PressableStyled>
       {children}
     </TopView>
   );
@@ -28,4 +31,11 @@ const TopView = styled.View`
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
+`;
+
+const PressableStyled = styled(Pressable)`
+  align-items: center;
+  justify-content: center;
+  width: ${normalize(32)}px;
+  height: ${normalize(32)}px;
 `;

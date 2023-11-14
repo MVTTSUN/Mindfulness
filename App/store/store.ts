@@ -23,6 +23,7 @@ import tasksReducer from "./tasksSlice";
 import downloadAudioReducer from "./downloadAudioSlice";
 import offlineReducer from "./offlineSlice";
 import trackerReducer from "./trackerSlice";
+import concentrationReducer from "./concentrationSlice";
 import { mindfulnessApi } from '../api/api';
 import { SliceName } from '../const';
 import { rtkQueryErrorLogger } from '../api/rtkQueryErrorLogger';
@@ -41,6 +42,7 @@ const rootReducer = combineReducers({
   [SliceName.DownloadAudio]: downloadAudioReducer,
   [SliceName.Offline]: offlineReducer,
   [SliceName.Tracker]: trackerReducer,
+  [SliceName.Concentration]: concentrationReducer,
   [mindfulnessApi.reducerPath]: mindfulnessApi.reducer,
 });
 
@@ -61,6 +63,7 @@ const persistConfig = {
     SliceName.DownloadAudio,
     SliceName.Offline,
     SliceName.Tracker,
+    SliceName.Concentration,
   ],
 };
 

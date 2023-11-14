@@ -203,9 +203,7 @@ export function Notes() {
       {!isDelete && (
         <Animated.View entering={ZoomInDown} exiting={ZoomOutDown}>
           <PressableStyled onPress={() => navigation.navigate(AppRoute.Note)}>
-            <ViewPlus>
-              <AddIcon />
-            </ViewPlus>
+            <AddIcon />
           </PressableStyled>
         </Animated.View>
       )}
@@ -280,17 +278,8 @@ const AnimatedTrash = styled(Animated.View)`
 
 const PressableStyled = styled.Pressable`
   position: absolute;
-  right: ${normalize(40)}px;
-  bottom: ${normalize(100)}px;
-`;
-
-const ViewPlus = styled.View`
-  align-items: center;
-  justify-content: center;
-  width: ${normalize(50)}px;
-  height: ${normalize(50)}px;
-  border-radius: ${normalize(25)}px;
-  background-color: ${Color.TextStandard};
+  right: ${normalize(30)}px;
+  bottom: ${normalize(90)}px;
 `;
 
 const NotesContainer = styled.View`

@@ -13,6 +13,7 @@ type CheckBoxProps = {
   isStroke?: boolean;
   isInColumn?: boolean;
   isSmall?: boolean;
+  isNoAdaptiveColor?: boolean;
 };
 
 export function CheckBox(props: CheckBoxProps) {
@@ -25,6 +26,7 @@ export function CheckBox(props: CheckBoxProps) {
     isStroke,
     isInColumn,
     isSmall,
+    isNoAdaptiveColor,
   } = props;
 
   return (
@@ -55,7 +57,7 @@ export function CheckBox(props: CheckBoxProps) {
           </Fill>
         )}
       </CheckBoxStyled>
-      {text && <TextStyled $isSmall={isSmall}>{text}</TextStyled>}
+      {text && <TextStyled $isSmall={isSmall} $isNoAdaptiveColor={isNoAdaptiveColor}>{text}</TextStyled>}
     </Container>
   );
 }
@@ -90,8 +92,8 @@ const Container = styled.View<{ $isInColumn?: boolean }>`
   gap: ${({ $isInColumn }) => ($isInColumn ? 2 : 15)}px;
 `;
 
-const TextStyled = styled.Text<{ $isSmall?: boolean }>`
+const TextStyled = styled.Text<{ $isSmall?: boolean; $isNoAdaptiveColor?: boolean }>`
   font-family: "Poppins-Regular";
   font-size: ${({ $isSmall }) => ($isSmall ? normalize(10) : normalize(18))}px;
-  color: ${({ theme }) => theme.color.standard};
+  color: ${({ $isNoAdaptiveColor, theme }) => $isNoAdaptiveColor ? Color.TextStandard : theme.color.standard};
 `;

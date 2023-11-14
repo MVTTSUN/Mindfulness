@@ -4,6 +4,8 @@ import { AppRoute, Color, ErrorMessage } from "../../const";
 import { CheckIcon } from "../svg/icons/other-icons/CheckIcon";
 import { Dimensions, Pressable } from "react-native";
 import Animated, {
+  FadeIn,
+  FadeOut,
   useAnimatedStyle,
   useSharedValue,
   withSpring,
@@ -179,7 +181,11 @@ export function Tracker(props: TrackerProps) {
 
   return (
     <>
-      <Container style={styleTracker}>
+      <Container
+        entering={FadeIn.duration(100)}
+        exiting={FadeOut.duration(100)}
+        style={styleTracker}
+      >
         <ContentContainer>
           <TitleContainer>
             <Title>Трекер</Title>
@@ -211,6 +217,7 @@ export function Tracker(props: TrackerProps) {
                         })}
                         isInColumn
                         isSmall
+                        isNoAdaptiveColor
                         color={Color.TextStandard}
                       />
                     </Pressable>
@@ -230,6 +237,7 @@ export function Tracker(props: TrackerProps) {
                         })}
                         isInColumn
                         isSmall
+                        isNoAdaptiveColor
                         color={Color.TextStandard}
                       />
                     </Pressable>
@@ -294,7 +302,7 @@ const PressableBlur = styled.Pressable`
 
 const Container = styled(Animated.View)`
   padding: ${normalize(15)}px 0 ${normalize(15)}px 16%;
-  z-index: 10;
+  z-index: 20;
   justify-content: space-between;
   flex-direction: row;
   position: absolute;

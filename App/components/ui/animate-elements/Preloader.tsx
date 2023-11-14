@@ -7,10 +7,10 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import styled from "styled-components/native";
-import { normalize } from "../../utils";
-import { Color } from "../../const";
+import { normalize } from "../../../utils";
+import { Color } from "../../../const";
 
-export function PulseCircle() {
+export function Preloader() {
   const pulseScale = useSharedValue(1);
   const circleStyle = useAnimatedStyle(() => ({
     transform: [{ scale: pulseScale.value }],
@@ -19,31 +19,22 @@ export function PulseCircle() {
   useEffect(() => {
     pulseScale.value = withRepeat(
       withSequence(
-        withTiming(1, { duration: 400 }),
-        withTiming(1.1, { duration: 400 }),
-        withTiming(1, { duration: 400 })
+        withTiming(0.4, { duration: 500 }),
+        withTiming(1, { duration: 500 }),
+        withTiming(0.4, { duration: 500 }),
+        withTiming(1, { duration: 500 })
       ),
-      -1
+      -1,
+      true
     );
   }, []);
 
-  return (
-    <Container>
-      <Circle style={circleStyle} />
-    </Container>
-  );
+  return <Circle style={circleStyle} />;
 }
 
-const Container = styled.View`
-  position: absolute;
-  align-items: center;
-  justify-content: center;
-  width: ${normalize(140)}px;
-  height: ${normalize(140)}px;
-`;
-
 const Circle = styled(Animated.View)`
-  position: absolute;
+  margin-top: 20px;
+  align-self: center;
   background-color: ${Color.Primary};
   height: ${normalize(90)}px;
   width: ${normalize(90)}px;

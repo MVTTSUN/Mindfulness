@@ -166,7 +166,7 @@ const TextLine = styled.Text`
 const ViewMade = styled.View`
   z-index: 1;
   padding-top: ${normalize(10)}px;
-  height: ${normalize(122)}px;
+  height: ${normalize(130)}px;
   align-items: center;
   background-color: ${({ theme }) => theme.backgroundColor.main};
 `;

@@ -14,6 +14,7 @@ import deepEqual from "deep-equal";
 import { setDataEmotionsCopy, setEmotions } from "../../../store/emotionsSlice";
 import { normalize } from "../../../utils";
 import { getIsOffline } from "../../../store/offlineSelectors";
+import { Preloader } from "../animate-elements/Preloader";
 
 type EmotionsPopupProps = {
   backgroundColor: string;
@@ -81,6 +82,7 @@ function EmotionsPopup(props: EmotionsPopupProps) {
     >
       <Container>
         <TextTitle>Эмоции</TextTitle>
+        {!emotions.length && <Preloader />}
         <ScrollView showsVerticalScrollIndicator={false}>
           <EmotionsContainer>
             {emotions.map((emotion) => (

@@ -22,6 +22,7 @@ import deepEqual from "deep-equal";
 import { normalize } from "../../utils";
 import { getIsOffline } from "../../store/offlineSelectors";
 import { useToastCustom } from "../../hooks/useToastCustom";
+import { Preloader } from "../../components/ui/animate-elements/Preloader";
 
 export function Tips() {
   const tips = useAppSelector(getTips);
@@ -99,14 +100,23 @@ export function Tips() {
     <GlobalScreen withoutScrollView>
       <CenterContainer>
         <HeaderWithBack>
-          <TextTitle>Как медитировать правильно?</TextTitle>
+          <TextTitle numberOfLines={2} ellipsizeMode="tail">
+            Как медитировать правильно?
+          </TextTitle>
         </HeaderWithBack>
+        {!tips.length && <Preloader />}
         <ScrollView showsVerticalScrollIndicator={false}>
           <Container>
-            {tips &&
+            {!!tips.length &&
               tips?.map((node) => {
                 if (node.type === "text") {
-                  return <TextNode key={node.id}>{node.payload}</TextNode>;
+                  return (
+                    <TextNodes key={node.id}>
+                      {node.payload.split("\n").map((text, index) => (
+                        <TextNode key={`${node.id}-${index}`}>{text}</TextNode>
+                      ))}
+                    </TextNodes>
+                  );
                 } else if (node.type === "image") {
                   return (
                     <ImageWrapper key={node.id}>
@@ -137,6 +147,8 @@ export function Tips() {
 }
 
 const TextTitle = styled.Text`
+  width: 90%;
+  text-align: right;
   font-family: "Poppins-Medium";
   font-size: ${normalize(18)}px;
   color: ${({ theme }) => theme.color.standard};
@@ -157,6 +169,10 @@ const LottieWrapper = styled.View`
 
 const LottieNode = styled(LottieView)`
   flex: 1;
+`;
+
+const TextNodes = styled.View`
+  gap: 15px;
 `;
 
 const TextNode = styled.Text`

@@ -6,7 +6,7 @@ import TrackPlayer, {
 } from "react-native-track-player";
 import { Slider } from "@miblanchard/react-native-slider";
 import { useAppSelector } from "../../hooks/useAppSelector";
-import { memo, useCallback, useEffect, useState } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { PauseIcon } from "../svg/icons/other-icons/PauseIcon";
 import { useAppDispatch } from "../../hooks/useAppDispatch";
 import { Pressable } from "react-native";
@@ -43,12 +43,13 @@ export const AudioPlayer = memo((props: AudioPlayerProps) => {
   const { meditation, duration } = props;
   const [isCurrentAudio, setIsCurrentAudio] = useState(false);
   const [position, setPosition] = useState(0);
+  const manualPosition = useRef<null | number>(null);
   const theme = useAppSelector(getValueTheme);
   const isUpdatePlayer = useAppSelector(getIsUpdatePlayer);
   const dispatch = useAppDispatch();
   const playbackState = usePlaybackState();
   const { onErrorToast } = useToastCustom();
-  const { startAnimating, stopAnimating } = useFrameInterval(1000, async () => {
+  const { startAnimating, stopAnimating } = useFrameInterval(100, async () => {
     try {
       const { position } = await TrackPlayer.getProgress();
       setPosition(position);
@@ -127,6 +128,7 @@ export const AudioPlayer = memo((props: AudioPlayerProps) => {
     try {
       await TrackPlayer.seekTo(e[0]);
       setPosition(e[0]);
+      manualPosition.current = null;
     } catch {
       onErrorToast(ErrorMessage.SeekTrack);
     }
@@ -202,8 +204,15 @@ export const AudioPlayer = memo((props: AudioPlayerProps) => {
     <ViewContainer>
       <Slider
         disabled={!isCurrentAudio}
-        value={isCurrentAudio ? position : 0}
+        value={
+          isCurrentAudio
+            ? manualPosition.current
+              ? manualPosition.current
+              : position
+            : 0
+        }
         onSlidingComplete={changeValue}
+        onValueChange={(value) => (manualPosition.current = value[0])}
         maximumValue={duration}
         containerStyle={{
           height: normalize(20),

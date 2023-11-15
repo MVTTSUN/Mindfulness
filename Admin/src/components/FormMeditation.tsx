@@ -44,9 +44,12 @@ import {
 } from "@hello-pangea/dnd";
 
 export function FormMeditation() {
-  const [textLines, setTextLines] = useState<TextLine[]>([]);
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const [isLoadingFile, setIsLoadingFile] = useState(
+    pathname.includes(BrowserRoute.Edit) ? true : false
+  );
+  const [textLines, setTextLines] = useState<TextLine[]>([]);
   const currentTime = useAppSelector(getCurrentTime);
   const data = useOutletContext<DataMeditation>();
   const [addMeditation, { isLoading: isLoadingAdd }] =
@@ -178,6 +181,7 @@ export function FormMeditation() {
           render={({ field: { onChange, value } }) => {
             return (
               <DropFileInput
+                setIsLoadingFileHandler={setIsLoadingFile}
                 labelText="Изображение"
                 withLabel
                 isNotArray
@@ -196,6 +200,7 @@ export function FormMeditation() {
           render={({ field: { onChange, value } }) => {
             return (
               <DropFileInput
+                setIsLoadingFileHandler={setIsLoadingFile}
                 labelText="Аудио"
                 withLabel
                 isNotArray
@@ -298,7 +303,11 @@ export function FormMeditation() {
         >
           + Строчка аудиозаписи
         </Button>
-        <Button disabled={isLoading} isPrimary isLoading={isLoading}>
+        <Button
+          disabled={isLoading || isLoadingFile}
+          isPrimary
+          isLoading={isLoading}
+        >
           {isLoading ? "Сохранение" : "Загрузить"}
         </Button>
       </Form>

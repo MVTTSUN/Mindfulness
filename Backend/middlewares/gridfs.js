@@ -10,11 +10,10 @@ const { DATABASE_URL, NODE_ENV } = process.env;
 
 const storageTips = new GridFsStorage({
   url: NODE_ENV === 'production' ? DATABASE_URL : DEV_DATABASE_URL,
-  file: async (_, file) => {
-    await mongoose.connection.collection('uploads/tips.chunks').deleteMany();
-    await mongoose.connection.collection('uploads/tips.files').deleteMany();
-
+  file: (_, file) => {
     return new Promise((resolve) => {
+      mongoose.connection.collection('uploads/tips.chunks').deleteMany();
+      mongoose.connection.collection('uploads/tips.files').deleteMany();
       const filename = uuidv4() + path.extname(file.originalname);
       const fileInfo = {
         filename,
@@ -27,11 +26,10 @@ const storageTips = new GridFsStorage({
 
 const storageInfo = new GridFsStorage({
   url: NODE_ENV === 'production' ? DATABASE_URL : DEV_DATABASE_URL,
-  file: async (_, file) => {
-    await mongoose.connection.collection('uploads/info.chunks').deleteMany();
-    await mongoose.connection.collection('uploads/info.files').deleteMany();
-
+  file: (_, file) => {
     return new Promise((resolve) => {
+      mongoose.connection.collection('uploads/info.chunks').deleteMany();
+      mongoose.connection.collection('uploads/info.files').deleteMany();
       const filename = uuidv4() + path.extname(file.originalname);
       const fileInfo = {
         filename,
@@ -44,7 +42,7 @@ const storageInfo = new GridFsStorage({
 
 const storageTasks = new GridFsStorage({
   url: NODE_ENV === 'production' ? DATABASE_URL : DEV_DATABASE_URL,
-  file: async (_, file) =>
+  file: (_, file) =>
     new Promise((resolve) => {
       const filename = uuidv4() + path.extname(file.originalname);
       const fileInfo = {
@@ -57,7 +55,7 @@ const storageTasks = new GridFsStorage({
 
 const storageMeditations = new GridFsStorage({
   url: NODE_ENV === 'production' ? DATABASE_URL : DEV_DATABASE_URL,
-  file: async (_, file) =>
+  file: (_, file) =>
     new Promise((resolve) => {
       const filename = uuidv4() + path.extname(file.originalname);
       const fileInfo = {

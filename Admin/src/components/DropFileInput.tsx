@@ -24,12 +24,22 @@ type DropFileInputProps = {
   isNotArray?: boolean;
   name?: string;
   src?: string | File;
+  setIsLoadingFileHandler?: (isLoading: boolean) => void;
 };
 
 export const DropFileInput = forwardRef(
   (props: DropFileInputProps, ref: ForwardedRef<HTMLInputElement>) => {
-    const { onChange, type, id, isNotArray, withLabel, labelText, name, src } =
-      props;
+    const {
+      onChange,
+      type,
+      id,
+      isNotArray,
+      withLabel,
+      labelText,
+      name,
+      src,
+      setIsLoadingFileHandler,
+    } = props;
     const [isDrag, setIsDrag] = useState(false);
     const [imagePreview, setImagePreview] = useState(src ? src : imageDefault);
     const [audioPreview, setAudioPreview] = useState("");
@@ -133,6 +143,7 @@ export const DropFileInput = forwardRef(
           const file = new File([data], `audio.${extensionName}`, {
             type: `audio/${extension}`,
           });
+          setIsLoadingFileHandler && setIsLoadingFileHandler(false);
 
           onChange(file);
         }

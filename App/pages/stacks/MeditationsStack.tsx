@@ -1,8 +1,8 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { Meditations } from "../tabNavigatePages/Meditations";
-import { Meditation } from "../stackNavigatePages/Meditation";
-import { Text } from "../stackNavigatePages/Text";
-import { Tips } from "../stackNavigatePages/Tips";
+import { Meditations } from "../tab-pages/Meditations";
+import { Meditation } from "../stack-pages/Meditation";
+import { Text } from "../stack-pages/Text";
+import { Tips } from "../stack-pages/Tips";
 import { AppRoute } from "../../const";
 
 const Stack = createNativeStackNavigator();

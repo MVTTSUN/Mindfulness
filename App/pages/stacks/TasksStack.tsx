@@ -1,6 +1,6 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { Tasks } from "../tabNavigatePages/Tasks";
-import { Task } from "../stackNavigatePages/Task";
+import { Tasks } from "../tab-pages/Tasks";
+import { Task } from "../stack-pages/Task";
 import { AppRoute } from "../../const";
 
 const Stack = createNativeStackNavigator();

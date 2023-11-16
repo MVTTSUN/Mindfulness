@@ -20,7 +20,7 @@ import {
   NameFolder,
   Theme,
 } from "../../const";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { LikeIcon } from "../../components/svg/icons/other-icons/LikeIcon";
 import { useAppSelector } from "../../hooks/useAppSelector";
 import { useAppDispatch } from "../../hooks/useAppDispatch";
@@ -37,7 +37,7 @@ import { useLazyGetTaskLottieQuery, useLazyGetTaskQuery } from "../../api/api";
 import deepEqual from "deep-equal";
 import { getDataTaskCopy, getTaskInTask } from "../../store/tasksSelectors";
 import { useFileSystem } from "../../hooks/useFileSystem";
-import { levelAdapter, normalize } from "../../utils";
+import { normalize } from "../../utils";
 import { setTasksInTask, setDataTasksCopy } from "../../store/tasksSlice";
 import { getIsLikeTask } from "../../store/likesSelectors";
 import { getIsOffline } from "../../store/offlineSelectors";
@@ -46,8 +46,11 @@ import { useToastCustom } from "../../hooks/useToastCustom";
 import { Preloader } from "../../components/ui/animate-elements/Preloader";
 import { LevelAndConcentration } from "../../components/ui/LevelAndConcentration";
 import { getIsConcentration } from "../../store/concentrationSelectors";
+import { DataPopup } from "../../components/ui/popups/DataPopup";
 
 export function Task() {
+  const [isOpenPopupData, setIsOpenPopupData] = useState(false);
+  const [sinceDay, setSinceDay] = useState<Date | null>(null);
   const route = useRoute();
   const { taskId } = route.params as { taskId: string };
   const navigation = useNavigation<NotesScreenProp & TasksScreenProp>();
@@ -71,7 +74,7 @@ export function Task() {
   const { onErrorToast } = useToastCustom();
   const scaleLike = useSharedValue(1);
   const likeStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scaleLike.value }],
+    transform: [{ scale: scaleLike.value } as never],
   }));
 
   const toggleLike = () => {
@@ -224,7 +227,13 @@ export function Task() {
       </GlobalScreen>
       {task && !isConcentration && (
         <>
-          <Tracker id={taskId} title={task?.title} />
+          <Tracker
+            id={taskId}
+            title={task?.title}
+            setIsOpenPopupDataHandle={setIsOpenPopupData}
+            setSinceDayHandle={setSinceDay}
+            sinceDay={sinceDay}
+          />
           <Animated.View
             entering={FadeIn.duration(100)}
             exiting={FadeOut.duration(100)}
@@ -242,9 +251,27 @@ export function Task() {
           </Animated.View>
         </>
       )}
+      {isOpenPopupData && (
+        <PressableBlur onPress={() => setIsOpenPopupData(false)}>
+          <Pressable>
+            <DataPopup setDayHandle={(day: Date) => setSinceDay(day)} />
+          </Pressable>
+        </PressableBlur>
+      )}
     </>
   );
 }
+
+const PressableBlur = styled.Pressable`
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: ${({ theme }) => theme.backgroundColor.blur};
+`;
 
 const PressableStyled = styled.Pressable`
   position: absolute;

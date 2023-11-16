@@ -3,16 +3,16 @@ import {
   createBottomTabNavigator,
 } from "@react-navigation/bottom-tabs";
 import { useAppSelector } from "../hooks/useAppSelector";
-import { Home } from "../pages/tabNavigatePages/Home";
-import { MeditationsStackScreen } from "../pages/stackScreens/MeditationsStack";
+import { Home } from "../pages/tab-pages/Home";
+import { MeditationsStackScreen } from "../pages/stacks/MeditationsStack";
 import { HomeIcon } from "./svg/icons/navigate-icons/HomeIcon";
 import { MeditationIcon } from "./svg/icons/navigate-icons/MeditationIcon";
 import { NotesIcon } from "./svg/icons/navigate-icons/NotesIcon";
 import { InfoAndSettingsIcon } from "./svg/icons/navigate-icons/InfoAndSettingsIcon";
-import { InfoAndSettingsStackScreen } from "../pages/stackScreens/InfoAndSettingsStack";
-import { NotesStackScreen } from "../pages/stackScreens/NotesStack";
+import { InfoAndSettingsStackScreen } from "../pages/stacks/InfoAndSettingsStack";
+import { NotesStackScreen } from "../pages/stacks/NotesStack";
 import { TasksIcon } from "./svg/icons/navigate-icons/TasksIcon";
-import { TasksStackScreen } from "../pages/stackScreens/TasksStack";
+import { TasksStackScreen } from "../pages/stacks/TasksStack";
 import { normalize } from "../utils";
 import { getValueTheme } from "../store/themeSelectors";
 import { AppRoute, Color, Theme } from "../const";

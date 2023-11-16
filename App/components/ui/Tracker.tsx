@@ -11,10 +11,9 @@ import Animated, {
   withSpring,
   withTiming,
 } from "react-native-reanimated";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { ArrowRightIcon } from "../svg/icons/other-icons/ArrowRightIcon";
 import { TouchableHighlight } from "./touchables/TouchableHighlight";
-import { DataPopup } from "./popups/DataPopup";
 import { useAppSelector } from "../../hooks/useAppSelector";
 import {
   getTrackerMeditation,
@@ -38,16 +37,19 @@ import {
 } from "../../store/notificationsSelectors";
 import { useNotifee } from "../../hooks/useNotifee";
 import { useToastCustom } from "../../hooks/useToastCustom";
+import { Shadow } from "react-native-shadow-2";
 
 type TrackerProps = {
   id: string;
   title?: string;
+  setIsOpenPopupDataHandle: (value: boolean) => void;
+  setSinceDayHandle: (value: Date | null) => void;
+  sinceDay: Date | null;
 };
 
 export function Tracker(props: TrackerProps) {
-  const { id, title } = props;
-  const [sinceDay, setSinceDay] = useState<Date | null>(null);
-  const [isOpenPopup, setIsOpenPopup] = useState(false);
+  const { id, title, setIsOpenPopupDataHandle, setSinceDayHandle, sinceDay } =
+    props;
   const isOpenRef = useRef<boolean>(false);
   const route = useRoute();
   const trackerMeditation = useAppSelector(getTrackerMeditation(id));
@@ -66,11 +68,11 @@ export function Tracker(props: TrackerProps) {
     -Dimensions.get("window").width * 0.8 + normalize(35)
   );
   const styleTracker = useAnimatedStyle(() => ({
-    transform: [{ translateX: translateXValue.value }],
+    transform: [{ translateX: translateXValue.value } as never],
   }));
   const rotateValue = useSharedValue(0);
   const styleArrowIcon = useAnimatedStyle(() => ({
-    transform: [{ rotate: `${rotateValue.value}deg` }],
+    transform: [{ rotate: `${rotateValue.value}deg` } as never],
   }));
   const firstMonthDayTracker =
     route.name === AppRoute.Meditation
@@ -136,7 +138,7 @@ export function Tracker(props: TrackerProps) {
     } else {
       dispatch(removeTaskTracker(id));
     }
-    setSinceDay(null);
+    setSinceDayHandle(null);
   };
 
   const onCreateTriggerNotificationForTrackersMeditationAsync = async () => {
@@ -175,154 +177,143 @@ export function Tracker(props: TrackerProps) {
 
   useEffect(() => {
     if (sinceDay) {
-      setIsOpenPopup(false);
+      setIsOpenPopupDataHandle(false);
     }
   }, [sinceDay]);
 
   return (
     <>
-      <Container
+      <AnimatedContainer
         entering={FadeIn.duration(100)}
         exiting={FadeOut.duration(100)}
         style={styleTracker}
       >
-        <ContentContainer>
-          <TitleContainer>
-            <Title>Трекер</Title>
-            {(trackerMeditation || trackerTask) && (
-              <Months>
-                {firstMonthDayTracker === lastMonthDayTracker
-                  ? firstMonthDayTracker
-                  : firstMonthDayTracker + " - " + lastMonthDayTracker}
-              </Months>
+        <Container distance={15} startColor={`${Color.TextStandard}10`}>
+          <ContentContainer>
+            <TitleContainer>
+              <Title>Трекер</Title>
+              {(trackerMeditation || trackerTask) && (
+                <Months>
+                  {firstMonthDayTracker === lastMonthDayTracker
+                    ? firstMonthDayTracker
+                    : firstMonthDayTracker + " - " + lastMonthDayTracker}
+                </Months>
+              )}
+            </TitleContainer>
+            {trackerMeditation || trackerTask ? (
+              <CheckBoxesContainer>
+                {route.name === AppRoute.Meditation
+                  ? trackerMeditation.days.map((day, index) => (
+                      <Pressable
+                        key={index}
+                        onPress={() =>
+                          dispatch(
+                            updateMeditationTracker({ id, dayValue: day.value })
+                          )
+                        }
+                      >
+                        <CheckBox
+                          backgroundColor={Color.Primary}
+                          isActive={day.isCheck}
+                          text={new Date(day.value).toLocaleString("ru", {
+                            day: "numeric",
+                          })}
+                          isInColumn
+                          isSmall
+                          isNoAdaptiveColor
+                          color={Color.TextStandard}
+                        />
+                      </Pressable>
+                    ))
+                  : trackerTask.days.map((day, index) => (
+                      <Pressable
+                        key={index}
+                        onPress={() =>
+                          dispatch(
+                            updateTaskTracker({ id, dayValue: day.value })
+                          )
+                        }
+                      >
+                        <CheckBox
+                          backgroundColor={Color.Primary}
+                          isActive={day.isCheck}
+                          text={new Date(day.value).toLocaleString("ru", {
+                            day: "numeric",
+                          })}
+                          isInColumn
+                          isSmall
+                          isNoAdaptiveColor
+                          color={Color.TextStandard}
+                        />
+                      </Pressable>
+                    ))}
+              </CheckBoxesContainer>
+            ) : (
+              <TouchableHighlight
+                onPress={() => setIsOpenPopupDataHandle(true)}
+              >
+                {sinceDay
+                  ? `${
+                      sinceDay.getDate() === 2 ? "Со" : "С"
+                    } ${sinceDay.toLocaleString("ru", {
+                      month: "long",
+                      day: "numeric",
+                    })}`
+                  : "Дата"}
+              </TouchableHighlight>
             )}
-          </TitleContainer>
-          {trackerMeditation || trackerTask ? (
-            <CheckBoxesContainer>
-              {route.name === AppRoute.Meditation
-                ? trackerMeditation.days.map((day, index) => (
-                    <Pressable
-                      key={index}
-                      onPress={() =>
-                        dispatch(
-                          updateMeditationTracker({ id, dayValue: day.value })
-                        )
-                      }
-                    >
-                      <CheckBox
-                        backgroundColor={Color.Primary}
-                        isActive={day.isCheck}
-                        text={new Date(day.value).toLocaleString("ru", {
-                          day: "numeric",
-                        })}
-                        isInColumn
-                        isSmall
-                        isNoAdaptiveColor
-                        color={Color.TextStandard}
-                      />
-                    </Pressable>
-                  ))
-                : trackerTask.days.map((day, index) => (
-                    <Pressable
-                      key={index}
-                      onPress={() =>
-                        dispatch(updateTaskTracker({ id, dayValue: day.value }))
-                      }
-                    >
-                      <CheckBox
-                        backgroundColor={Color.Primary}
-                        isActive={day.isCheck}
-                        text={new Date(day.value).toLocaleString("ru", {
-                          day: "numeric",
-                        })}
-                        isInColumn
-                        isSmall
-                        isNoAdaptiveColor
-                        color={Color.TextStandard}
-                      />
-                    </Pressable>
-                  ))}
-            </CheckBoxesContainer>
-          ) : (
-            <TouchableHighlight onPress={() => setIsOpenPopup(true)}>
-              {sinceDay
-                ? `${
-                    sinceDay.getDate() === 2 ? "Со" : "С"
-                  } ${sinceDay.toLocaleString("ru", {
-                    month: "long",
-                    day: "numeric",
-                  })}`
-                : "Дата"}
-            </TouchableHighlight>
-          )}
-        </ContentContainer>
-        <ControlContainer>
-          {trackerMeditation || trackerTask ? (
-            <>
-              <Pressable onPress={removeTracker}>
-                <CloseIcon size={24} />
-              </Pressable>
-            </>
-          ) : (
-            <>
-              <Pressable onPress={createTracker}>
-                <CheckIcon size={22} color={Color.TextStandard} />
-              </Pressable>
-            </>
-          )}
-          <PressableRightIcon onPress={toggleTracker}>
-            <Animated.View style={styleArrowIcon}>
-              <ArrowRightIcon size={36} />
-            </Animated.View>
-          </PressableRightIcon>
-        </ControlContainer>
-      </Container>
-      {isOpenPopup && (
-        <PressableBlur onPress={() => setIsOpenPopup(false)}>
-          <Pressable>
-            <DataPopup setDayHandle={(day: Date) => setSinceDay(day)} />
-          </Pressable>
-        </PressableBlur>
-      )}
+          </ContentContainer>
+          <ControlContainer>
+            {trackerMeditation || trackerTask ? (
+              <>
+                <Pressable onPress={removeTracker}>
+                  <CloseIcon size={24} />
+                </Pressable>
+              </>
+            ) : (
+              <>
+                <Pressable onPress={createTracker}>
+                  <CheckIcon size={22} color={Color.TextStandard} />
+                </Pressable>
+              </>
+            )}
+            <PressableRightIcon onPress={toggleTracker}>
+              <Animated.View style={styleArrowIcon}>
+                <ArrowRightIcon size={36} />
+              </Animated.View>
+            </PressableRightIcon>
+          </ControlContainer>
+        </Container>
+      </AnimatedContainer>
     </>
   );
 }
 
-const PressableBlur = styled.Pressable`
-  z-index: 20;
-  align-items: center;
-  justify-content: center;
+const AnimatedContainer = styled(Animated.View)`
   position: absolute;
-  top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: ${({ theme }) => theme.backgroundColor.blur};
+  width: 83%;
+  bottom: ${normalize(90)}px;
 `;
 
-const Container = styled(Animated.View)`
+const Container = styled(Shadow)`
   padding: ${normalize(15)}px 0 ${normalize(15)}px 16%;
-  z-index: 20;
+  height: ${normalize(130)}px;
   justify-content: space-between;
   flex-direction: row;
-  position: absolute;
-  left: 0;
-  width: 80%;
-  bottom: ${normalize(90)}px;
-  height: ${normalize(130)}px;
   border-top-right-radius: ${normalize(20)}px;
   border-bottom-right-radius: ${normalize(20)}px;
   background-color: ${Color.PrimaryPastel};
-  border: ${normalize(2)}px dashed ${({ theme }) => theme.color.standard};
+  gap: ${normalize(15)}px;
 `;
 
 const ContentContainer = styled.View`
-  width: 60%;
+  width: 57%;
   justify-content: space-between;
 `;
 
 const ControlContainer = styled.View`
-  width: 35%;
+  width: 32%;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;

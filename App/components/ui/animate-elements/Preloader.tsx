@@ -13,7 +13,7 @@ import { Color } from "../../../const";
 export function Preloader() {
   const pulseScale = useSharedValue(1);
   const circleStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: pulseScale.value }],
+    transform: [{ scale: pulseScale.value } as never],
   }));
 
   useEffect(() => {

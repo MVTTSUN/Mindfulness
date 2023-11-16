@@ -41,7 +41,7 @@ export function LastMeditation() {
       duration: 500,
       easing: Easing.bezier(0.25, -0.5, 0.25, 1),
     }),
-    transform: [{ rotate: `${rotate.value * 360}deg` }],
+    transform: [{ rotate: `${rotate.value * 360}deg` } as never],
   }));
   const sizeLineActive = useSharedValue(0);
   const lineActiveStyle = useAnimatedStyle(() => ({

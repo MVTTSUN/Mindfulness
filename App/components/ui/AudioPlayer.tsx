@@ -61,18 +61,18 @@ export const AudioPlayer = memo((props: AudioPlayerProps) => {
   const rotatePlayButton = useSharedValue(0);
   const borderRadius = useSharedValue(normalize(35));
   const rotateStyle = useAnimatedStyle(() => ({
-    transform: [{ rotate: `${rotate.value * 360}deg` }],
+    transform: [{ rotate: `${rotate.value * 360}deg` } as never],
   }));
   const buttonPlayStyle = useAnimatedStyle(() => ({
     borderRadius: withTiming(borderRadius.value, {
       duration: 500,
       easing: Easing.bezier(0.25, -0.5, 0.25, 1),
     }),
-    transform: [{ rotate: `${rotatePlayButton.value * 360}deg` }],
+    transform: [{ rotate: `${rotatePlayButton.value * 360}deg` } as never],
   }));
   const scaleBackPlay = useSharedValue(1);
   const backPlayStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scaleBackPlay.value }],
+    transform: [{ scale: scaleBackPlay.value } as never],
   }));
 
   const togglePlayAudio = async () => {

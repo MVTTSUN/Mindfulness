@@ -13,7 +13,7 @@ import { LikeIcon } from "../../components/svg/icons/other-icons/LikeIcon";
 import { AudioPlayer } from "../../components/ui/AudioPlayer";
 import { useAppSelector } from "../../hooks/useAppSelector";
 import { useAppDispatch } from "../../hooks/useAppDispatch";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   addMeditationLike,
   removeMeditationLike,
@@ -66,8 +66,11 @@ import { Preloader } from "../../components/ui/animate-elements/Preloader";
 import { LevelAndConcentration } from "../../components/ui/LevelAndConcentration";
 import { getIsConcentration } from "../../store/concentrationSelectors";
 import { setIsUpdatePlayer } from "../../store/trackPlayerSlice";
+import { DataPopup } from "../../components/ui/popups/DataPopup";
 
 export function Meditation() {
+  const [isOpenPopupData, setIsOpenPopupData] = useState(false);
+  const [sinceDay, setSinceDay] = useState<Date | null>(null);
   const route = useRoute();
   const { meditationId } = route.params as { meditationId: string };
   const navigation = useNavigation<MeditationScreenProp & NotesScreenProp>();
@@ -91,7 +94,7 @@ export function Meditation() {
   const { onErrorToast, onSuccessToast } = useToastCustom();
   const scaleLike = useSharedValue(1);
   const likeStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scaleLike.value }],
+    transform: [{ scale: scaleLike.value } as never],
   }));
 
   const toggleLike = () => {
@@ -280,7 +283,13 @@ export function Meditation() {
       </GlobalScreen>
       {meditation && !isConcentration && (
         <>
-          <Tracker id={meditationId} title={meditation?.title} />
+          <Tracker
+            id={meditationId}
+            title={meditation?.title}
+            setIsOpenPopupDataHandle={setIsOpenPopupData}
+            setSinceDayHandle={setSinceDay}
+            sinceDay={sinceDay}
+          />
           <Animated.View
             entering={FadeIn.duration(100)}
             exiting={FadeOut.duration(100)}
@@ -298,9 +307,27 @@ export function Meditation() {
           </Animated.View>
         </>
       )}
+      {isOpenPopupData && (
+        <PressableBlur onPress={() => setIsOpenPopupData(false)}>
+          <Pressable>
+            <DataPopup setDayHandle={(day: Date) => setSinceDay(day)} />
+          </Pressable>
+        </PressableBlur>
+      )}
     </OverflowContainer>
   );
 }
+
+const PressableBlur = styled.Pressable`
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: ${({ theme }) => theme.backgroundColor.blur};
+`;
 
 const OverflowContainer = styled.View`
   flex: 1;
@@ -308,7 +335,6 @@ const OverflowContainer = styled.View`
 `;
 
 const PressableStyled = styled.Pressable`
-  z-index: 5;
   position: absolute;
   right: ${normalize(30)}px;
   bottom: ${normalize(90)}px;

@@ -1,10 +1,10 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { InfoAndSettings } from "../tabNavigatePages/InfoAndSettings";
-import { Contacts } from "../stackNavigatePages/Contacts";
-import { Service } from "../stackNavigatePages/Service";
-import { Notification } from "../stackNavigatePages/Notification";
-import { ImportAndExport } from "../stackNavigatePages/ImportAndExport";
-import { Storage } from "../stackNavigatePages/Storage";
+import { InfoAndSettings } from "../tab-pages/InfoAndSettings";
+import { Contacts } from "../stack-pages/Contacts";
+import { Service } from "../stack-pages/Service";
+import { Notification } from "../stack-pages/Notification";
+import { ImportAndExport } from "../stack-pages/ImportAndExport";
+import { Storage } from "../stack-pages/Storage";
 import { AppRoute } from "../../const";
 
 const Stack = createNativeStackNavigator();

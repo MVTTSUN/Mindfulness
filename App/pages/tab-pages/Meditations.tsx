@@ -46,11 +46,11 @@ export function Meditations() {
   const dispatch = useAppDispatch();
   const scaleLike = useSharedValue(1);
   const likeStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scaleLike.value }],
+    transform: [{ scale: scaleLike.value } as never],
   }));
   const scaleDownload = useSharedValue(1);
   const downloadStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scaleDownload.value }],
+    transform: [{ scale: scaleDownload.value } as never],
   }));
 
   const findFavorites = () => {

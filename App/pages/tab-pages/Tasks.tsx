@@ -27,7 +27,7 @@ export function Tasks() {
   const dispatch = useAppDispatch();
   const scaleLike = useSharedValue(1);
   const likeStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scaleLike.value }],
+    transform: [{ scale: scaleLike.value } as never],
   }));
 
   const findFavorites = () => {

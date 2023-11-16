@@ -61,12 +61,14 @@ export function LastMeditation() {
       if (
         (playbackState.state === State.Stopped ||
           playbackState.state === State.Ended ||
-          playbackState.state === State.None) &&
+          playbackState.state === State.None ||
+          isUpdatePlayer) &&
         lastMeditation !== null
       ) {
         await TrackPlayer.reset();
         await TrackPlayer.add([lastMeditation]);
         await TrackPlayer.play();
+        dispatch(setIsUpdatePlayer(false));
       }
       if (
         playbackState.state === State.Paused ||
@@ -111,14 +113,6 @@ export function LastMeditation() {
       onErrorToast(ErrorMessage.NoConnect);
     }
   }, [playbackState.state]);
-
-  useEffect(() => {
-    if (isUpdatePlayer && lastMeditation !== null) {
-      TrackPlayer.reset();
-      TrackPlayer.add([lastMeditation]);
-      dispatch(setIsUpdatePlayer(false));
-    }
-  }, [isUpdatePlayer]);
 
   return (
     <>

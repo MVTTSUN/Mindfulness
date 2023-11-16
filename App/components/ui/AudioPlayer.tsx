@@ -81,7 +81,8 @@ export const AudioPlayer = memo((props: AudioPlayerProps) => {
 
       if (
         currentAudio?.id !== meditation.id ||
-        playbackState.state === State.Stopped
+        playbackState.state === State.Stopped ||
+        isUpdatePlayer
       ) {
         setPosition(0);
         await TrackPlayer.reset();
@@ -89,6 +90,7 @@ export const AudioPlayer = memo((props: AudioPlayerProps) => {
         await TrackPlayer.play();
         setIsCurrentAudio(true);
         dispatch(setLastMeditation(meditation));
+        dispatch(setIsUpdatePlayer(false));
       }
 
       if (currentAudio?.id === meditation.id && currentAudio?.id !== null) {
@@ -179,18 +181,6 @@ export const AudioPlayer = memo((props: AudioPlayerProps) => {
       });
     }
   }, [playbackState.state, isCurrentAudio]);
-
-  useEffect(() => {
-    if (isUpdatePlayer && meditation) {
-      TrackPlayer.reset();
-      TrackPlayer.add([meditation]);
-      dispatch(setIsUpdatePlayer(false));
-    }
-
-    if (!meditation) {
-      dispatch(setIsUpdatePlayer(false));
-    }
-  }, [isUpdatePlayer]);
 
   useEffect(() => {
     rotate.value = withRepeat(

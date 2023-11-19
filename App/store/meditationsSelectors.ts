@@ -17,6 +17,13 @@ const getKindMeditations = (state: Pick<RootState, SliceName.Meditations>) => st
 const getIsLikeMeditations = (state: Pick<RootState, SliceName.Meditations>) => state[SliceName.Meditations].isLikeMeditations;
 const getIsDownloadMeditations = (state: Pick<RootState, SliceName.Meditations>) => state[SliceName.Meditations].isDownloadMeditations;
 const getCountMeditations = (state: Pick<RootState, SliceName.Meditations>) => state[SliceName.Meditations].countMeditations;
+const getMeditationId = (title: string) => (state: Pick<RootState, SliceName.Meditations>) => {
+  const meditations = state[SliceName.Meditations].meditations.filter((task) => task.title === title);
+  if (meditations.length > 0) {
+    return meditations[0]._id;
+  }
+  return null;
+};
 const getFilteredMeditations = createSelector(
   [
     getMeditations,
@@ -77,6 +84,7 @@ const getDownloadMeditations = createSelector(
 );
 
 export {
+  getMeditationId,
   getMeditations,
   getSearchMeditations,
   getIsLikeMeditations,

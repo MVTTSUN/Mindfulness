@@ -67,6 +67,8 @@ enum AppRoute {
   ImportAndExport = "ImportAndExport",
   Storage = "Storage",
   Tips = "Tips",
+  TaskNote = "TaskNote",
+  MeditationNote = "MeditationNote",
 }
 
 enum NameFolder {

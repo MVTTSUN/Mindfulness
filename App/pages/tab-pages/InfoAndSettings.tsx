@@ -65,7 +65,7 @@ export function InfoAndSettings() {
             >
               <ViewLine>
                 <ImportAndExportIcon />
-                <TextLine>Импорт/экспорт</TextLine>
+                <TextLine>Экспорт/импорт</TextLine>
               </ViewLine>
             </Pressable>
             <Pressable onPress={() => navigation.navigate(AppRoute.Storage)}>

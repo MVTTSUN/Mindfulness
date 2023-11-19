@@ -42,12 +42,12 @@ export const mindfulnessApi = createApi({
         return ApiRoute.Tasks;
       },
     }),
-    getTask: builder.query<DataTextLottieImage, string>({
-      query: (id) => {
+    getTask: builder.query<DataTextLottieImage, { id: string, isStatistics: boolean }>({
+      query: ({ id, isStatistics }) => {
         return {
           url: `${ApiRoute.Tasks}/${id}`,
           headers: {
-            "platform": Platform.OS,
+            "platform": isStatistics ? Platform.OS : 'none',
           },
         }
       },
@@ -65,12 +65,12 @@ export const mindfulnessApi = createApi({
         return ApiRoute.Meditations;
       },
     }),
-    getMeditation: builder.query<DataMeditation, string>({
-      query: (id) => {
+    getMeditation: builder.query<DataMeditation, { id: string, isStatistics: boolean }>({
+      query: ({ id, isStatistics }) => {
         return {
           url: `${ApiRoute.Meditations}/${id}`,
           headers: {
-            "platform": Platform.OS,
+            "platform": isStatistics ? Platform.OS : 'none',
           },
         }
       },

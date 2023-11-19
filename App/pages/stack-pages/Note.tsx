@@ -21,6 +21,10 @@ import EmotionsPopup from "../../components/ui/popups/EmotionsPopup";
 import { useAppDispatch } from "../../hooks/useAppDispatch";
 import { addNote, removeNotes, updateNote } from "../../store/notesSlice";
 import { normalize } from "../../utils";
+import { TextIcon } from "../../components/svg/icons/other-icons/TextIcon";
+import { useAppSelector } from "../../hooks/useAppSelector";
+import { getTaskId } from "../../store/tasksSelectors";
+import { getMeditationId } from "../../store/meditationsSelectors";
 
 function Note() {
   const [isRenderOne, setIsRenderOne] = useState(false);
@@ -56,6 +60,8 @@ function Note() {
   const prevStateAfterUnmount = useRef(dataAfterUnmount.current);
   const route = useRoute();
   const navigation = useNavigation<NotesScreenProp>();
+  const taskId = useAppSelector(getTaskId(nameNote.split(": ")[1]));
+  const meditationId = useAppSelector(getMeditationId(nameNote.split(": ")[1]));
   const dispatch = useAppDispatch();
 
   const setNameNoteHandle = (
@@ -192,9 +198,24 @@ function Note() {
       <GlobalScreen withoutScrollView>
         <CenterContainer>
           <HeaderWithBack isCustomPress onPress={back}>
-            <Pressable onPress={back}>
-              <CheckIcon />
-            </Pressable>
+            <ToolsContainer>
+              <Pressable
+                onPress={() => {
+                  if (taskId) {
+                    navigation.navigate(AppRoute.TaskNote, { taskId });
+                  } else if (meditationId) {
+                    navigation.navigate(AppRoute.MeditationNote, {
+                      meditationId,
+                    });
+                  }
+                }}
+              >
+                <TextIcon disabled={!(taskId || meditationId)} />
+              </Pressable>
+              <Pressable onPress={back}>
+                <CheckIcon />
+              </Pressable>
+            </ToolsContainer>
           </HeaderWithBack>
           <FlatList
             ref={flatListRef}
@@ -279,7 +300,7 @@ function Note() {
                         return prevStateCopy;
                       })
                     }
-                    height={150}
+                    height={300}
                     borderColor={backgroundColor}
                   />
                 </>
@@ -326,6 +347,12 @@ function Note() {
 }
 
 export default memo(Note);
+
+const ToolsContainer = styled.View`
+  flex-direction: row;
+  align-items: center;
+  gap: 20px;
+`;
 
 const PressableStyled = styled.Pressable`
   height: 70%;

@@ -1,3 +1,4 @@
+import { Text } from 'react-native';
 import store from "./store/store";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
@@ -29,6 +30,8 @@ type InfoAndSettingsScreenProp = NativeStackNavigationProp<{
 }>;
 
 type NotesScreenProp = NativeStackNavigationProp<{
+  TaskNote: { taskId: string };
+  MeditationNote: { meditationId: string };
   Statistics: undefined;
   Note:
     | undefined
@@ -194,7 +197,7 @@ type DataTips = {
   type: string;
   payload: string;
   id: string;
-}
+};
 
 type ExportJSONData = {
     likes: {
@@ -206,7 +209,11 @@ type ExportJSONData = {
       trackersMeditation: Tracker[];
       trackersTask: Tracker[];
     }
-}
+};
+
+type TextWithDefaultProps = Text & {
+  defaultProps?: { allowFontScaling?: boolean };
+};
 
 export {
   RootState,
@@ -231,5 +238,6 @@ export {
   DataTips,
   DownloadAudio,
   Tracker,
-  ExportJSONData
+  ExportJSONData,
+  TextWithDefaultProps,
 };

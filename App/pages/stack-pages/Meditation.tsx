@@ -167,7 +167,7 @@ export function Meditation() {
   };
 
   const downloadData = async () => {
-    const { data } = await getMeditationQuery(meditationId);
+    const { data } = await getMeditationQuery({ id: meditationId, isStatistics: true });
 
     if (data) {
       if (!deepEqual(data, dataMeditationCopy)) {
@@ -191,11 +191,22 @@ export function Meditation() {
           if (duration) {
             result.duration = duration;
           }
-          result.url =
-            BASE_URL +
-            ApiRoute.Meditations +
-            ApiRoute.Filename +
-            `/${data.audio}`;
+          if (isDownload) {
+            result.url = await download(
+              BASE_URL +
+                ApiRoute.Meditations +
+                ApiRoute.Filename +
+                `/${data.audio}`,
+              NameFolder.Meditations + `/${meditationId}`,
+              data.audio
+            );
+          } else {
+            result.url =
+              BASE_URL +
+              ApiRoute.Meditations +
+              ApiRoute.Filename +
+              `/${data.audio}`;
+          }
           const uriImage = await download(
             BASE_URL +
               ApiRoute.Meditations +
@@ -209,7 +220,6 @@ export function Meditation() {
           }
           dispatch(setMeditationsInMeditation(result));
           dispatch(setDataMeditationsCopy(data));
-          dispatch(removeDownloadAudio(meditationId));
         } catch {
           onErrorToast(ErrorMessage.DownloadFile);
         }

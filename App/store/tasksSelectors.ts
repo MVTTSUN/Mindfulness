@@ -12,6 +12,13 @@ const getSearchTasks = (state: Pick<RootState, SliceName.Tasks>) => state[SliceN
 const getKindTasks = (state: Pick<RootState, SliceName.Tasks>) => state[SliceName.Tasks].kindTasks;
 const getIsLikeTasks = (state: Pick<RootState, SliceName.Tasks>) => state[SliceName.Tasks].isLikeTasks;
 const getCountTasks = (state: Pick<RootState, SliceName.Tasks>) => state[SliceName.Tasks].countTasks;
+const getTaskId = (title: string) => (state: Pick<RootState, SliceName.Tasks>) => {
+  const tasks = state[SliceName.Tasks].tasks.filter((task) => task.title === title);
+  if (tasks.length > 0) {
+    return tasks[0]._id;
+  }
+  return null;
+};
 const getFilteredTasks = createSelector(
   [getTasks, getSearchTasks, getKindTasks, getIsLikeTasks, getLikesTask],
   (tasks, searchTasks, kindTasks, isLikeTasks, likesTask) => {
@@ -54,6 +61,7 @@ const getCountFilteredTasks = createSelector(
 );
 
 export {
+  getTaskId,
   getTasks,
   getSearchTasks,
   getIsLikeTasks,

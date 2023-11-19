@@ -2,8 +2,8 @@ import { StatusBar } from "expo-status-bar";
 import { NavigationContainer } from "@react-navigation/native";
 import { memo, useCallback, useEffect } from "react";
 import { useFonts } from "expo-font";
-import * as SplashScreen from "expo-splash-screen";
 import * as NavigationBar from "expo-navigation-bar";
+import BootSplash from "react-native-bootsplash";
 import { ThemeProvider, styled } from "styled-components/native";
 import { Color, DARK_THEME, ErrorMessage, LIGHT_THEME, Theme } from "./const";
 import { useAppSelector } from "./hooks/useAppSelector";
@@ -21,8 +21,6 @@ import { useNotifee } from "./hooks/useNotifee";
 import { AppState, useColorScheme } from "react-native";
 import { changeTheme } from "./store/themeSlice";
 import { useAppDispatch } from "./hooks/useAppDispatch";
-
-SplashScreen.preventAutoHideAsync();
 
 export const App = memo(() => {
   const colorScheme = useColorScheme();
@@ -44,7 +42,7 @@ export const App = memo(() => {
 
   const onLayoutRootView = useCallback(async () => {
     if (fontsLoaded) {
-      await SplashScreen.hideAsync();
+      await BootSplash.hide({ fade: true });
     }
   }, [fontsLoaded]);
 
@@ -141,7 +139,22 @@ export const App = memo(() => {
     >
       <ViewStyled onLayout={onLayoutRootView}>
         <ThemeProvider theme={theme === Theme.Light ? LIGHT_THEME : DARK_THEME}>
-          <NavigationContainer>
+          <NavigationContainer
+            theme={{
+              dark: false,
+              colors: {
+                background:
+                  theme === Theme.Light
+                    ? LIGHT_THEME.backgroundColor.main
+                    : DARK_THEME.backgroundColor.main,
+                primary: "",
+                card: "",
+                text: "",
+                border: "",
+                notification: "",
+              },
+            }}
+          >
             <TabNavigator />
             <StatusBar
               style={theme === Theme.Light ? Theme.Dark : Theme.Light}

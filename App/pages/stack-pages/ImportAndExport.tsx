@@ -112,11 +112,16 @@ export function ImportAndExport() {
     <GlobalScreen>
       <CenterContainer>
         <HeaderWithBack>
-          <TextTitle>Импорт/экспорт</TextTitle>
+          <TextTitle>Экспорт/импорт</TextTitle>
         </HeaderWithBack>
         <TextInfo>
-          {`Экспортируются только избранные медитации и задания, трекеры медитаций и заданий, и ежедневник. Файл будет иметь такой вид: "${NAME_FILE_JSON}"`}
+          10 Экспорт и импорт нужен, если вы собираетесь удалить на какое-то
+          время приложение с вашего устройства и в будущем вернуться.
         </TextInfo>
+        <TextInfo>
+          {`Экспорт - сохраняет медитации и задания, которые вы добавили в избранное, трекеры медитаций и заданий, которые вы создали, и все ваши заметки в ежедневнике. Всё сохраняется в файл "${NAME_FILE_JSON}" на вашем устройстве.`}
+        </TextInfo>
+        <TextInfo>{`Импорт - позволяет восстановить все вышеперечисленные данные из файла "${NAME_FILE_JSON}".`}</TextInfo>
         <ButtonContainer>
           <TouchableHighlight onPress={exportFile}>Экспорт</TouchableHighlight>
           <TouchableHighlight onPress={importFile}>Импорт</TouchableHighlight>

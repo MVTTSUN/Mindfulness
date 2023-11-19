@@ -47,6 +47,7 @@ import { Preloader } from "../../components/ui/animate-elements/Preloader";
 import { LevelAndConcentration } from "../../components/ui/LevelAndConcentration";
 import { getIsConcentration } from "../../store/concentrationSelectors";
 import { DataPopup } from "../../components/ui/popups/DataPopup";
+import { getValueTheme } from "../../store/themeSelectors";
 
 export function Task() {
   const [isOpenPopupData, setIsOpenPopupData] = useState(false);
@@ -54,7 +55,7 @@ export function Task() {
   const route = useRoute();
   const { taskId } = route.params as { taskId: string };
   const navigation = useNavigation<NotesScreenProp & TasksScreenProp>();
-  const theme = useAppSelector((state) => state.theme.value);
+  const theme = useAppSelector(getValueTheme);
   const isLike = useAppSelector(getIsLikeTask(taskId));
   const dataTaskCopy = useAppSelector(getDataTaskCopy(taskId));
   const task = useAppSelector(getTaskInTask(taskId));
@@ -91,7 +92,7 @@ export function Task() {
   };
 
   const downloadData = async () => {
-    const { data } = await getTaskQuery(taskId);
+    const { data } = await getTaskQuery({ id: taskId, isStatistics: true });
 
     if (data) {
       if (!deepEqual(data, dataTaskCopy)) {

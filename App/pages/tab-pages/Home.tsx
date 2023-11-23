@@ -6,6 +6,7 @@ import { CenterContainer } from "../../components/CenterContainer";
 import { Subtitle } from "../../components/ui/titles/Subtitle";
 import { CardListMeditation } from "../../components/ui/lists/CardListMeditation";
 import { CardListMain } from "../../components/ui/lists/CardListMain";
+import { CardListTasks } from "../../components/ui/lists/CardListTasks";
 
 export function Home() {
   return (
@@ -19,6 +20,8 @@ export function Home() {
       <CenterContainer>
         <Subtitle>Подходящие медитации</Subtitle>
         <CardListMeditation count={6} />
+        <Subtitle>Подходящие задания</Subtitle>
+        <CardListTasks count={6} />
       </CenterContainer>
     </GlobalScreen>
   );

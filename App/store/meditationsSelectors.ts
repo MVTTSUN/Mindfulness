@@ -38,7 +38,7 @@ const getFilteredMeditations = createSelector(
     return meditations.filter((meditation) =>
       (kindMeditations === "Все"
         ? true
-        : meditation.kind === kindMeditations) &&
+        : meditation.kind.includes(kindMeditations)) &&
       (searchMeditations.trim() === ""
         ? true
         : meditation.title && meditation.title

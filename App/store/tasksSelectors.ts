@@ -25,7 +25,7 @@ const getFilteredTasks = createSelector(
     return tasks.filter((task) =>
       (kindTasks === "Все"
         ? true
-        : task.kind === kindTasks) &&
+        : task.kind?.includes(kindTasks)) &&
       (searchTasks.trim() === ""
         ? true
         : task.title && task.title

@@ -1,7 +1,11 @@
 import { styled } from "styled-components/native";
 import { DataTextLottieImage, TasksScreenProp } from "../../../types";
 import { TouchableHighlightCard } from "../touchables/TouchableHighlightCard";
-import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import {
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+} from "@react-navigation/native";
 import { useEffect, useCallback } from "react";
 import { useAppSelector } from "../../../hooks/useAppSelector";
 import { useAppDispatch } from "../../../hooks/useAppDispatch";
@@ -31,6 +35,7 @@ type CardListTasksProps = {
 
 export function CardListTasks(props: CardListTasksProps) {
   const { count } = props;
+  const route = useRoute();
   const navigation = useNavigation<TasksScreenProp>();
   const tasks = useAppSelector(getTasks);
   const countFilteredTasks = useAppSelector(getCountFilteredTasks);
@@ -43,6 +48,8 @@ export function CardListTasks(props: CardListTasksProps) {
   const seeAll = () => {
     dispatch(setCountTasks(tasks.length));
   };
+
+  const navigateTasks = () => navigation.navigate(AppRoute.TasksStack);
 
   const loadingData = async () => {
     const { data } = await getTasksQuery();
@@ -105,7 +112,11 @@ export function CardListTasks(props: CardListTasksProps) {
             tasks.length > count
           ) {
             return (
-              <TouchableHighlightCard isAll key={task._id} onPress={seeAll}>
+              <TouchableHighlightCard
+                isAll
+                key={task._id}
+                onPress={route.name === AppRoute.Home ? navigateTasks : seeAll}
+              >
                 Смотреть все
               </TouchableHighlightCard>
             );
@@ -116,9 +127,19 @@ export function CardListTasks(props: CardListTasksProps) {
               backgroundColor={Color.Task}
               underlayColor={Color.TaskPressed}
               key={task._id}
-              onPress={() =>
-                navigation.navigate(AppRoute.Task, { taskId: task._id })
-              }
+              onPress={() => {
+                if (route.name === AppRoute.Home) {
+                  navigation.navigate(AppRoute.TasksStack, {
+                    screen: AppRoute.Tasks,
+                    params: {
+                      screen: AppRoute.Task,
+                      taskId: task._id,
+                    },
+                  });
+                } else {
+                  navigation.navigate(AppRoute.Task, { taskId: task._id });
+                }
+              }}
             >
               {task.title}
             </TouchableHighlightCard>

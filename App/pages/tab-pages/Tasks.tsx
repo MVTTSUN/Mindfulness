@@ -4,7 +4,7 @@ import { CenterContainer } from "../../components/CenterContainer";
 import { Input } from "../../components/ui/inputs/Input";
 import { styled } from "styled-components/native";
 import { Select } from "../../components/ui/inputs/Select";
-import { Color, OPTIONS_DATA_TASKS } from "../../const";
+import { AppRoute, Color, OPTIONS_DATA_TASKS } from "../../const";
 import { CardListTasks } from "../../components/ui/lists/CardListTasks";
 import { LikeIcon } from "../../components/svg/icons/other-icons/LikeIcon";
 import Animated, {
@@ -13,15 +13,22 @@ import Animated, {
   withSequence,
   withSpring,
 } from "react-native-reanimated";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { useAppDispatch } from "../../hooks/useAppDispatch";
 import { useAppSelector } from "../../hooks/useAppSelector";
-import { useFocusEffect } from "@react-navigation/native";
+import {
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+} from "@react-navigation/native";
 import { setIsLikeTasks, setSearchTasks } from "../../store/tasksSlice";
 import { normalize } from "../../utils";
 import { getIsLikeTasks, getSearchTasks } from "../../store/tasksSelectors";
+import { TasksScreenProp } from "../../types";
 
 export function Tasks() {
+  const route = useRoute();
+  const navigation = useNavigation<TasksScreenProp>();
   const searchTasks = useAppSelector(getSearchTasks);
   const isLikeTasks = useAppSelector(getIsLikeTasks);
   const dispatch = useAppDispatch();
@@ -54,6 +61,13 @@ export function Tasks() {
       };
     }, [])
   );
+
+  useEffect(() => {
+    if (route.params) {
+      const { taskId } = route.params as { taskId: string };
+      navigation.navigate(AppRoute.Task, { taskId });
+    }
+  }, [route.params]);
 
   return (
     <GlobalScreen>

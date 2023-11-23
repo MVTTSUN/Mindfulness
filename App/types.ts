@@ -54,7 +54,10 @@ type NotesScreenProp = NativeStackNavigationProp<{
 type TasksScreenProp = NativeStackNavigationProp<{
   Task: undefined | { taskId: string };
   Tasks: undefined;
-  TasksStack: undefined;
+  TasksStack: undefined | {
+    screen: string;
+    params: { screen: string; taskId: string };
+  };
 }>;
 
 type MainCard = {

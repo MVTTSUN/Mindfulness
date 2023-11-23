@@ -24,10 +24,13 @@ export function Select(props: SelectProps) {
   const dispatch = useAppDispatch();
 
   const changeKind = (title: string) => {
-    if (route.name === AppRoute.Meditations || route.name === AppRoute.Home) {
+    if (route.name === AppRoute.Meditations) {
       dispatch(setKindMeditations(title));
     } else if (route.name === AppRoute.Tasks) {
       dispatch(setKindTasks(title));
+    } else if (route.name === AppRoute.Home) {
+      dispatch(setKindMeditations(title.slice(0, 4)));
+      dispatch(setKindTasks(title.slice(0, 4)));
     }
   };
 
@@ -42,8 +45,8 @@ export function Select(props: SelectProps) {
               onPress={() => changeKind(option.title)}
               isActive={
                 route.name === AppRoute.Tasks
-                  ? kindTasks === option.title
-                  : kindMeditations === option.title
+                  ? option.title.includes(kindTasks)
+                  : option.title.includes(kindMeditations)
               }
             >
               {option.title}

@@ -6,6 +6,7 @@ const initialState = {
   meditations: [] as DataMeditation[],
   meditationsInMeditation: [] as MeditationPlayer[],
   dataMeditationsCopy: [] as DataMeditation[],
+  randomOrSortMeditations: [] as DataMeditation[],
   searchMeditations: "",
   kindMeditations: "Все",
   isLikeMeditations: false,
@@ -67,6 +68,15 @@ export const meditationsSlice = createSlice({
     setCountMeditations(state, action) {
       state.countMeditations = action.payload;
     },
+    setToggleRandomOrSortMeditations(state, action) {
+      const meditations = JSON.parse(JSON.stringify(state.meditations)) as DataMeditation[];
+
+      if (action.payload === "random") {
+        state.randomOrSortMeditations = meditations.sort(() => Math.random() - 0.5);
+      } else if (action.payload === "sort") {
+        state.randomOrSortMeditations = meditations.sort((a, b) => a.title && b.title ? a.title.localeCompare(b.title) : -1);
+      }
+    }
   },
 });
 
@@ -81,6 +91,7 @@ export const {
   setCountMeditations,
   setDataMeditationsCopy,
   deleteDataMeditationsCopy,
+  setToggleRandomOrSortMeditations
 } = meditationsSlice.actions;
 
 export default meditationsSlice.reducer;

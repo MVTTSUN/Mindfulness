@@ -25,6 +25,7 @@ import {
   setKindMeditations,
   setMeditations,
   setSearchMeditations,
+  setToggleRandomOrSortMeditations,
 } from "../../../store/meditationsSlice";
 import { getIsOffline } from "../../../store/offlineSelectors";
 import { AppRoute, Color, ErrorMessage, NameFolder } from "../../../const";
@@ -86,6 +87,8 @@ export function CardListMeditation(props: CardListMeditationProps) {
             dispatch(removeDownloadAudio(meditation._id));
           }
           dispatch(setMeditations(data));
+          route.name === AppRoute.Home &&
+            dispatch(setToggleRandomOrSortMeditations("random"));
         } catch {
           onErrorToast(ErrorMessage.DeleteFile);
         }
@@ -109,6 +112,10 @@ export function CardListMeditation(props: CardListMeditationProps) {
     if (!isOffline) {
       loadingData();
     }
+
+    route.name === AppRoute.Home
+      ? dispatch(setToggleRandomOrSortMeditations("random"))
+      : dispatch(setToggleRandomOrSortMeditations("sort"));
   }, []);
 
   return (

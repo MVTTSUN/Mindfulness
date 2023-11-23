@@ -20,6 +20,7 @@ import {
   setKindTasks,
   setSearchTasks,
   setTasks,
+  setToggleRandomOrSortTasks,
 } from "../../../store/tasksSlice";
 import { normalize } from "../../../utils";
 import { useFileSystem } from "../../../hooks/useFileSystem";
@@ -75,6 +76,8 @@ export function CardListTasks(props: CardListTasksProps) {
             dispatch(removeTaskLike(task._id));
           }
           dispatch(setTasks(data));
+          route.name === AppRoute.Home &&
+            dispatch(setToggleRandomOrSortTasks("random"));
         } catch {
           onErrorToast(ErrorMessage.DeleteFile);
         }
@@ -98,6 +101,10 @@ export function CardListTasks(props: CardListTasksProps) {
     if (!isOffline) {
       loadingData();
     }
+
+    route.name === AppRoute.Home
+      ? dispatch(setToggleRandomOrSortTasks("random"))
+      : dispatch(setToggleRandomOrSortTasks("sort"));
   }, []);
 
   return (

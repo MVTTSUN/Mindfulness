@@ -24,9 +24,10 @@ const getMeditationId = (title: string) => (state: Pick<RootState, SliceName.Med
   }
   return null;
 };
+const getRandomOrSortMeditations = (state: Pick<RootState, SliceName.Meditations>) => state[SliceName.Meditations].randomOrSortMeditations;
 const getFilteredMeditations = createSelector(
   [
-    getMeditations,
+    getRandomOrSortMeditations,
     getSearchMeditations,
     getKindMeditations,
     getIsLikeMeditations,

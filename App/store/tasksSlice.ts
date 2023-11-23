@@ -6,6 +6,7 @@ const initialState = {
   tasks: [] as DataTextLottieImage[],
   tasksInTask: [] as DataTextLottieImage[],
   dataTasksCopy: [] as DataTextLottieImage[],
+  randomOrSortTasks: [] as DataTextLottieImage[],
   searchTasks: "",
   kindTasks: "Все",
   isLikeTasks: false,
@@ -63,6 +64,15 @@ export const tasksSlice = createSlice({
     setCountTasks(state, action) {
       state.countTasks = action.payload;
     },
+    setToggleRandomOrSortTasks(state, action) {
+      const tasks = JSON.parse(JSON.stringify(state.tasks)) as DataTextLottieImage[];
+
+      if (action.payload === "random") {
+        state.randomOrSortTasks = tasks.sort(() => Math.random() - 0.5);
+      } else if (action.payload === "sort") {
+        state.randomOrSortTasks = tasks.sort((a, b) => a.title && b.title ? a.title.localeCompare(b.title) : -1);
+      }
+    }
   },
 });
 
@@ -76,6 +86,7 @@ export const {
   setCountTasks,
   setDataTasksCopy,
   deleteDataTasksCopy,
+  setToggleRandomOrSortTasks,
 } = tasksSlice.actions;
 
 export default tasksSlice.reducer;

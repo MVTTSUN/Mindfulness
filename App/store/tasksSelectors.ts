@@ -19,8 +19,9 @@ const getTaskId = (title: string) => (state: Pick<RootState, SliceName.Tasks>) =
   }
   return null;
 };
+const getRandomOrSortTasks = (state: Pick<RootState, SliceName.Tasks>) => state[SliceName.Tasks].randomOrSortTasks;
 const getFilteredTasks = createSelector(
-  [getTasks, getSearchTasks, getKindTasks, getIsLikeTasks, getLikesTask],
+  [getRandomOrSortTasks, getSearchTasks, getKindTasks, getIsLikeTasks, getLikesTask],
   (tasks, searchTasks, kindTasks, isLikeTasks, likesTask) => {
     return tasks.filter((task) =>
       (kindTasks === "Все"
